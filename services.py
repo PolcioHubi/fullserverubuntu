@@ -65,7 +65,7 @@ class AccessKeyService:
         logging.info(f"Access key {key_val} is valid.")
         return True, ""
 
-    def use_access_key(self, key_val: str) -> bool:
+    def use_access_key(self, key_val: str, commit: bool = True) -> bool:
         """
         Atomically marks an access key as used.
         Uses SELECT FOR UPDATE to prevent race conditions.
@@ -84,18 +84,21 @@ class AccessKeyService:
                 key_data.used_count += 1
                 key_data.last_used = datetime.datetime.now()
                 key_data.is_active = False  # Deactivate after use
-                db.session.commit()
+                if commit:
+                    db.session.commit()
                 logging.info(f"Access key {key_val} marked as used and deactivated.")
                 return True
             elif key_data and not key_data.is_active:
-                db.session.rollback()  # Release the lock
+                if commit:
+                    db.session.rollback()  # Release the lock
                 logging.info(f"Access key {key_val} is already inactive. Not incrementing usage.")
                 return False
             else:
                 logging.warning(f"Access key {key_val} not found for usage attempt.")
                 return False
         except Exception as e:
-            db.session.rollback()
+            if commit:
+                db.session.rollback()
             logging.error(f"Error using access key {key_val}: {e}", exc_info=True)
             raise
 
@@ -318,13 +321,15 @@ class StatisticsService:
 class NotificationService:
     """Manages user notifications using SQLAlchemy."""
 
-    def create_notification(self, user_id: str, message: str):
+    def create_notification(self, user_id: str, message: str, commit: bool = True):
         try:
             new_notification = Notification(user_id=user_id, message=message)
             db.session.add(new_notification)
-            db.session.commit()
+            if commit:
+                db.session.commit()
         except Exception as e:
-            db.session.rollback()
+            if commit:
+                db.session.rollback()
             logging.error(
                 f"Error creating notification for user {user_id}: {e}", exc_info=True
             )
@@ -346,12 +351,19 @@ class NotificationService:
             for n in notifications
         ]
 
-    def mark_notification_as_read(self, notification_id: int):
+    def mark_notification_as_read(
+        self, notification_id: int, user_id: Optional[str] = None
+    ) -> bool:
         try:
-            notification = db.session.get(Notification, notification_id)
+            query = Notification.query.filter_by(id=notification_id)
+            if user_id is not None:
+                query = query.filter_by(user_id=user_id)
+            notification = query.first()
             if notification:
                 notification.is_read = True
                 db.session.commit()
+                return True
+            return False
         except Exception as e:
             db.session.rollback()
             logging.error(

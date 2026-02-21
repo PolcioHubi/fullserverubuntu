@@ -12,19 +12,19 @@
             position: fixed;
             bottom: 10px;
             right: 10px;
-            background-color: #7f8c8d;
-            color: white;
+            background-color: #20262d;
+            color: #eef1f4;
             padding: 8px 12px;
-            border-radius: 5px;
+            border-radius: 8px;
             z-index: 9999;
-            font-family: 'Courier New', Courier, monospace;
+            font-family: 'Segoe UI', Arial, sans-serif;
             font-size: 12px;
-            border: 1px solid #616a6b;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            border: 1px solid #2d343d;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
             opacity: 0.9;
         }
         .impersonation-widget a {
-            color: #ecf0f1;
+            color: #c4cfdd;
             font-weight: bold;
             text-decoration: underline;
             cursor: pointer;
@@ -32,7 +32,7 @@
         }
     </style>
     <!-- SweetAlert2 -->
-    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="/static/js/page-transitions.js" defer></script>
 </head>
 <body>
@@ -47,13 +47,12 @@
     <!-- Strona logowania dla niezalogowanych użytkowników -->
     <div class="login-page">
         <div class="login-container">
-            <h1>🔐</h1>
             <h1>Podmieniacz Danych HTML</h1>
-            <p>Zaloguj się lub zarejestruj, aby uzyskać dostęp do aplikacji</p>
+            <p>Zaloguj się lub załóż konto, aby przejść dalej</p>
 
             <div class="login-buttons">
-                <a href="/login" class="login-btn primary">🔐 Zaloguj się</a>
-                <a href="/register" class="login-btn secondary">📝 Zarejestruj się</a>
+                <a href="/login" class="login-btn primary">Zaloguj się</a>
+                <a href="/register" class="login-btn secondary">Załóż konto</a>
             </div>
 
             <div class="stats-section">
@@ -68,7 +67,7 @@
             </div>
 
             <div class="admin-link-bottom">
-                <a href="/admin">🔧 Panel administratora</a>
+                <a href="/admin">Panel administratora</a>
             </div>
         </div>
     </div>
@@ -76,15 +75,20 @@
     <!-- Główna aplikacja dla zalogowanych użytkowników -->
     <div class="main-app">
         <!-- Link do panelu administracyjnego -->
-        <a href="/admin" class="admin-link">🔧 Admin</a>
+        <a href="/admin" class="admin-link">Admin</a>
 
         <!-- Status użytkownika -->
         <div class="user-status">
             <div class="user-info-box">
-                👤 Zalogowany: <strong>{{ username }}</strong>
+                Zalogowany: <strong>{{ username }}</strong>
             </div>
-            <a href="/logout" class="logout-btn">🚪 Wyloguj</a>
-            <a href="/profile" class="logout-btn">👤 Profil</a>
+            <a href="/logout" class="logout-btn">Wyloguj</a>
+            <a href="/profile" class="logout-btn">Profil / Dokument</a>
+        </div>
+
+        <div id="mobileActionDock" class="mobile-action-dock" aria-hidden="true">
+            <a href="/profile" class="mobile-action-btn">Profil / Dokument</a>
+            <a href="/logout" class="mobile-action-btn">Wyloguj</a>
         </div>
 
         <div class="stats-section">
@@ -117,7 +121,7 @@
             <p class="description">Wypełnij formularz nowymi danymi, które zastąpią istniejące dane w pliku HTML.</p>
 
             <div class="disclaimer">
-                <h3>⚠️ UWAGA - CELE EDUKACYJNE</h3>
+                <h3>UWAGA - CELE EDUKACYJNE</h3>
                 <p>Ta aplikacja została stworzona wyłącznie w celach edukacyjnych i demonstracyjnych. Nie należy jej używać do tworzenia fałszywych dokumentów ani do jakichkolwiek nielegalnych działań. Użytkownik ponosi pełną odpowiedzialność za sposób wykorzystania tej aplikacji.</p>
             </div>
 
@@ -136,7 +140,47 @@
                     <div class="form-group">
                         <label for="image_upload">Wgraj zdjęcie (zdjecie_686510da4d2591.91511191.jpg):</label>
                         <input type="file" id="image_upload" name="image_upload" accept="image/*">
-                        <img id="imagePreview" src="" alt="Podgląd zdjęcia" style="max-width: 100%; height: auto; display: none; margin-top: 10px;">
+                        <div class="photo-preview-layout">
+                            <div class="photo-preview-panel">
+                                <p class="photo-preview-title">Podgląd zdjęcia</p>
+                                <img id="imagePreview" class="photo-preview-image" src="" alt="Podgląd zdjęcia">
+                                <p class="photo-preview-note">Miniatura jest pomniejszona dla wygody. Oryginał pozostaje bez zmian.</p>
+                            </div>
+                            <div class="id-demo-panel">
+                                <p class="photo-preview-title">Demo na dowodzie (jak w szablonie)</p>
+                                <div class="id-demo-card">
+                                    <div class="id-demo-main">
+                                        <section class="id-demo-left">
+                                            <div class="id-demo-photo-wrap">
+                                                <img id="imagePreviewCard" class="id-demo-photo" src="" alt="Podgląd zdjęcia na dowodzie">
+                                                <span id="imagePreviewCardPlaceholder" class="id-demo-photo-placeholder">BRAK ZDJĘCIA</span>
+                                            </div>
+                                            <img class="id-demo-flag" src="/static/flaga.gif?v=1" alt="Flaga">
+                                            <div class="id-demo-rzecz">
+                                                <img class="id-demo-godlo" src="/static/godlo.gif?v=1" alt="Godło">
+                                                <p>Rzeczpospolita<br>Polska</p>
+                                            </div>
+                                        </section>
+                                        <section class="id-demo-right">
+                                            <p id="demoImie" class="id-demo-value">PIOTR</p>
+                                            <p class="id-demo-sub">Imię (Imiona)</p>
+                                            <p id="demoNazwisko" class="id-demo-value">KOWALSKI</p>
+                                            <p class="id-demo-sub">Nazwisko</p>
+                                            <p id="demoObywatelstwo" class="id-demo-value">POLSKIE</p>
+                                            <p class="id-demo-sub">Obywatelstwo</p>
+                                            <p id="demoDataUrodzenia" class="id-demo-value">15.03.1985</p>
+                                            <p class="id-demo-sub">Data urodzenia</p>
+                                            <p id="demoPesel" class="id-demo-value">85031512345</p>
+                                            <p class="id-demo-sub">Numer PESEL</p>
+                                        </section>
+                                    </div>
+                                    <div class="id-demo-bottom">
+                                        <img src="/static/checkmark.svg?v=1" alt="checkmark">
+                                        <p>Dokument ważny</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </fieldset>
 
@@ -179,7 +223,7 @@
                             <input type="text" id="pesel" name="pesel" placeholder="np. 90031512345" maxlength="11">
                             <button type="button" class="generate-pesel-btn">Automatyczne generowanie PESELu</button>
                         </div>
-                        <p class="help-text" style="font-size: 0.9em; color: #aaa; margin-top: 5px;">
+                        <p class="help-text">
                             PESEL jest generowany automatycznie na podstawie daty urodzenia i płci.
                             Upewnij się, że pola "Data urodzenia" i "Płeć" są wypełnione.
                         </p>
@@ -274,6 +318,10 @@
                 <div class="submit-section">
                     <button type="submit" class="submit-btn">Modyfikuj i Zapisz</button>
                     <button type="button" class="clear-btn" onclick="clearForm()">Wyczyść formularz</button>
+                    <div id="postSaveActions" class="post-save-actions hidden">
+                        <p class="post-save-text">Dane zapisane. Przejdź do dokumentu:</p>
+                        <button type="button" id="openDocumentBtn" class="post-save-btn">Przejdź do dokumentu</button>
+                    </div>
                 </div>
             </form>
         </div>
@@ -285,6 +333,25 @@
             <h2 id="notificationTitle"></h2>
             <p id="notificationMessage"></p>
             <button onclick="closeNotificationModal()">OK</button>
+        </div>
+    </div>
+
+    <div id="documentDisclaimerModal" class="notification-modal" style="display:none;">
+        <div class="notification-modal-content disclaimer-modal-content">
+            <h2>UWAGA - CELE EDUKACYJNE</h2>
+            <p class="disclaimer-modal-text">
+                Ta aplikacja została stworzona wyłącznie w celach edukacyjnych i demonstracyjnych.
+                Nie należy jej używać do tworzenia fałszywych dokumentów ani do jakichkolwiek nielegalnych działań.
+                Użytkownik ponosi pełną odpowiedzialność za sposób wykorzystania tej aplikacji.
+            </p>
+            <label class="disclaimer-check" for="disclaimerAgree">
+                <input type="checkbox" id="disclaimerAgree">
+                <span>Potwierdzam, że używam aplikacji wyłącznie w celach edukacyjnych i zgodnie z prawem.</span>
+            </label>
+            <div class="disclaimer-modal-actions">
+                <button type="button" id="cancelOpenDocumentBtn" class="disclaimer-cancel-btn">Anuluj</button>
+                <button type="button" id="confirmOpenDocumentBtn" disabled>Otwórz dokument</button>
+            </div>
         </div>
     </div>
 
@@ -308,9 +375,9 @@
                     title: type.charAt(0).toUpperCase() + type.slice(1),
                     text: message,
                     icon: type,
-                    confirmButtonColor: '#4caf50',
-                    background: '#1a1a1a',
-                    color: '#e0e0e0'
+                    confirmButtonColor: '#667789',
+                    background: '#1b1f24',
+                    color: '#eef1f4'
                 });
             }
 
@@ -320,8 +387,156 @@
                 document.getElementById('notificationModal').style.display = 'block';
             }
 
+            const mobileActionDock = document.getElementById('mobileActionDock');
+            const userStatusPanel = document.querySelector('.user-status');
+            const profileButtons = document.querySelectorAll('a[href="/profile"]');
+
+            profileButtons.forEach((btn) => {
+                if (btn && btn.classList.contains('logout-btn')) {
+                    btn.textContent = 'Profil / Dokument';
+                }
+            });
+
+            function getScrollTopY() {
+                return (
+                    window.scrollY ||
+                    window.pageYOffset ||
+                    document.documentElement.scrollTop ||
+                    document.body.scrollTop ||
+                    0
+                );
+            }
+
+            function updateMobileActionDockVisibility() {
+                if (!mobileActionDock) return;
+
+                const isMobileLayout = window.matchMedia('(max-width: 900px)').matches;
+                if (!isMobileLayout) {
+                    mobileActionDock.classList.remove('is-visible');
+                    mobileActionDock.setAttribute('aria-hidden', 'true');
+                    if (userStatusPanel) userStatusPanel.classList.remove('is-condensed');
+                    return;
+                }
+
+                const shouldShow = getScrollTopY() > 60;
+                mobileActionDock.classList.toggle('is-visible', shouldShow);
+                mobileActionDock.setAttribute('aria-hidden', shouldShow ? 'false' : 'true');
+                if (userStatusPanel) userStatusPanel.classList.toggle('is-condensed', shouldShow);
+            }
+
+            updateMobileActionDockVisibility();
+            window.addEventListener('scroll', updateMobileActionDockVisibility, { passive: true });
+            window.addEventListener('touchmove', updateMobileActionDockVisibility, { passive: true });
+            window.addEventListener('wheel', updateMobileActionDockVisibility, { passive: true });
+            window.addEventListener('resize', updateMobileActionDockVisibility);
+
+            const imagePreview = document.getElementById('imagePreview');
+            const imagePreviewCard = document.getElementById('imagePreviewCard');
+            const imagePreviewCardPlaceholder = document.getElementById('imagePreviewCardPlaceholder');
+            let uploadObjectUrl = null;
+
+            function clearUploadObjectUrl() {
+                if (uploadObjectUrl) {
+                    URL.revokeObjectURL(uploadObjectUrl);
+                    uploadObjectUrl = null;
+                }
+            }
+
+            function updateImagePreviews(imageSrc) {
+                const hasImage = Boolean(imageSrc);
+
+                if (imagePreview) {
+                    imagePreview.src = hasImage ? imageSrc : '';
+                    imagePreview.style.display = hasImage ? 'block' : 'none';
+                }
+
+                if (imagePreviewCard) {
+                    imagePreviewCard.src = hasImage ? imageSrc : '';
+                    imagePreviewCard.style.display = hasImage ? 'block' : 'none';
+                }
+
+                if (imagePreviewCardPlaceholder) {
+                    imagePreviewCardPlaceholder.style.display = hasImage ? 'none' : 'inline';
+                }
+            }
+
+            function formatDemoValue(value, fallback = '—') {
+                if (!value || typeof value !== 'string') return fallback;
+                const cleaned = value.trim();
+                return cleaned ? cleaned.toUpperCase() : fallback;
+            }
+
+            function updateIdCardDemoText() {
+                const mappings = [
+                    { inputId: 'imie', outputId: 'demoImie', fallback: 'IMIĘ' },
+                    { inputId: 'nazwisko', outputId: 'demoNazwisko', fallback: 'NAZWISKO' },
+                    { inputId: 'obywatelstwo', outputId: 'demoObywatelstwo', fallback: 'POLSKIE' },
+                    { inputId: 'data_urodzenia', outputId: 'demoDataUrodzenia', fallback: '15.03.1985' },
+                    { inputId: 'pesel', outputId: 'demoPesel', fallback: '85031512345' }
+                ];
+
+                mappings.forEach(({ inputId, outputId, fallback }) => {
+                    const input = document.getElementById(inputId);
+                    const output = document.getElementById(outputId);
+                    if (!output) return;
+                    output.textContent = formatDemoValue(input ? input.value : '', fallback);
+                });
+            }
+
             window.closeNotificationModal = function() {
                 document.getElementById('notificationModal').style.display = 'none';
+            }
+
+            const postSaveActions = document.getElementById('postSaveActions');
+            const openDocumentBtn = document.getElementById('openDocumentBtn');
+            const documentDisclaimerModal = document.getElementById('documentDisclaimerModal');
+            const disclaimerAgree = document.getElementById('disclaimerAgree');
+            const cancelOpenDocumentBtn = document.getElementById('cancelOpenDocumentBtn');
+            const confirmOpenDocumentBtn = document.getElementById('confirmOpenDocumentBtn');
+
+            function showPostSaveActions() {
+                if (!postSaveActions) return;
+                postSaveActions.classList.remove('hidden');
+                postSaveActions.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
+            function openDocumentDisclaimer() {
+                if (!documentDisclaimerModal) return;
+                documentDisclaimerModal.style.display = 'block';
+                if (disclaimerAgree) disclaimerAgree.checked = false;
+                if (confirmOpenDocumentBtn) confirmOpenDocumentBtn.disabled = true;
+            }
+
+            function closeDocumentDisclaimer() {
+                if (!documentDisclaimerModal) return;
+                documentDisclaimerModal.style.display = 'none';
+            }
+
+            if (openDocumentBtn) {
+                openDocumentBtn.addEventListener('click', function() {
+                    logAction("Clicked 'Go to document' button.");
+                    openDocumentDisclaimer();
+                });
+            }
+
+            if (cancelOpenDocumentBtn) {
+                cancelOpenDocumentBtn.addEventListener('click', function() {
+                    closeDocumentDisclaimer();
+                });
+            }
+
+            if (disclaimerAgree && confirmOpenDocumentBtn) {
+                disclaimerAgree.addEventListener('change', function() {
+                    confirmOpenDocumentBtn.disabled = !disclaimerAgree.checked;
+                });
+            }
+
+            if (confirmOpenDocumentBtn) {
+                confirmOpenDocumentBtn.addEventListener('click', function() {
+                    if (!disclaimerAgree || !disclaimerAgree.checked) return;
+                    logAction("Accepted educational disclaimer and opened documents page.");
+                    window.location.href = '/logowaniedozmodyfikowanieplikuhtml';
+                });
             }
 
             // --- FORM LOGIC ---
@@ -349,6 +564,7 @@
                     const data = await response.json();
                     if (data.success) {
                         peselInput.value = data.pesel;
+                        updateIdCardDemoText();
                         showAlert('PESEL został wygenerowany pomyślnie.', 'success');
                     } else {
                         showAlert(data.error || 'Nie udało się wygenerować numeru PESEL.', 'error');
@@ -370,11 +586,9 @@
                         input.value = '';
                     }
                 });
-                const imagePreview = document.getElementById('imagePreview');
-                if (imagePreview) {
-                    imagePreview.src = '';
-                    imagePreview.style.display = 'none';
-                }
+                clearUploadObjectUrl();
+                updateImagePreviews('');
+                updateIdCardDemoText();
             }
 
             document.getElementById('mainForm').addEventListener('submit', async function(e) {
@@ -391,6 +605,7 @@
                     const result = await response.json();
                     if (result.success) {
                         showNotification('Sukces!', result.message, 'success');
+                        showPostSaveActions();
                         // NEW LOGIC: Trigger tutorial step 2 after successful form submission
                         if (!hasSeenTutorial && currentStep === 1) {
                             showTutorialStep(2);
@@ -412,9 +627,12 @@
                 const [file] = event.target.files;
                 if (file) {
                     logAction(`Selected an image to upload: ${file.name}`);
-                    const imagePreview = document.getElementById('imagePreview');
-                    imagePreview.src = URL.createObjectURL(file);
-                    imagePreview.style.display = 'block';
+                    clearUploadObjectUrl();
+                    uploadObjectUrl = URL.createObjectURL(file);
+                    updateImagePreviews(uploadObjectUrl);
+                } else {
+                    clearUploadObjectUrl();
+                    updateImagePreviews('');
                 }
             });
 
@@ -439,6 +657,7 @@
                             const element = document.getElementById(key);
                             if (element) element.value = value;
                         }
+                        updateIdCardDemoText();
                     } catch (error) {
                         console.error('Błąd podczas pobierania losowych danych:', error);
                         alert('Nie udało się załadować losowych danych.');
@@ -450,6 +669,13 @@
             if (generatePeselBtn) {
                 generatePeselBtn.addEventListener('click', generatePESEL);
             }
+
+            ['imie', 'nazwisko', 'obywatelstwo', 'data_urodzenia', 'pesel'].forEach((fieldId) => {
+                const field = document.getElementById(fieldId);
+                if (!field) return;
+                field.addEventListener('input', updateIdCardDemoText);
+                field.addEventListener('change', updateIdCardDemoText);
+            });
 
             // --- INITIAL DATA POPULATION ---
             const lastFormData = {{ last_form_data | tojson }};
@@ -468,16 +694,15 @@
                     }
                 }
             }
-            const imagePreview = document.getElementById('imagePreview');
             const imageFilename = lastFormData.image_filename;
             if (imageFilename) {
                 const imageUrl = `/user_files/{{ username }}/${imageFilename}`;
-                imagePreview.src = imageUrl;
-                imagePreview.style.display = 'block';
+                clearUploadObjectUrl();
+                updateImagePreviews(imageUrl);
             } else {
-                imagePreview.src = '';
-                imagePreview.style.display = 'none';
+                updateImagePreviews('');
             }
+            updateIdCardDemoText();
 
             // --- TUTORIAL LOGIC ---
             const hasSeenTutorial = {{ has_seen_tutorial | tojson }};
@@ -581,7 +806,7 @@
                 <button class="btn-tutorial" onclick="showTutorialStep(4, 'android')">Android</button>
             </div>
             <div id="tutorial-step-4-image" style="display:none;">
-                <img id="tutorial-platform-image" src="" alt="Instrukcja instalacji" style="max-width: 100%; border: 1px solid #333;"/>
+                <img id="tutorial-platform-image" src="" alt="Instrukcja instalacji" style="max-width: 100%; border: 1px solid #2d343d;"/>
                 <p id="tutorial-step-4-instruction" style="margin-top: 10px;"></p>
             </div>
             <div class="tutorial-buttons">
@@ -596,3 +821,4 @@
     </div>
 </body>
 </html>
+

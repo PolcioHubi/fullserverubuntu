@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (username.length > 0 && username.length < 3) {
                     this.style.borderColor = "#e74c3c";
                 } else {
-                    this.style.borderColor = "#e1e5e9";
+                    this.style.borderColor = "#3a424d";
                 }
             });
 
@@ -146,7 +146,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (password.length > 0 && password.length < 6) {
                     this.style.borderColor = "#e74c3c";
                 } else {
-                    this.style.borderColor = "#e1e5e9";
+                    this.style.borderColor = "#3a424d";
                 }
             });
 

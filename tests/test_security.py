@@ -2,6 +2,8 @@ import pytest
 from flask import url_for
 import json
 import re
+import os
+from models import Notification
 
 def test_csrf_protection_on_login(csrf_enabled_client):
     """
@@ -223,3 +225,162 @@ def test_path_traversal_download_user_data(admin_client, malicious_username, exp
     else:
         response_data = json.loads(response.data)
         assert expected_error_message in response_data["error"]
+
+
+def test_index_rejects_cross_user_form_submission(
+    logged_in_client, auth_manager, access_key_service
+):
+    """
+    Testuje, czy zalogowany użytkownik nie może wysłać formularza głównego
+    dla innego `user_name`.
+    """
+    access_key = access_key_service.generate_access_key("cross_user_key")
+    auth_manager.register_user("victim_user", "password123", access_key)
+
+    response = logged_in_client.post(
+        "/",
+        data={
+            "user_name": "victim_user",
+            "imie": "JAN",
+            "nazwisko": "KOWALSKI",
+            "pesel": "90010112345",
+        },
+        content_type="multipart/form-data",
+    )
+
+    assert response.status_code == 403
+    response_data = response.get_json()
+    assert response_data["success"] is False
+    assert "Brak uprawnień" in response_data["error"]
+
+
+def test_notifications_mark_read_prevents_idor(
+    logged_in_client, auth_manager, access_key_service, db_session
+):
+    """
+    Testuje, czy użytkownik nie może oznaczać jako przeczytanych
+    powiadomień należących do innego użytkownika.
+    """
+    access_key = access_key_service.generate_access_key("idor_notification_key")
+    auth_manager.register_user("notification_victim", "password123", access_key)
+
+    victim_notification = (
+        db_session.query(Notification)
+        .filter_by(user_id="notification_victim")
+        .order_by(Notification.id.desc())
+        .first()
+    )
+    assert victim_notification is not None
+
+    response = logged_in_client.post(
+        "/api/notifications/read",
+        json={"id": victim_notification.id},
+    )
+
+    assert response.status_code == 404
+    response_data = response.get_json()
+    assert response_data["success"] is False
+    assert "Powiadomienie nie znalezione" in response_data["error"]
+
+
+def test_regular_user_cannot_delete_global_announcement(
+    admin_client, logged_in_client
+):
+    """
+    Testuje, że zwykły użytkownik nie może globalnie dezaktywować ogłoszeń.
+    """
+    # Fixtures współdzielą klienta i sesję; po logowaniu usera odtwarzamy flagi admina.
+    with admin_client.session_transaction() as sess:
+        sess["admin_logged_in"] = True
+        sess["admin_username"] = "admin_test"
+        sess.modified = True
+
+    response_admin = admin_client.post(
+        "/admin/api/announcements",
+        json={
+            "title": "Ogłoszenie bezpieczeństwa",
+            "message": "Tylko admin może je usunąć globalnie.",
+            "type": "info",
+            "expires_at": "",
+        },
+    )
+    assert response_admin.status_code == 200
+    assert response_admin.get_json()["success"] is True
+
+    from models import Announcement
+
+    announcement = Announcement.query.order_by(Announcement.created_at.desc()).first()
+    assert announcement is not None
+
+    with logged_in_client.session_transaction() as sess:
+        sess.pop("admin_logged_in", None)
+        sess.pop("admin_username", None)
+        sess.modified = True
+
+    response_user = logged_in_client.delete(
+        f"/api/announcements/delete/{announcement.id}",
+        headers={"X-CSRFToken": logged_in_client.csrf_token},
+    )
+    assert response_user.status_code == 403
+    response_data = response_user.get_json()
+    assert response_data["success"] is False
+    assert "Brak uprawnień" in response_data["error"]
+
+
+def test_log_action_sanitizes_control_characters(logged_in_client, monkeypatch):
+    """
+    Testuje, czy endpoint logowania akcji usuwa znaki kontrolne
+    i sekwencje wielolinijkowe z danych użytkownika.
+    """
+    captured = {}
+
+    def _fake_log_user_action(action):
+        captured["action"] = action
+
+    monkeypatch.setattr("app.log_user_action", _fake_log_user_action)
+
+    response = logged_in_client.post(
+        "/api/log-action",
+        json={"action": "Line1\nLine2\r\t\x1b[31mInjected"},
+    )
+    assert response.status_code == 200
+    assert response.get_json()["success"] is True
+    assert "action" in captured
+    assert "\n" not in captured["action"]
+    assert "\r" not in captured["action"]
+    assert "\x1b" not in captured["action"]
+    assert len(captured["action"]) <= 200
+
+
+def test_user_files_responses_disable_cache(logged_in_client, registered_user):
+    """
+    Testuje, czy pliki użytkownika są serwowane z nagłówkami zakazującymi cache.
+    """
+    from app import USER_DATA_DIR
+
+    username = registered_user["username"]
+    files_dir = os.path.join(USER_DATA_DIR, username, "files")
+    os.makedirs(files_dir, exist_ok=True)
+
+    filename = "sensitive.txt"
+    file_path = os.path.join(files_dir, filename)
+    with open(file_path, "w", encoding="utf-8") as f:
+        f.write("secret")
+
+    response_owner_route = logged_in_client.get(f"/user_files/{username}/{filename}")
+    assert response_owner_route.status_code == 200
+    assert (
+        response_owner_route.headers.get("Cache-Control")
+        == "private, no-cache, no-store, must-revalidate"
+    )
+    assert response_owner_route.headers.get("Pragma") == "no-cache"
+    assert response_owner_route.headers.get("Expires") == "0"
+
+    response_self_route = logged_in_client.get(f"/user_files/{filename}")
+    assert response_self_route.status_code == 200
+    assert (
+        response_self_route.headers.get("Cache-Control")
+        == "private, no-cache, no-store, must-revalidate"
+    )
+    assert response_self_route.headers.get("Pragma") == "no-cache"
+    assert response_self_route.headers.get("Expires") == "0"

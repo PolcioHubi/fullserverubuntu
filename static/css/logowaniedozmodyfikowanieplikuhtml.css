@@ -1,18 +1,18 @@
 :root {
-            --primary-green: #4caf50;
-            --secondary-green: #388e3c;
-            --dark-bg: #0d0d0d;
-            --darker-bg: #1a1a1a;
-            --text-light: #e0e0e0;
-            --text-gray: #aaa;
-            --border-dark: #333;
-            --border-light: #555;
+            --primary-green: #667789;
+            --secondary-green: #5a6a7c;
+            --dark-bg: #111315;
+            --darker-bg: #1b1f24;
+            --text-light: #eef1f4;
+            --text-gray: #96a0ac;
+            --border-dark: #2d343d;
+            --border-light: #3a424d;
             --shadow-dark: rgba(0, 0, 0, 0.5);
             --shadow-light: rgba(0, 0, 0, 0.2);
         }
 
         body {
-            font-family: 'Courier New', Courier, monospace;
+            font-family: 'Segoe UI', Arial, sans-serif;
             background-color: var(--dark-bg);
             margin: 0;
             padding: 20px;
@@ -125,7 +125,7 @@
             font-size: 1em;
             font-weight: 600;
             transition: background-color 0.3s ease, color 0.3s, border-color 0.3s;
-            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
+            box-shadow: 0 4px 12px rgba(102, 119, 137, 0.2);
             white-space: nowrap;
             width: fit-content;
             display: inline-block;
@@ -136,7 +136,7 @@
                 color: var(--primary-green);
                 border-color: var(--primary-green);
                 transform: translateY(-2px);
-                box-shadow: 0 6px 18px rgba(76, 175, 80, 0.3);
+                box-shadow: 0 6px 18px rgba(102, 119, 137, 0.3);
             }
 
         .button-group {
@@ -199,3 +199,5 @@
                 padding: 10px 20px;
             }
         }
+
+

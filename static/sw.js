@@ -1,6 +1,5 @@
-const CACHE_NAME = 'mobywatel-cache-v4';
+const CACHE_NAME = 'mobywatel-cache-v6';
 const urlsToCache = [
-  '/',
   '/static/logowanie.html',
   '/static/dashboard.html',
   '/static/documents.html',
@@ -74,6 +73,30 @@ self.addEventListener('fetch', event => {
   }
 
   const requestUrl = event.request.url;
+  const requestOrigin = new URL(requestUrl).origin;
+
+  // Nie przechwytujemy zasobów z innych domen (np. CDN).
+  // Dzięki temu request idzie normalnie przez przeglądarkę i nie wpada pod CSP connect-src w SW.
+  if (requestOrigin !== self.location.origin) {
+    return;
+  }
+
+  const acceptHeader = event.request.headers.get('accept') || '';
+  const isDocumentRequest =
+    event.request.mode === 'navigate' ||
+    event.request.destination === 'document' ||
+    acceptHeader.includes('text/html');
+
+  // HTML (np. /, /profile, /login) zawsze pobieramy z sieci.
+  // Dzięki temu po imporcie bazy nie zostaje stary widok użytkownika/statystyk.
+  if (isDocumentRequest) {
+    event.respondWith(
+      fetch(event.request).catch(() => {
+        return caches.match(event.request).then(cachedResponse => cachedResponse || Response.error());
+      })
+    );
+    return;
+  }
 
   // NETWORK FIRST dla dynamicznych danych (zdjęcia użytkowników, dokumenty, API)
   if (isDynamicRequest(requestUrl)) {
@@ -91,7 +114,7 @@ self.addEventListener('fetch', event => {
         })
         .catch(() => {
           // Fallback do cache gdy offline
-          return caches.match(event.request);
+          return caches.match(event.request).then(cachedResponse => cachedResponse || Response.error());
         })
     );
     return;
@@ -120,8 +143,7 @@ self.addEventListener('fetch', event => {
             return networkResponse;
           }
         ).catch(() => {
-          // Opcjonalnie: zwróć stronę offline
-          // return caches.match('/static/offline.html');
+          return caches.match(event.request).then(cachedResponse => cachedResponse || Response.error());
         });
       })
   );

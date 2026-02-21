@@ -196,10 +196,8 @@ def test_password_recovery_e2e(page: Page, base_url, registered_user, auth_manag
     old_password = registered_user["password"]
     new_password = "new_super_secret_password_123!"
 
-    # Krok 1: Użyj auth_manager, aby uzyskać token odzyskiwania dla naszego użytkownika testowego.
-    # To symuluje sytuację, w której użytkownik otrzymał token (np. po rejestracji).
-    user = auth_manager.get_user_by_id(username)
-    recovery_token = user.recovery_token
+    # Krok 1: Użyj tokenu odzyskiwania z odpowiedzi rejestracji.
+    recovery_token = registered_user["recovery_token"]
     assert recovery_token is not None
 
     # Krok 2: Przejdź na stronę odzyskiwania hasła.

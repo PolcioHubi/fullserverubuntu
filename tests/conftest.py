@@ -159,8 +159,10 @@ def registered_user(client, auth_manager, access_key_service):
     db.session.commit()
     username = "testuser"
     password = "password123"
-    auth_manager.register_user(username, password, key, mark_tutorial_seen=True)
-    return {"username": username, "password": password}
+    _, _, recovery_token = auth_manager.register_user(
+        username, password, key, mark_tutorial_seen=True
+    )
+    return {"username": username, "password": password, "recovery_token": recovery_token}
 
 
 @pytest.fixture(scope="function")

@@ -6,8 +6,9 @@
 # Zaktualizowano Content-Security-Policy, aby zezwolić na skrypty z cdn.jsdelivr.net
 # ==============================================================================
 
-# Zatrzymaj skrypt w przypadku błędu
-set -e
+# Zatrzymaj skrypt w przypadku błędu, użycia niezdefiniowanej zmiennej
+# oraz błędów w pipeline.
+set -euo pipefail
 
 # --- ZMIENNE KONFIGURACYJNE ---
 SERVICE_NAME="mobywatel"
@@ -51,18 +52,15 @@ sudo usermod -aG $PROJECT_USER www-data
 
 # --- KROK 2: Przygotowanie katalogu aplikacji ---
 echo ">>> KROK 2: Ustawianie właściciela katalogu $DEST_DIR..."
-sudo chown -R $PROJECT_USER:$PROJECT_USER $DEST_DIR
+sudo chown "$PROJECT_USER:$PROJECT_USER" "$DEST_DIR"
 echo ">>> KROK 2.5: Tworzenie katalogów na logi i dane..."
-sudo mkdir -p $DEST_DIR/logs
-sudo mkdir -p $DEST_DIR/auth_data
-sudo mkdir -p $DEST_DIR/user_data
-sudo chown -R $PROJECT_USER:$PROJECT_USER $DEST_DIR/logs
-sudo chown -R $PROJECT_USER:$PROJECT_USER $DEST_DIR/auth_data
-sudo chown -R $PROJECT_USER:$PROJECT_USER $DEST_DIR/user_data
-echo ">>> KROK 2.6: Ustawianie bezpiecznych uprawnień do plików i folderów..."
-sudo find $DEST_DIR -type d -exec chmod 750 {} \;
-sudo find $DEST_DIR -type f -exec chmod 640 {} \;
-sudo chmod +x $0
+sudo install -d -m 750 -o "$PROJECT_USER" -g "$PROJECT_USER" "$DEST_DIR/logs"
+sudo install -d -m 750 -o "$PROJECT_USER" -g "$PROJECT_USER" "$DEST_DIR/auth_data"
+sudo install -d -m 750 -o "$PROJECT_USER" -g "$PROJECT_USER" "$DEST_DIR/user_data"
+echo ">>> KROK 2.6: Ustawianie bezpiecznych uprawnień tylko dla katalogów runtime..."
+sudo find "$DEST_DIR/logs" "$DEST_DIR/auth_data" "$DEST_DIR/user_data" -type d -exec chmod 750 {} \;
+sudo find "$DEST_DIR/logs" "$DEST_DIR/auth_data" "$DEST_DIR/user_data" -type f -exec chmod 640 {} \;
+sudo chmod +x "$0"
 
 # --- KROK 3: Konfiguracja środowiska wirtualnego i zależności ---
 echo ">>> KROK 3: Uruchamianie konfiguracji środowiska Python..."
@@ -179,11 +177,12 @@ sudo certbot --nginx --non-interactive --agree-tos -m "$SSL_EMAIL" -d "$DOMAIN" 
 # --- KROK 8: Wstrzykiwanie ostatecznych nagłówków bezpieczeństwa do konfiguracji SSL ---
 echo ">>> KROK 8: Wstrzykiwanie ostatecznych nagłówków bezpieczeństwa i limitów do konfiguracji SSL..."
 CONFIG_FILE="/etc/nginx/sites-available/$SERVICE_NAME"
-# Używamy sed do wstawienia linii 'include ...' zaraz po linii 'server_name ...'
-sudo sed -i "/server_name $DOMAIN/a include /etc/nginx/snippets/security-headers.conf;" $CONFIG_FILE
-# Dodajemy również limity uploadów, jeśli jeszcze nie są w konfiguracji SSL
-if ! grep -q "upload-limits.conf" "$CONFIG_FILE"; then
-    sudo sed -i "/server_name $DOMAIN/a include /etc/nginx/snippets/upload-limits.conf;" $CONFIG_FILE
+# Wstawianie include jest idempotentne - unikamy duplikowania wpisów przy kolejnych uruchomieniach.
+if ! sudo grep -qF "include /etc/nginx/snippets/security-headers.conf;" "$CONFIG_FILE"; then
+    sudo sed -i "/server_name $DOMAIN/a\\    include /etc/nginx/snippets/security-headers.conf;" "$CONFIG_FILE"
+fi
+if ! sudo grep -qF "include /etc/nginx/snippets/upload-limits.conf;" "$CONFIG_FILE"; then
+    sudo sed -i "/server_name $DOMAIN/a\\    include /etc/nginx/snippets/upload-limits.conf;" "$CONFIG_FILE"
 fi
 
 # --- KROK 9: Ostateczny restart Nginx ---

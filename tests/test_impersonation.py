@@ -26,6 +26,8 @@ def test_start_impersonation_success(admin_client, registered_user):
         assert sess["is_impersonating"] is True
         assert sess["original_admin_id"] == "admin_test"
         assert sess["_user_id"] == registered_user["username"]
+        assert "admin_logged_in" not in sess
+        assert "admin_username" not in sess
 
 def test_stop_impersonation_success(admin_client, registered_user):
     """

@@ -52,6 +52,14 @@ def test_set_user_validation(client):
     response_too_long = client.post("/set_user", json={"user_name": long_name})
     assert "musi mieć od 2 do 50 znaków" in response_too_long.get_json()["error"]
 
+    # Test 4: Nazwa zawiera niedozwolone znaki ścieżki
+    response_invalid_chars = client.post("/set_user", json={"user_name": "../evil"})
+    assert response_invalid_chars.status_code == 400
+    assert (
+        "zawiera niedozwolone znaki"
+        in response_invalid_chars.get_json()["error"]
+    )
+
 @pytest.mark.parametrize("malicious_filename", [
     "../malicious.jpg",
     "test/../../etc/passwd",
@@ -75,4 +83,3 @@ def test_image_upload_path_traversal(logged_in_client, malicious_filename):
     json_data = response.get_json()
     assert json_data["success"] is False
     assert "Nazwa pliku zawiera niedozwolone znaki" in json_data["error"]
-

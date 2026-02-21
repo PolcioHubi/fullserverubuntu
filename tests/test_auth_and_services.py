@@ -1,4 +1,5 @@
 import pytest
+import hashlib
 from models import User, AccessKey, Announcement, db, File, Notification
 from services import AnnouncementService, StatisticsService, NotificationService, AccessKeyService # Dodano AccessKeyService
 import datetime # Dodano import datetime
@@ -40,6 +41,8 @@ def test_user_registration(auth_manager, access_key_service):
     user = User.query.filter_by(username="testuser").first()
     assert user is not None
     assert user.username == "testuser"
+    assert user.recovery_token_expires is not None
+    assert user.recovery_token_expires > datetime.datetime.now()
 
     # 4. Sprawdź, czy klucz dostępu został zużyty (dezaktywowany)
     key_obj = AccessKey.query.filter_by(key=access_key).first()
@@ -354,6 +357,39 @@ def test_reset_password_with_valid_recovery_token(auth_manager, access_key_servi
     assert success is True
     assert user is not None
 
+    updated_user = User.query.filter_by(username=username).first()
+    assert updated_user is not None
+    assert updated_user.recovery_token is None
+    assert updated_user.recovery_token_expires is None
+
+
+def test_reset_password_with_expired_recovery_token(auth_manager, access_key_service):
+    """
+    Testuje odrzucenie resetu hasła przy wygasłym tokenie odzyskiwania.
+    """
+    username = "expired_recovery_user"
+    old_password = "old_password"
+    new_password = "new_password_after_expiry"
+    access_key = access_key_service.generate_access_key("expired_recovery_key")
+
+    _, _, recovery_token = auth_manager.register_user(username, old_password, access_key)
+    assert recovery_token is not None
+
+    user = User.query.filter_by(username=username).first()
+    assert user is not None
+    user.recovery_token_expires = datetime.datetime.now() - datetime.timedelta(minutes=1)
+    db.session.commit()
+
+    success, message = auth_manager.reset_password_with_recovery_token(
+        username, recovery_token, new_password
+    )
+    assert success is False
+    assert "Nieprawidłowa nazwa użytkownika lub token odzyskiwania" in message
+
+    success, _, user = auth_manager.authenticate_user(username, old_password)
+    assert success is True
+    assert user is not None
+
 
 def test_deactivate_nonexistent_access_key(access_key_service):
     """
@@ -531,7 +567,8 @@ def test_generate_password_reset_token(auth_manager, registered_user):
 
     user = User.query.filter_by(username=username).first()
     assert user is not None, "User should exist"
-    assert user.password_reset_token == token
+    assert user.password_reset_token != token
+    assert user.password_reset_token == hashlib.sha256(token.encode("utf-8")).hexdigest()
     assert user.password_reset_expires is not None
 
 

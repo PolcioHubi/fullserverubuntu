@@ -1,10 +1,16 @@
 import pytest
 import datetime
+import io
 import os
 import shutil
+import sqlite3
+import stat
+import tempfile
 import uuid
 import threading
-from app import app
+import zipfile
+from sqlalchemy import text
+from app import app, import_operation_lock, restart_operation_lock
 from models import db, User, AccessKey, Announcement, File
 from services import StatisticsService
 from user_auth import UserAuthManager
@@ -66,6 +72,31 @@ def user_with_files(app, temp_user):
         shutil.rmtree(user_folder)
 
 
+def _build_valid_backup_zip_bytes() -> bytes:
+    """Create an in-memory backup ZIP with minimal valid structure."""
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        db_path = os.path.join(tmp_dir, "database.db")
+        conn = sqlite3.connect(db_path)
+        try:
+            conn.execute(
+                "CREATE TABLE users (username TEXT PRIMARY KEY UNIQUE NOT NULL, password TEXT NOT NULL)"
+            )
+            conn.execute(
+                "INSERT INTO users (username, password) VALUES (?, ?)",
+                ("import_test_user", "hashed_password_placeholder"),
+            )
+            conn.commit()
+        finally:
+            conn.close()
+
+        zip_buffer = io.BytesIO()
+        with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zipf:
+            zipf.writestr("user_data/import_test_user/files/dummy.txt", "dummy")
+            zipf.write(db_path, "auth_data/database.db")
+
+        return zip_buffer.getvalue()
+
+
 # --- Authentication and Basic Access Tests ---
 
 def test_admin_login_success(client, admin_credentials):
@@ -122,6 +153,133 @@ def test_api_get_users(admin_client):
     assert response.json["success"]
     assert "users_data" in response.json
     assert "stats" in response.json
+
+
+def test_api_get_admin_stats(admin_client):
+    """Tests lightweight admin stats endpoint used by restart health checks."""
+    response = admin_client.get("/admin/api/stats")
+    assert response.status_code == 200
+    assert response.json["success"] is True
+    assert "stats" in response.json
+    assert "total_users" in response.json["stats"]
+    assert "active_users" in response.json["stats"]
+
+
+def test_api_import_validate_success(admin_client):
+    """Tests import pre-validation endpoint with a valid backup ZIP."""
+    zip_bytes = _build_valid_backup_zip_bytes()
+    response = admin_client.post(
+        "/admin/api/import/validate",
+        data={"backupFile": (io.BytesIO(zip_bytes), "backup.zip")},
+        content_type="multipart/form-data",
+    )
+    assert response.status_code == 200
+    payload = response.get_json()
+    assert payload["success"] is True
+    assert payload["valid"] is True
+    assert "schema_updates_preview" in payload
+    assert payload["requires_restart"] is True
+
+
+def test_api_import_validate_invalid_zip(admin_client):
+    """Tests import pre-validation endpoint with invalid ZIP structure."""
+    zip_buffer = io.BytesIO()
+    with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zipf:
+        zipf.writestr("../evil.txt", "bad")
+
+    response = admin_client.post(
+        "/admin/api/import/validate",
+        data={"backupFile": (io.BytesIO(zip_buffer.getvalue()), "backup.zip")},
+        content_type="multipart/form-data",
+    )
+    assert response.status_code == 200
+    payload = response.get_json()
+    assert payload["success"] is True
+    assert payload["valid"] is False
+    assert payload["issues"]
+
+
+def test_api_import_validate_rejects_symlink(admin_client):
+    """Tests import pre-validation endpoint rejects symlinks in ZIP entries."""
+    zip_buffer = io.BytesIO()
+    with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zipf:
+        link_info = zipfile.ZipInfo("user_data/malicious_link")
+        link_info.create_system = 3  # Unix metadata semantics
+        link_info.external_attr = (stat.S_IFLNK | 0o777) << 16
+        zipf.writestr(link_info, "outside_target")
+        zipf.writestr("auth_data/database.db", "not-a-real-db")
+
+    response = admin_client.post(
+        "/admin/api/import/validate",
+        data={"backupFile": (io.BytesIO(zip_buffer.getvalue()), "backup.zip")},
+        content_type="multipart/form-data",
+    )
+    assert response.status_code == 200
+    payload = response.get_json()
+    assert payload["success"] is True
+    assert payload["valid"] is False
+    assert any("symlink" in issue.lower() for issue in payload["issues"])
+
+
+def test_api_import_validate_rejects_excessive_uncompressed_size(
+    admin_client, monkeypatch
+):
+    """Tests import pre-validation endpoint rejects oversized archives after decompression."""
+    zip_buffer = io.BytesIO(_build_valid_backup_zip_bytes())
+    with zipfile.ZipFile(zip_buffer, "a", zipfile.ZIP_DEFLATED) as zipf:
+        zipf.writestr("user_data/import_test_user/files/oversized.txt", "A" * 4096)
+
+    monkeypatch.setitem(app.config, "IMPORT_MAX_UNCOMPRESSED_BYTES", 1024)
+
+    response = admin_client.post(
+        "/admin/api/import/validate",
+        data={"backupFile": (io.BytesIO(zip_buffer.getvalue()), "backup.zip")},
+        content_type="multipart/form-data",
+    )
+    assert response.status_code == 200
+    payload = response.get_json()
+    assert payload["success"] is True
+    assert payload["valid"] is False
+    assert any(
+        "Suma rozmiarów plików po rozpakowaniu przekracza" in issue
+        for issue in payload["issues"]
+    )
+
+
+def test_api_import_rejects_parallel_run(admin_client):
+    """Tests single-flight lock for import endpoint."""
+    acquired = import_operation_lock.acquire(blocking=False)
+    assert acquired
+    try:
+        response = admin_client.post(
+            "/admin/api/import/all",
+            data={},
+            content_type="multipart/form-data",
+        )
+        assert response.status_code == 409
+        payload = response.get_json()
+        assert payload["success"] is False
+        assert payload["code"] == "IMPORT_IN_PROGRESS"
+        assert payload["request_id"]
+    finally:
+        if import_operation_lock.locked():
+            import_operation_lock.release()
+
+
+def test_api_restart_rejects_parallel_run(admin_client):
+    """Tests single-flight lock for restart endpoint."""
+    acquired = restart_operation_lock.acquire(blocking=False)
+    assert acquired
+    try:
+        response = admin_client.post("/admin/api/restart")
+        assert response.status_code == 409
+        payload = response.get_json()
+        assert payload["success"] is False
+        assert payload["code"] == "RESTART_IN_PROGRESS"
+        assert payload["request_id"]
+    finally:
+        if restart_operation_lock.locked():
+            restart_operation_lock.release()
 
 
 def test_api_get_user_logs(admin_client, temp_user):
@@ -244,6 +402,19 @@ def test_api_access_key_lifecycle(admin_client):
     with app.app_context():
         key_obj = AccessKey.query.filter_by(key=access_key).first()
         assert key_obj is None
+
+
+def test_api_get_access_keys_self_heals_missing_table(admin_client):
+    """Endpoint should recreate missing tables and avoid returning 500."""
+    with app.app_context():
+        db.session.execute(text("DROP TABLE IF EXISTS access_keys"))
+        db.session.commit()
+
+    response = admin_client.get("/admin/api/access-keys")
+    assert response.status_code == 200
+    payload = response.get_json()
+    assert payload["success"] is True
+    assert "access_keys" in payload
 
 
 # --- Registered User Management API Tests ---

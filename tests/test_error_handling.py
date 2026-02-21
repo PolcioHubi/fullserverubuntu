@@ -1,5 +1,4 @@
 import pytest
-from unittest.mock import patch, MagicMock
 from sqlalchemy.exc import IntegrityError
 import logging
 
@@ -158,9 +157,8 @@ def test_mark_notification_as_read_database_error(notification_service, mocker):
     oznaczania powiadomienia jako przeczytanego.
     """
     # Arrange
-    # Mock get to return a mock object so the commit is attempted
-    mock_notification = MagicMock()
-    mocker.patch('models.db.session.get', return_value=mock_notification)
+    # Create a notification first so service lookup finds a record and attempts commit
+    notification_service.create_notification("testuser", "Test message")
     mocker.patch('models.db.session.commit', side_effect=Exception("Simulated DB error"))
     mock_rollback = mocker.patch('models.db.session.rollback')
 

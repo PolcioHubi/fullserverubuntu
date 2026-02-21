@@ -22,7 +22,10 @@ def test_index_page(client):
     # Follow the redirect to ensure it lands on the login page
     response = client.get("/", follow_redirects=True)
     assert response.status_code == 200
-    assert b"<title>Logowanie - Podmieniacz Danych HTML</title>" in response.data
+    soup = BeautifulSoup(response.data, "html.parser")
+    title_tag = soup.find("title")
+    assert title_tag is not None
+    assert title_tag.text.strip() == "Logowanie"
 
 
 def test_profile_page_unauthenticated(client):
@@ -32,7 +35,10 @@ def test_profile_page_unauthenticated(client):
     """
     response = client.get("/profile", follow_redirects=True)
     assert response.status_code == 200
-    assert b"<title>Logowanie - Podmieniacz Danych HTML</title>" in response.data
+    soup = BeautifulSoup(response.data, "html.parser")
+    title_tag = soup.find("title")
+    assert title_tag is not None
+    assert title_tag.text.strip() == "Logowanie"
 
 
 def test_login_and_logout(client, registered_user):
@@ -69,12 +75,18 @@ def test_login_and_logout(client, registered_user):
     # 3. Wylogowanie
     response = client.get("/logout", follow_redirects=True)
     assert response.status_code == 200
-    assert b"<title>Logowanie - Podmieniacz Danych HTML</title>" in response.data
+    soup = BeautifulSoup(response.data, "html.parser")
+    title_tag = soup.find("title")
+    assert title_tag is not None
+    assert title_tag.text.strip() == "Logowanie"
 
     # 4. Sprawdzenie, czy profil jest ponownie chroniony
     response = client.get("/profile", follow_redirects=True)
     assert response.status_code == 200
-    assert b"<title>Logowanie - Podmieniacz Danych HTML</title>" in response.data
+    soup = BeautifulSoup(response.data, "html.parser")
+    title_tag = soup.find("title")
+    assert title_tag is not None
+    assert title_tag.text.strip() == "Logowanie"
 
 
 def test_notifications_api_flow(logged_in_client):
@@ -364,6 +376,12 @@ def test_delete_announcement_api(admin_client, logged_in_client, db_session):
         Announcement,
     )  # Importujemy tutaj, aby uniknąć cyklicznych zależności
 
+    # Fixtures współdzielą klienta i sesję; po logowaniu usera odtwarzamy flagi admina.
+    with admin_client.session_transaction() as sess:
+        sess["admin_logged_in"] = True
+        sess["admin_username"] = "admin_test"
+        sess.modified = True
+
     # 1. Admin tworzy ogłoszenie
     response_admin = admin_client.post(
         "/admin/api/announcements",
@@ -382,16 +400,34 @@ def test_delete_announcement_api(admin_client, logged_in_client, db_session):
     assert announcement is not None
     announcement_id = announcement.id
 
-    # 2. Użytkownik próbuje usunąć ogłoszenie
+    # 2. Zwykły użytkownik nie może globalnie usunąć ogłoszenia
+    with logged_in_client.session_transaction() as sess:
+        sess.pop("admin_logged_in", None)
+        sess.pop("admin_username", None)
+        sess.modified = True
+
     response_user = logged_in_client.delete(
         f"/api/announcements/delete/{announcement_id}",
         headers={"X-CSRFToken": logged_in_client.csrf_token},
     )
-    assert response_user.status_code == 200
-    assert response_user.get_json()["success"] is True
-    assert "Ogłoszenie zostało usunięte." in response_user.get_json()["message"]
+    assert response_user.status_code == 403
+    assert response_user.get_json()["success"] is False
 
-    # 3. Sprawdź, czy ogłoszenie zostało dezaktywowane w bazie danych
+    # Przywróć sesję admina (fixtures współdzielą klienta i sesję)
+    with admin_client.session_transaction() as sess:
+        sess["admin_logged_in"] = True
+        sess["admin_username"] = "admin_test"
+        sess.modified = True
+
+    # 3. Admin usuwa ogłoszenie
+    response_admin_delete = admin_client.delete(
+        f"/admin/api/announcements/delete/{announcement_id}"
+    )
+    assert response_admin_delete.status_code == 200
+    assert response_admin_delete.get_json()["success"] is True
+    assert "Ogłoszenie zostało usunięte." in response_admin_delete.get_json()["message"]
+
+    # 4. Sprawdź, czy ogłoszenie zostało dezaktywowane w bazie danych
     updated_announcement = db.session.get(Announcement, announcement_id)
     assert updated_announcement is not None
     assert updated_announcement.is_active is False
@@ -717,6 +753,3 @@ def test_load_data_from_file_os_error(mocker, caplog):
         # Sprawdź, czy błąd został zalogowany
         assert "Error reading data file some_file.txt" in caplog.text
         assert "Simulated OS error" in caplog.text
-
-
-

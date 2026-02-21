@@ -23,6 +23,18 @@ def test_register_password_too_short(client, access_key_service):
     assert data["error"] == "Hasło musi mieć co najmniej 6 znaków"
 
 
+def test_register_username_with_forbidden_characters(client, access_key_service):
+    """Testuje odrzucenie nazwy użytkownika zawierającej niedozwolone znaki ścieżki."""
+    key = access_key_service.generate_access_key("forbidden_username_test")
+    response = client.post(
+        "/register",
+        json={"username": "../bad_user", "password": "password123", "access_key": key},
+    )
+    assert response.status_code == 400
+    data = response.get_json()
+    assert data["error"] == "Nazwa użytkownika zawiera niedozwolone znaki"
+
+
 def test_register_missing_access_key(client):
     """Testuje próbę rejestracji bez klucza dostępu."""
     response = client.post(

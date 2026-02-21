@@ -5,6 +5,16 @@ Konfiguracja produkcyjna dla aplikacji Dowodnowy HTML App
 import os
 
 
+def _env_int(name: str, default: int) -> int:
+    raw = os.environ.get(name)
+    if raw is None:
+        return default
+    try:
+        return int(raw)
+    except (TypeError, ValueError):
+        return default
+
+
 class ProductionConfig:
     # Bezpieczeństwo
     SECRET_KEY = os.environ.get("SECRET_KEY")
@@ -35,6 +45,17 @@ class ProductionConfig:
     # Admin credentials (zmień w produkcji!)
     ADMIN_USERNAME = os.environ.get("ADMIN_USERNAME")
     ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD")
+    EXPOSE_RESET_TOKEN = False
+    EXPOSE_RECOVERY_TOKEN = False
+    RECOVERY_TOKEN_TTL_HOURS = _env_int("RECOVERY_TOKEN_TTL_HOURS", 24)
+    IMPORT_MAX_UNCOMPRESSED_BYTES = _env_int(
+        "IMPORT_MAX_UNCOMPRESSED_BYTES", 500 * 1024 * 1024
+    )
+    IMPORT_MAX_FILES = _env_int("IMPORT_MAX_FILES", 10_000)
+    IMPORT_MAX_SINGLE_FILE_BYTES = _env_int(
+        "IMPORT_MAX_SINGLE_FILE_BYTES", 100 * 1024 * 1024
+    )
+    IMPORT_MAX_COMPRESSION_RATIO = _env_int("IMPORT_MAX_COMPRESSION_RATIO", 100)
 
     # Rate limiting (wymaga Redis w produkcji dla wielu instancji)
     # Użyj "memory://" tylko dla pojedynczej instancji lub środowiska deweloperskiego.
@@ -83,6 +104,26 @@ class DevelopmentConfig:
     SESSION_COOKIE_SECURE = False
     SESSION_COOKIE_HTTPONLY = True
     MAX_CONTENT_LENGTH = 100 * 1024 * 1024  # 100MB max upload for development (dla backupów)
+    EXPOSE_RESET_TOKEN = os.environ.get("EXPOSE_RESET_TOKEN", "false").lower() in (
+        "1",
+        "true",
+        "yes",
+    )
+    EXPOSE_RECOVERY_TOKEN = os.environ.get("EXPOSE_RECOVERY_TOKEN", "true").lower() in (
+        "1",
+        "true",
+        "yes",
+    )
+    RECOVERY_TOKEN_TTL_HOURS = _env_int("RECOVERY_TOKEN_TTL_HOURS", 24)
+    IMPORT_MAX_UNCOMPRESSED_BYTES = _env_int(
+        "IMPORT_MAX_UNCOMPRESSED_BYTES", 500 * 1024 * 1024
+    )
+    IMPORT_MAX_FILES = _env_int("IMPORT_MAX_FILES", 10_000)
+    IMPORT_MAX_SINGLE_FILE_BYTES = _env_int(
+        "IMPORT_MAX_SINGLE_FILE_BYTES", 100 * 1024 * 1024
+    )
+    IMPORT_MAX_COMPRESSION_RATIO = _env_int("IMPORT_MAX_COMPRESSION_RATIO", 100)
+    RATELIMIT_STORAGE_URL = os.environ.get("RATELIMIT_STORAGE_URL", "memory://")
 
     @staticmethod
     def init_app(app):

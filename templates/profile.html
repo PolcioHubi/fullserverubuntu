@@ -5,88 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token_func() }}">
     <title>Profil Użytkownika - {{ username }}</title>
-    <style>
-        body {
-            font-family: 'Courier New', Courier, monospace;
-            background-color: #0d0d0d;
-            color: #e0e0e0;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .header {
-            width: 100%;
-            max-width: 800px;
-            border-bottom: 1px solid #333;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-            text-align: left;
-        }
-        .header h1 {
-            font-size: 2em;
-            margin: 0;
-            color: #fff;
-        }
-        .header .username {
-            color: #4caf50; /* Zielony akcent */
-        }
-        .profile-container {
-            background-color: #1a1a1a;
-            border: 1px solid #333;
-            padding: 20px;
-            width: 100%;
-            max-width: 800px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
-        }
-        .section {
-            margin-bottom: 20px;
-        }
-        .section h2 {
-            font-size: 1.5em;
-            color: #4caf50;
-            border-bottom: 1px solid #333;
-            padding-bottom: 5px;
-            margin-bottom: 10px;
-        }
-        .info-grid {
-            display: grid;
-            grid-template-columns: 150px 1fr;
-            gap: 10px;
-        }
-        .info-grid .label {
-            font-weight: bold;
-            color: #aaa;
-        }
-        .info-grid .value {
-            color: #e0e0e0;
-        }
-        .actions a {
-            display: inline-block;
-            background-color: #333;
-            color: #e0e0e0;
-            padding: 10px 15px;
-            text-decoration: none;
-            border: 1px solid #555;
-            transition: background-color 0.3s, color 0.3s;
-            margin-right: 10px;
-        }
-        .actions a:hover {
-            background-color: #4caf50;
-            color: #0d0d0d;
-        }
-        .footer {
-            margin-top: 20px;
-            font-size: 0.8em;
-            color: #555;
-        }
-    </style>
+    <link rel="stylesheet" href="/static/css/profile.css">
     <script src="/static/js/page-transitions.js" defer></script>
 </head>
 <body>
     <div class="header">
-        <h1>[ Profil <span class="username">{{ username }}</span> ]</h1>
+        <h1>Profil użytkownika: <span class="username">{{ username }}</span></h1>
     </div>
 
     <div class="profile-container">
@@ -96,20 +20,20 @@
                 <div class="label">Nazwa Użytkownika:</div>
                 <div class="value">{{ username }}</div>
                 <div class="label">Status:</div>
-                <div class="value" style="color: #4caf50;">Aktywny</div>
+                <div class="value value-status">Aktywny</div>
                 <div class="label">Data Rejestracji:</div>
                 <div class="value">{{ created_at.strftime('%Y-%m-%d %H:%M') }}</div>
-                <div class="label">Hubert Coin:</div>
-                <div class="value">{{ hubert_coins }} 🪙</div>
+                <div class="label">Hubert Coiny:</div>
+                <div class="value">{{ hubert_coins }}</div>
             </div>
-            <p style="font-size: 0.8em; color: #888; margin-top: 10px;">Hubert Coin to nagroda za zaproszenie użytkownika do zakupu naszej usługi.</p>
+            <p class="info-note">Hubert Coin to nagroda za zaproszenie użytkownika do zakupu naszej usługi.</p>
         </div>
 
         <div class="section">
             <h2>Zarządzanie Plikami</h2>
             <p>Zarządzaj swoimi wygenerowanymi plikami i danymi.</p>
             <div class="actions">
-                <a href="/logowaniedozmodyfikowanieplikuhtml">Przeglądaj Pliki</a>
+                <a id="filesLink" href="#" data-target-url="/logowaniedozmodyfikowanieplikuhtml" role="button">Przejdź do dokumentu</a>
                 <a href="/">Strona Główna</a>
             </div>
         </div>
@@ -143,7 +67,7 @@
                     <tr>
                         <td>10 HC</td>
                         <td>100 zł</td>
-                        <td style="color: #4caf50; font-weight: bold;">10 zł!</td>
+                        <td class="commission-highlight">10 zł!</td>
                     </tr>
                 </tbody>
             </table>
@@ -165,8 +89,8 @@
                 <button class="btn-tutorial" onclick="showTutorialStep(4, 'android')">Android</button>
             </div>
             <div id="tutorial-step-4-image" style="display:none;">
-                <img id="tutorial-platform-image" src="" alt="Instrukcja instalacji" style="max-width: 100%; border: 1px solid #333;"/>
-                <p id="tutorial-step-4-instruction" style="margin-top: 10px;"></p>
+                <img id="tutorial-platform-image" class="tutorial-platform-image" src="" alt="Instrukcja instalacji">
+                <p id="tutorial-step-4-instruction" class="tutorial-step-instruction"></p>
             </div>
             <div class="tutorial-buttons">
                 <button id="tutorialBtnSkip" class="btn-tutorial-skip">Pomiń</button>
@@ -179,13 +103,80 @@
         </div>
     </div>
 
-    <link rel="stylesheet" href="/static/css/profile.css">
+    <div id="profileDisclaimerModal" class="disclaimer-modal" style="display:none;">
+        <div class="disclaimer-modal-content">
+            <h2>UWAGA - CELE EDUKACYJNE</h2>
+            <p class="disclaimer-modal-text">
+                Ta aplikacja została stworzona wyłącznie w celach edukacyjnych i demonstracyjnych.
+                Nie należy jej używać do tworzenia fałszywych dokumentów ani do jakichkolwiek nielegalnych działań.
+                Użytkownik ponosi pełną odpowiedzialność za sposób wykorzystania tej aplikacji.
+            </p>
+            <label class="disclaimer-check" for="profileDisclaimerAgree">
+                <input type="checkbox" id="profileDisclaimerAgree">
+                <span>Potwierdzam, że używam aplikacji wyłącznie w celach edukacyjnych i zgodnie z prawem.</span>
+            </label>
+            <div class="disclaimer-modal-actions">
+                <button type="button" id="profileDisclaimerCancel" class="disclaimer-cancel-btn">Anuluj</button>
+                <button type="button" id="profileDisclaimerConfirm" disabled>Otwórz dokument</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Ten sam kod co w index.html, ale z logiką startującą od etapu 3
         document.addEventListener('DOMContentLoaded', function() {
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('tutorial') === 'true') {
                 showTutorialStep(3);
+            }
+
+            const filesLink = document.getElementById('filesLink');
+            const filesTargetUrl = (filesLink && filesLink.dataset.targetUrl) ? filesLink.dataset.targetUrl : '/logowaniedozmodyfikowanieplikuhtml';
+            const profileDisclaimerModal = document.getElementById('profileDisclaimerModal');
+            const profileDisclaimerAgree = document.getElementById('profileDisclaimerAgree');
+            const profileDisclaimerCancel = document.getElementById('profileDisclaimerCancel');
+            const profileDisclaimerConfirm = document.getElementById('profileDisclaimerConfirm');
+
+            function openProfileDisclaimer() {
+                if (!profileDisclaimerModal) return;
+                profileDisclaimerModal.style.display = 'block';
+                if (profileDisclaimerAgree) profileDisclaimerAgree.checked = false;
+                if (profileDisclaimerConfirm) profileDisclaimerConfirm.disabled = true;
+            }
+
+            function closeProfileDisclaimer() {
+                if (!profileDisclaimerModal) return;
+                profileDisclaimerModal.style.display = 'none';
+            }
+
+            if (filesLink) {
+                filesLink.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    if (typeof event.stopImmediatePropagation === 'function') {
+                        event.stopImmediatePropagation();
+                    }
+                    openProfileDisclaimer();
+                }, true);
+            }
+
+            if (profileDisclaimerCancel) {
+                profileDisclaimerCancel.addEventListener('click', function() {
+                    closeProfileDisclaimer();
+                });
+            }
+
+            if (profileDisclaimerAgree && profileDisclaimerConfirm) {
+                profileDisclaimerAgree.addEventListener('change', function() {
+                    profileDisclaimerConfirm.disabled = !profileDisclaimerAgree.checked;
+                });
+            }
+
+            if (profileDisclaimerConfirm) {
+                profileDisclaimerConfirm.addEventListener('click', function() {
+                    if (!profileDisclaimerAgree || !profileDisclaimerAgree.checked) return;
+                    window.location.href = filesTargetUrl;
+                });
             }
         });
 
@@ -278,3 +269,5 @@
     </script>
 </body>
 </html>
+
+

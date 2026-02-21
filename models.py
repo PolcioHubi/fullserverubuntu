@@ -18,6 +18,7 @@ class User(db.Model):
     password_reset_token = db.Column(db.String, nullable=True, index=True)
     password_reset_expires = db.Column(db.DateTime, nullable=True)
     recovery_token = db.Column(db.String, nullable=True, index=True)
+    recovery_token_expires = db.Column(db.DateTime, nullable=True, index=True)
     has_seen_tutorial = db.Column(db.Boolean, nullable=False, default=False)
 
     # Relationships
@@ -34,6 +35,7 @@ class User(db.Model):
         password: str,
         access_key_used: Optional[str] = None,
         recovery_token: Optional[str] = None,
+        recovery_token_expires: Optional[datetime] = None,
         has_seen_tutorial: bool = False,
         **kwargs
     ):
@@ -42,6 +44,7 @@ class User(db.Model):
         self.password = password
         self.access_key_used = access_key_used
         self.recovery_token = recovery_token
+        self.recovery_token_expires = recovery_token_expires
         self.has_seen_tutorial = has_seen_tutorial
 
 

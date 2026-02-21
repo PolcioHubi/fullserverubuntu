@@ -1,13 +1,14 @@
 import logging
 import bcrypt
+import hashlib
 import secrets
 import datetime
 from typing import List, Optional, Tuple
+from flask import current_app, has_app_context
 from flask_login import UserMixin
 from sqlalchemy.exc import IntegrityError
 from models import db, User
 from services import AccessKeyService, NotificationService
-import threading
 
 
 # Add UserMixin to the User model from models.py for Flask-Login compatibility
@@ -28,7 +29,6 @@ class UserAuthManager:
         """Initializes the manager with its dependencies."""
         self.access_key_service = access_key_service
         self.notification_service = notification_service
-        self.hubert_coins_lock = threading.Lock()
 
     def _hash_password(self, password: str) -> str:
         hashed = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt(rounds=self.BCRYPT_ROUNDS))
@@ -41,6 +41,10 @@ class UserAuthManager:
             )
         except (ValueError, TypeError):
             return False
+
+    @staticmethod
+    def _hash_token(token: str) -> str:
+        return hashlib.sha256(token.encode("utf-8")).hexdigest()
 
     def validate_referral_code(self, code: str) -> bool:
         """Checks if a referral code (username) exists and is active."""
@@ -86,6 +90,19 @@ class UserAuthManager:
                     f"Registration failed for {username}: Username too long (length: {len(username)})."
                 )
                 return False, "Nazwa użytkownika może mieć maksymalnie 50 znaków", None
+            # Ensure username is safe for filesystem-backed user directories.
+            forbidden_chars = set('<>:"/\\|?*')
+            if (
+                "\x00" in username
+                or username.startswith(".")
+                or ".." in username
+                or any(char in forbidden_chars for char in username)
+                or any(ord(char) < 32 for char in username)
+            ):
+                logging.warning(
+                    f"Registration failed for {username}: Username contains forbidden characters."
+                )
+                return False, "Nazwa użytkownika zawiera niedozwolone znaki", None
             if len(password) < 6:
                 logging.warning(
                     f"Registration failed for {username}: Password too short (length: {len(password)})."
@@ -106,17 +123,39 @@ class UserAuthManager:
 
             hashed_password = self._hash_password(password)
             recovery_token = secrets.token_urlsafe(16)
+            recovery_token_hash = self._hash_token(recovery_token)
+            recovery_token_ttl_hours = 24
+            if has_app_context():
+                try:
+                    recovery_token_ttl_hours = int(
+                        current_app.config.get("RECOVERY_TOKEN_TTL_HOURS", 24)
+                    )
+                except (TypeError, ValueError):
+                    recovery_token_ttl_hours = 24
+            recovery_token_expires = datetime.datetime.now() + datetime.timedelta(
+                hours=max(1, recovery_token_ttl_hours)
+            )
 
             new_user = User(
                 username=username,
                 password=hashed_password,
                 access_key_used=access_key,
-                recovery_token=recovery_token,
+                recovery_token=recovery_token_hash,
+                recovery_token_expires=recovery_token_expires,
                 has_seen_tutorial=mark_tutorial_seen,  # Set tutorial status
             )
             db.session.add(new_user)
 
-            self.access_key_service.use_access_key(access_key)
+            access_key_used = self.access_key_service.use_access_key(
+                access_key, commit=False
+            )
+            if not access_key_used:
+                db.session.rollback()
+                return (
+                    False,
+                    "Ten klucz dostępu został już wykorzystany lub jest nieaktywny.",
+                    None,
+                )
 
             message = "Użytkownik zarejestrowany pomyślnie"
             if (
@@ -130,7 +169,9 @@ class UserAuthManager:
                     message += ". Otrzymałeś 1 Hubert Coin za polecenie!"
 
             self.notification_service.create_notification(
-                username, "Witaj w mObywatel! Dziękujemy za rejestrację."
+                username,
+                "Witaj w mObywatel! Dziękujemy za rejestrację.",
+                commit=False,
             )
 
             db.session.commit()
@@ -202,18 +243,37 @@ class UserAuthManager:
         return False
 
     def update_hubert_coins(self, username: str, amount: int) -> Tuple[bool, str]:
-        with self.hubert_coins_lock:
-            user = User.query.filter_by(username=username).first()
-            if not user:
-                return False, "Użytkownik nie został znaleziony"
+        try:
+            base_query = User.query.filter_by(username=username)
+            if amount < 0:
+                # Atomic guard to prevent race-driven negative balances.
+                base_query = base_query.filter(User.hubert_coins >= -amount)
 
-            new_balance = user.hubert_coins + amount
-            if new_balance < 0:
+            updated_rows = base_query.update(
+                {User.hubert_coins: User.hubert_coins + amount},
+                synchronize_session=False,
+            )
+
+            if updated_rows == 0:
+                user = User.query.filter_by(username=username).first()
+                db.session.rollback()
+                if not user:
+                    return False, "Użytkownik nie został znaleziony"
                 return False, "Niewystarczająca ilość Hubert Coins"
 
-            user.hubert_coins = new_balance
             db.session.commit()
+            new_balance = (
+                User.query.with_entities(User.hubert_coins)
+                .filter_by(username=username)
+                .scalar()
+            )
             return True, f"Zaktualizowano saldo Hubert Coins do: {new_balance}"
+        except Exception as e:
+            db.session.rollback()
+            logging.error(
+                f"Error updating Hubert Coins for {username}: {e}", exc_info=True
+            )
+            return False, "Wystąpił błąd podczas aktualizacji Hubert Coins"
 
     def reset_user_password(self, username: str, new_password: str) -> Tuple[bool, str]:
         if len(new_password) < 6 or len(new_password) > 100:
@@ -233,7 +293,7 @@ class UserAuthManager:
             return None
 
         token = secrets.token_urlsafe(32)
-        user.password_reset_token = token
+        user.password_reset_token = self._hash_token(token)
         user.password_reset_expires = datetime.datetime.now() + datetime.timedelta(
             hours=1
         )
@@ -243,7 +303,8 @@ class UserAuthManager:
     def reset_user_password_with_token(
         self, token: str, new_password: str
     ) -> Tuple[bool, str]:
-        user = User.query.filter_by(password_reset_token=token).first()
+        token_hash = self._hash_token(token)
+        user = User.query.filter_by(password_reset_token=token_hash).first()
 
         if not user:
             return False, "Nieprawidłowy token"
@@ -267,12 +328,19 @@ class UserAuthManager:
             return False, "Nowe hasło musi mieć od 6 do 100 znaków"
 
         user = User.query.filter_by(
-            username=username, recovery_token=recovery_token
+            username=username, recovery_token=self._hash_token(recovery_token)
         ).first()
         if not user:
             return False, "Nieprawidłowa nazwa użytkownika lub token odzyskiwania"
+        if (
+            user.recovery_token_expires is None
+            or datetime.datetime.now() > user.recovery_token_expires
+        ):
+            return False, "Nieprawidłowa nazwa użytkownika lub token odzyskiwania"
 
         user.password = self._hash_password(new_password)
+        user.recovery_token = None
+        user.recovery_token_expires = None
         db.session.commit()
         return True, "Hasło zostało pomyślnie zresetowane"
 
