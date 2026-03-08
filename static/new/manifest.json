@@ -1,0 +1,26 @@
+{
+  "name": "mObywatel",
+  "short_name": "mObywatel",
+  "display": "standalone",
+  "orientation": "portrait",
+  "scope": "/",
+  "start_url": "/documents",
+  "background_color": "#f6f9fb",
+  "theme_color": "#f6f9fb",
+  "description": "Aplikacja mObywatel",
+  "categories": ["government", "utilities"],
+  "icons": [
+      {
+        "src": "/assets/img/apple-180x.png",
+        "sizes": "180x180",
+        "type": "image/png",
+        "purpose": "any"
+      },
+      {
+        "src": "/assets/img/logo.png",
+        "sizes": "512x512",
+        "type": "image/png",
+        "purpose": "any maskable"
+      }
+  ]
+}

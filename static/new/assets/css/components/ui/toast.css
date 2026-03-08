@@ -1,0 +1,100 @@
+.toast-wrapper {
+    position: fixed;
+    bottom: var(--responsive-space-s);
+    right: var(--responsive-space-s);
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 0;
+    max-width: 380px;
+    width: calc(100% - 48px);
+    z-index: 2147483647;
+}
+
+/* Dodajemy styl dla urządzeń mobilnych */
+@media (max-width: 768px) {
+    .toast-wrapper {
+        left: 50%;
+        right: auto; /* wyłączamy ustawienie right */
+        transform: translateX(-50%);
+    }
+}
+
+.toast-wrapper:hover {
+    gap: 8px;
+}
+
+.toast {
+    background-color: rgba(var(--card), 1);
+    backdrop-filter: blur(8px);
+    color: rgba(var(--card-foreground), 1);
+    padding: 12px 16px;
+    border-radius: var(--radius-m);
+    border: 1px solid rgba(var(--border), 1);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    transition: all 0.3s ease;
+    transform-origin: bottom center;
+    animation: fade-up 0.3s ease-out;
+}
+
+.toast-first {
+    z-index: 3;
+}
+
+.toast-second {
+    z-index: 2;
+}
+
+.toast-third {
+    z-index: 1;
+}
+
+.toast-wrapper:not(:hover) .toast-first {
+    transform: scaleX(1);
+    margin-top: -50px;
+}
+
+.toast-wrapper:not(:hover) .toast-second {
+    transform: scaleX(0.94);
+    margin-top: -50px;
+}
+
+.toast-wrapper:not(:hover) .toast-third {
+    transform: scaleX(0.9);
+    opacity: 0.5;
+}
+
+.toast-wrapper:hover .toast {
+    transform: scaleX(1);
+}
+
+.toast-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.toast-title {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.toast-action {
+    background-color: rgba(var(--card-foreground), 0.1);
+    color: rgba(var(--card-foreground), 1);
+    border: none;
+    padding: 4px 8px;
+    border-radius: var(--radius-s);
+    font-size: var(--text-size-default);
+    cursor: pointer;
+}
+
+.toast-action:hover {
+    background-color: rgba(var(--card-foreground), 0.2);
+}
+
+.toast-message {
+    font-size: var(--text-size-default);
+    color: rgba(var(--card-foreground), 0.5);
+}

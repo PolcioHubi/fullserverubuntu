@@ -1,0 +1,13 @@
+a {
+    font-weight: 400;
+    font-size: var(--text-size-default);
+}
+
+a {
+    text-decoration: none;
+    color: rgba(var(--primary), 0.7);
+}
+
+a:hover {
+    color: rgba(var(--primary), 0.5);
+}

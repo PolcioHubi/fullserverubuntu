@@ -1,0 +1,20 @@
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500">
+	<style>
+		.s0 { fill: none;stroke: #285ff4;stroke-width: 25 } 
+		.s1 { fill: #285ff4 } 
+	</style>
+	<path id="outline" fill-rule="evenodd" class="s0" d="m122 50h255c33.1 0 60 26.9 60 60v244c0 33.1-26.9 60-60 60h-255c-33.1 0-60-26.9-60-60v-244c0-33.1 26.9-60 60-60z"/>
+	<path id="bumper" fill-rule="evenodd" class="s1" d="m55 293.3v-20.9h390v20.9z"/>
+	<g id="reflectors">
+		<path id="left_reflector" fill-rule="evenodd" class="s1" d="m154.5 370c-12.4 0-22.5-10.1-22.5-22.5 0-12.4 10.1-22.5 22.5-22.5 12.4 0 22.5 10.1 22.5 22.5 0 12.4-10.1 22.5-22.5 22.5z"/>
+		<path id="right_reflector" fill-rule="evenodd" class="s1" d="m358.5 370c-12.4 0-22.5-10.1-22.5-22.5 0-12.4 10.1-22.5 22.5-22.5 12.4 0 22.5 10.1 22.5 22.5 0 12.4-10.1 22.5-22.5 22.5z"/>
+	</g>
+	<g id="mirrors">
+		<path id="left_mirror" fill-rule="evenodd" class="s1" d="m47.5 125c6.9 0 12.5 5.6 12.5 12.5v55c0 6.9-5.6 12.5-12.5 12.5-6.9 0-12.5-5.6-12.5-12.5v-55c0-6.9 5.6-12.5 12.5-12.5z"/>
+		<path id="right_mirror" fill-rule="evenodd" class="s1" d="m452.5 125c6.9 0 12.5 5.6 12.5 12.5v55c0 6.9-5.6 12.5-12.5 12.5-6.9 0-12.5-5.6-12.5-12.5v-55c0-6.9 5.6-12.5 12.5-12.5z"/>
+	</g>
+	<g id="Tires">
+		<path id="tire" class="s0" d="m388 418.5v44.5c0 7.7-6.3 14-14 14h-43c-7.7 0-14-6.3-14-14v-44.5zm0-1.5v44.5c0 7.8-6.3 14-14 14h-43c-7.7 0-14-6.2-14-14v-44.5z"/>
+		<path id="tire copy" class="s0" d="m193 417.5v44.5c0 7.7-6.3 14-14 14h-43c-7.7 0-14-6.3-14-14v-44.5zm0-1.5v44.5c0 7.8-6.3 14-14 14h-43c-7.7 0-14-6.2-14-14v-44.5z"/>
+	</g>
+</svg>

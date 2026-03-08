@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="default" data-mode="light" data-custom>
+<head>
+    <!-- Meta -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="description" content="">
+    <meta name="author" content="mObywatel">
+    <!-- Default Meta -->
+            <meta name="theme-color" content="#f5f6fb">
+        <meta name="apple-mobile-web-app-title" content="mObywatel">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <!-- [LOCAL] noscript redirect disabled -->
+    <!-- Open Graph Meta -->
+    <meta property='og:title' content='mObywatel'>
+    <meta property='og:description' content=''>
+    <meta property='og:type' content='website'>
+    <meta property='og:locale' content='en_US'>
+    <meta property='og:image' content='/assets/img/logo.png'>
+    <!-- Twitter Meta -->
+    <meta name='twitter:card' content='summary'>
+    <meta name='twitter:title' content='mObywatel'>
+    <meta name='twitter:description' content=''>
+    <meta name='twitter:image' content='/assets/img/logo.png'>
+    <!-- Links -->
+    <link rel="shortcut icon" href="/assets/img/logo.png" type="image/x-icon">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-180x.png">
+    <link rel="apple-touch-startup-image" sizes="180x180" href="/assets/img/apple-180x.png">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <!-- JavaScript -->
+    <script src='/assets/js/global/jquery.js'></script>
+    <script src='/assets/js/global/qrcode.js'></script>
+    <!-- Service Worker -->
+    <script src="/assets/js/global/worker-starter.js"></script>
+    <!-- Libraries & Assets -->
+    <script src="/assets/js/global/utilities.js"></script>
+    <!-- Pages -->
+    <script src="/assets/js/pages/index.js"></script>
+    <script src='/assets/js/pages/login.js'></script>                    <!-- Documents -->
+                    <!-- Main JavaScript -->
+    <script src="/assets/js/script.js"></script>
+    <script>
+        $(function() { if (typeof loginManager !== 'undefined') loginManager.init(); });
+    </script>
+    <script src="/assets/js/global/enhancements.js" defer></script>
+    <!-- Title -->
+    <title>mObywatel</title>
+</head>
+<body class="login-body">
+    <div class="login-bg fillHeight fillWidth overflow[hidden]" data-standalone>
+        <div class="relative fillWidth fillHeight us[none] px[s]" data-wrapper>
+            <div class="flex direction[row] justify[start] align[start] g[xs] fillWidth height[110px] pt[l]">
+                <div class="flex justify[center] align[center] square[50px] overflow[hidden]">
+                    <img class='square[45px]' src="/assets/svg/logo.svg" alt="logo">
+                </div>
+                <div class="height[50px] flex align[center]"><h1 class="font[Inter] font-weight[700] text-size[24]">mObywatel</h1></div>
+            </div>
+            <div class="flex direction[column] g[l] justify[start] align[center] fillWidth fillHeight">
+                <div class="flex direction[column] g[8] fillWidth">
+                    <h1 class="font[Inter] text-size[32] font-weight[700]">Dzień dobry!</h1>
+                    <p class="label font[Inter] font-weight[400] text-size[16]">Zaloguj się do aplikacji</p>
+                </div>
+                <div class="card shadow flex direction[column] g[8] justify[start] align[start] fillWidth autoHeight p[s] radius[xl]">
+                    <p class="label text-size[14]">Hasło</p>
+                    <div class="relative fillWidth autoHeight min-height[50px] max-height[50px]" data-group="password">
+                        <input class="p[s] radius[l] border-solid-1 fillWidth min-height[60px]" minlength="6" maxlength="20" type="password" autocomplete="off">
+                        <div class="eye absolute flex justify[center] align[center] square[30px]">
+                            <i class="cursor[pointer] fat fa-eye text-size[xs]"></i>
+                        </div>
+                    </div>
+                    <div class="flex fillWidth autoHeight direction[column] g[s] pt[xs]">
+                        <div class="fillWidth flex direction[row] align[center] danger display-none" data-message="danger">
+                            <i class="fas fa-warning prefix"></i><p class="font-weight[500] text-size[16] text-align[left] fillWidth"></p>
+                        </div>
+                        <div class="fillWidth flex direction[row] align[center]">
+                            <a class="redirect font-weight[500] text-size[16] text-align[left] fillWidth" data-button="forgot">Nie pamiętasz hasła?</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="sticky flex direction[column] g[8] justify[start] align[center] bottom[0] height[120px]" data-group="submit">
+                <button class="primary fillWidth radius[xl] border[unset] py[s]">Zaloguj się</button>
+                <div class="flex direction[row] justify[between] align[center] fillWidth autoHeight">
+                    <div class="card white radius[s] px[4] flex fillWidth direction[row] align[center] g[4] autoHeight min-height[30px]">
+                        <div class="fillWidth fillHeight max-height[20px]">
+                            <img class="login-logo" src="/assets/svg/login/kpo.svg" alt="kop">
+                        </div>
+                        <div class="fillWidth fillHeight max-height[20px]">
+                            <img class="login-logo" src="/assets/svg/login/rp.svg" alt="rp">
+                        </div>
+                        <div class="fillWidth fillHeight max-height[20px]">
+                            <img class="login-logo" src="/assets/svg/login/eu.svg" alt="eu">
+                        </div>
+                        <div class="fillWidth fillHeight max-height[30px]">
+                            <img src="/assets/svg/login/mc.svg" class="max-width[80px]" alt="mc">
+                        </div>
+                    </div>
+                </div>
+                <p class="label fillWidth text-align[center] text-size[12] font-weight[300]">wersja 4.71.1 (2)</p>
+            </div>
+        </div>
+        <div class="forgot absolute top[0] z[max] fillWidth fillHeight background[unset]" style="transform: translateX(100%);">
+            <div class="dashboard-navigation sticky top[0] background[unset] flex direction[row] justify[between] align[end] g[s] fillWidth  height[45px] px[s] z[2] pb[xs]">
+                <a class="redirect flex direction[row] g[4] align[center] font-weight[400] text-size[16] text-align[left]" data-button="forgot_back"><i class="far fa-chevron-left text-size[24]"></i>Wróć</a>    
+            </div>
+            <div class="relative fillWidth fillHeight us[none] px[s] py[s]">
+                <div class="flex direction[column] g[s] fillWidth autoHeight">
+                    <div class="flex justify[center] align[center] radius[full] square[80px]" style="background-color: rgba(var(--blue-inactive), 1);">
+                        <img src="/assets/svg/login/password.svg" class="square[45px] z[1]">
+                    </div>
+                    <div class="autoHeight fillWidth flex justify[start] align[center]">
+                        <h1 class="font[Inter] font-weight[700] text-size[32]">Nie pamiętasz hasła?</h1>
+                    </div>
+                    <div class="autoHeight fillWidth flex justify[start] align[center]">
+                        <p class="label font[Inter] font-weight[400] text-size[16]">Reaktywuj aplikacje - ustaw nowe hasło, dodaj dokument i potwierdź swoją tożsamość</p>
+                    </div>
+                    <div class="autoHeight fillWidth flex justify[start] align[center]">
+                        <h1 class="font[Inter] font-weight[700] text-size[24]">Co musisz zrobić?</h1>
+                    </div>
+                    <div class="autoHeight fillWidth flex justify[start] align[center]">
+                        <p class="label font[Inter] font-weight[400] text-size[16]">Potwierdź swoją tożsamość zaufanym profilem, swoim e-dowodem lub bankowością elektroniczną</p>
+                    </div>
+                </div>
+            </div>
+            <div class="sticky bottom[0] fillWidth autoHeight py[s] pb[m] px[s]">
+                <button class="primary fillWidth radius[full] border[unset] py[s]">Reaktywuj</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

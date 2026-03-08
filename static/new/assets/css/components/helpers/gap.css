@@ -1,0 +1,25 @@
+.g\[0\]   { gap: var(--static-space-0)   }
+.g\[1\]   { gap: var(--static-space-1)   }
+.g\[2\]   { gap: var(--static-space-2)   }
+.g\[4\]   { gap: var(--static-space-4)   }
+.g\[8\]   { gap: var(--static-space-8)   }
+.g\[12\]  { gap: var(--static-space-12)  }
+.g\[16\]  { gap: var(--static-space-16)  }
+.g\[20\]  { gap: var(--static-space-20)  }
+.g\[24\]  { gap: var(--static-space-24)  }
+.g\[32\]  { gap: var(--static-space-32)  }
+.g\[40\]  { gap: var(--static-space-40)  }
+.g\[48\]  { gap: var(--static-space-48)  }
+.g\[56\]  { gap: var(--static-space-56)  }
+.g\[64\]  { gap: var(--static-space-64)  }
+.g\[80\]  { gap: var(--static-space-80)  }
+.g\[104\] { gap: var(--static-space-104) }
+.g\[128\] { gap: var(--static-space-128) }
+.g\[160\] { gap: var(--static-space-160) }
+
+.g\[xs\] { gap:var(--responsive-space-xxs) }
+.g\[xs\] { gap:var(--responsive-space-xs) }
+.g\[s\]  { gap:var(--responsive-space-s)  }
+.g\[m\]  { gap:var(--responsive-space-m)  }
+.g\[l\]  { gap:var(--responsive-space-l)  }
+.g\[xl\] { gap:var(--responsive-space-xl) }

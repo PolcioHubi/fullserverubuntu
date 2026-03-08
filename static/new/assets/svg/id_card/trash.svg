@@ -1,0 +1,11 @@
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500">
+	<title>trash</title>
+	<style>
+		.s0 { fill: none;stroke: #cd291c;stroke-miterlimit:100;stroke-width: 20 } 
+		.s1 { fill: #cd291c } 
+	</style>
+	<path id="Shape 1" class="s0" d="m139.5 102h221c19.6 0 35.5 15.9 35.5 35.5v30.5c0 2.8-2.2 5-5 5h-282c-2.8 0-5-2.2-5-5v-30.5c0-19.6 15.9-35.5 35.5-35.5zm79.5-45h60c11 0 20 9 20 20v20h-100v-20c0-11 9-20 20-20z"/>
+	<path id="Shape 3" fill-rule="evenodd" class="s1" d="m205 235h10c5.5 0 10 4.5 10 10v115c0 5.5-4.5 10-10 10h-10c-5.5 0-10-4.5-10-10v-115c0-5.5 4.5-10 10-10z"/>
+	<path id="Shape 3 copy" fill-rule="evenodd" class="s1" d="m285 236h10c5.5 0 10 4.5 10 10v115c0 5.5-4.5 10-10 10h-10c-5.5 0-10-4.5-10-10v-115c0-5.5 4.5-10 10-10z"/>
+	<path id="Shape 2" fill-rule="evenodd" class="s0" d="m365 218v176c0 19.3-15.7 35-35 35h-160c-19.3 0-35-15.7-35-35v-176h1v175c0 19.3 15.7 35 35 35h158c19.3 0 35-15.7 35-35v-175z"/>
+</svg>

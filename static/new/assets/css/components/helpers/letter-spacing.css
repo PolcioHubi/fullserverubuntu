@@ -1,0 +1,24 @@
+.letter-spacing\[xl\]  { letter-spacing: var(--text-size-xl);  }
+.letter-spacing\[l\]   { letter-spacing: var(--text-size-l);   }
+.letter-spacing\[m\]   { letter-spacing: var(--text-size-m);   }
+.letter-spacing\[s\]   { letter-spacing: var(--text-size-s);   }
+.letter-spacing\[xs\]  { letter-spacing: var(--text-size-xs);  }
+.letter-spacing\[xxs\] { letter-spacing: var(--text-size-xxs); }
+.letter-spacing\[default\] { letter-spacing: var(--text-size-default); }
+
+.letter-spacing\[2\] { letter-spacing: 2px !important; }
+.letter-spacing\[4\] { letter-spacing: 4px !important; }
+.letter-spacing\[6\] { letter-spacing: 6px !important; }
+.letter-spacing\[8\] { letter-spacing: 8px !important; }
+.letter-spacing\[10\] { letter-spacing: 10px !important; }
+.letter-spacing\[12\] { letter-spacing: 12px !important; }
+.letter-spacing\[14\] { letter-spacing: 14px !important; }
+.letter-spacing\[16\] { letter-spacing: 16px !important; }
+.letter-spacing\[18\] { letter-spacing: 18px !important; }
+.letter-spacing\[20\] { letter-spacing: 20px !important; }
+.letter-spacing\[22\] { letter-spacing: 22px !important; }
+.letter-spacing\[24\] { letter-spacing: 24px !important; }
+.letter-spacing\[26\] { letter-spacing: 26px !important; }
+.letter-spacing\[28\] { letter-spacing: 28px !important; }
+.letter-spacing\[30\] { letter-spacing: 30px !important; }
+.letter-spacing\[32\] { letter-spacing: 32px !important; }

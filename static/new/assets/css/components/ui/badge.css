@@ -1,0 +1,36 @@
+.badge {
+    width: fit-content;
+    height: fit-content;
+    padding: var(--static-space-4);
+    font-weight: 550;
+}
+
+.badge.primary {
+    background-color: rgba(var(--card), 1);
+    color: rgba(var(--primary), 1);
+    border: 1px solid rgba(var(--border), 1);
+}
+
+.badge.primary:hover {
+    filter: brightness(0.8);
+}
+
+.badge.secondary {
+    background-color: rgba(var(--background), 0.5);
+    color: rgba(var(--primary), 1);
+    border: 1px solid rgba(var(--border), 1);
+}
+
+.badge.secondary:hover {
+    background-color: rgba(var(--border), 1);
+}
+
+.badge.danger {
+    background-color: rgba(var(--destructive), 1);
+    color: rgba(var(--destructive-foreground), 1);
+    border: 1px solid rgba(var(--destructive), 1);
+}
+
+.badge.danger:hover {
+    filter: brightness(0.8);
+}

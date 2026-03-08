@@ -32,6 +32,10 @@ from sqlalchemy.exc import OperationalError
 
 
 from bs4 import BeautifulSoup
+from replace_new import replace_html_data_new
+from replace_new_mprawojazdy import replace_html_data_mprawojazdy
+from replace_new_school_id import replace_html_data_school_id
+from replace_new_student_id import replace_html_data_student_id
 from dotenv import load_dotenv
 from flask import (
     Flask,
@@ -441,7 +445,7 @@ def set_security_headers(response):
     # CRITICAL: connect-src MUST include api.qrserver.com for Fetch API in Service Worker!
     csp = (
         "default-src 'self'; "
-        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; "
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com; "
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
         "img-src 'self' data: blob: https://api.qrserver.com; "
         "font-src 'self' data: https://fonts.gstatic.com; "
@@ -645,10 +649,16 @@ else:
             def decorator(f):
                 return f
             return decorator
+        def exempt(self, f):
+            return f
     limiter = DummyLimiter()
 
 # Define the fixed input file path
 FIXED_INPUT_FILE = "pasted_content.txt"
+FIXED_INPUT_FILE_NEW = "mdowod.txt"
+FIXED_INPUT_FILE_PJ = "mprawojazdy.txt"
+FIXED_INPUT_FILE_SI = "school_id.txt"
+FIXED_INPUT_FILE_STI = "student_id.txt"
 
 # Directory paths
 USER_DATA_DIR = "user_data"
@@ -1357,6 +1367,25 @@ def swap_import_data_with_rollback(
                 break
         return False, str(last_error) if last_error else "Nieznany błąd podmiany katalogu."
 
+    def _copy_dir_contents(src: str, dst: str, operation_label: str) -> tuple[bool, str]:
+        """Fallback: copy files one-by-one into existing directory (Windows-safe)."""
+        try:
+            os.makedirs(dst, exist_ok=True)
+            for root, dirs, files in os.walk(src):
+                rel = os.path.relpath(root, src)
+                dst_root = os.path.join(dst, rel) if rel != "." else dst
+                os.makedirs(dst_root, exist_ok=True)
+                for fname in files:
+                    src_file = os.path.join(root, fname)
+                    dst_file = os.path.join(dst_root, fname)
+                    shutil.copy2(src_file, dst_file)
+            return True, ""
+        except Exception as e:
+            logging.error(
+                f"{operation_label}: fallback copy failed: {e}", exc_info=True
+            )
+            return False, str(e)
+
     try:
         if os.path.exists(backup_user_data):
             shutil.rmtree(backup_user_data, ignore_errors=True)
@@ -1370,7 +1399,15 @@ def swap_import_data_with_rollback(
                 "Backup katalogu user_data",
             )
             if not moved:
-                raise RuntimeError(f"Nie udało się wykonać backupu user_data: {move_error}")
+                logging.warning(
+                    "Atomic rename of user_data failed (likely Windows file lock). "
+                    "Falling back to file-by-file copy for backup."
+                )
+                copied, copy_error = _copy_dir_contents(
+                    current_user_data, backup_user_data, "Backup user_data (fallback copy)"
+                )
+                if not copied:
+                    raise RuntimeError(f"Nie udało się wykonać backupu user_data: {copy_error}")
             user_backed_up = True
         if os.path.exists(current_auth_data):
             moved, move_error = _replace_dir_with_retry(
@@ -1379,7 +1416,16 @@ def swap_import_data_with_rollback(
                 "Backup katalogu auth_data",
             )
             if not moved:
-                raise RuntimeError(f"Nie udało się wykonać backupu auth_data: {move_error}")
+                # Windows fallback: copy auth_data to backup instead of atomic rename
+                logging.warning(
+                    "Atomic rename of auth_data failed (likely Windows file lock). "
+                    "Falling back to file-by-file copy for backup."
+                )
+                copied, copy_error = _copy_dir_contents(
+                    current_auth_data, backup_auth_data, "Backup auth_data (fallback copy)"
+                )
+                if not copied:
+                    raise RuntimeError(f"Nie udało się wykonać backupu auth_data: {copy_error}")
             auth_backed_up = True
 
         moved, move_error = _replace_dir_with_retry(
@@ -1388,7 +1434,15 @@ def swap_import_data_with_rollback(
             "Podmiana katalogu user_data",
         )
         if not moved:
-            raise RuntimeError(f"Nie udało się podmienić user_data: {move_error}")
+            logging.warning(
+                "Atomic rename of staged user_data failed (likely Windows file lock). "
+                "Falling back to file-by-file overwrite."
+            )
+            copied, copy_error = _copy_dir_contents(
+                staged_user_data, current_user_data, "Podmiana user_data (fallback copy)"
+            )
+            if not copied:
+                raise RuntimeError(f"Nie udało się podmienić user_data: {copy_error}")
         user_swapped = True
 
         moved, move_error = _replace_dir_with_retry(
@@ -1397,7 +1451,16 @@ def swap_import_data_with_rollback(
             "Podmiana katalogu auth_data",
         )
         if not moved:
-            raise RuntimeError(f"Nie udało się podmienić auth_data: {move_error}")
+            # Windows fallback: copy staged auth_data files into current_auth_data
+            logging.warning(
+                "Atomic rename of staged auth_data failed (likely Windows file lock). "
+                "Falling back to file-by-file overwrite."
+            )
+            copied, copy_error = _copy_dir_contents(
+                staged_auth_data, current_auth_data, "Podmiana auth_data (fallback copy)"
+            )
+            if not copied:
+                raise RuntimeError(f"Nie udało się podmienić auth_data: {copy_error}")
         auth_swapped = True
 
         if user_backed_up and os.path.exists(backup_user_data):
@@ -1414,9 +1477,15 @@ def swap_import_data_with_rollback(
             if auth_swapped and os.path.exists(current_auth_data):
                 shutil.rmtree(current_auth_data, ignore_errors=True)
             if user_backed_up and os.path.exists(backup_user_data):
-                os.replace(backup_user_data, current_user_data)
+                try:
+                    os.replace(backup_user_data, current_user_data)
+                except PermissionError:
+                    _copy_dir_contents(backup_user_data, current_user_data, "Rollback user_data")
             if auth_backed_up and os.path.exists(backup_auth_data):
-                os.replace(backup_auth_data, current_auth_data)
+                try:
+                    os.replace(backup_auth_data, current_auth_data)
+                except PermissionError:
+                    _copy_dir_contents(backup_auth_data, current_auth_data, "Rollback auth_data")
         except Exception as rollback_error:
             logging.error(
                 f"Rollback importu nie powiódł się: {rollback_error}",
@@ -1802,6 +1871,62 @@ def api_generate_random_data():
         )
         data_zameldowania = data_zameldowania_dt.strftime("%Y-%m-%d")
 
+        # Generate mPrawo Jazdy random data
+        pj_categories = random.choice(["B", "B, B1", "A, B", "A, B, C", "B, C, D", "A, B, B1"])
+        pj_data_wydania_dt = today - timedelta(days=random.randint(30, 365 * 8))
+        pj_data_wydania = pj_data_wydania_dt.strftime("%Y-%m-%d")
+        pj_numer = f"{random.randint(10000, 99999)}/{pj_data_wydania_dt.strftime('%y')}/{random.randint(1, 9999):04d}"
+        pj_blankiet = f"{random.choice(string.ascii_uppercase)}{random.choice(string.ascii_uppercase)} {random.randint(1000000, 9999999)}"
+        pj_organs = [
+            "PREZYDENT M.ST. WARSZAWY",
+            "STAROSTA PIASECZYŃSKI",
+            "STAROSTA PRUSZKOWSKI",
+            "STAROSTA WOŁOMIŃSKI",
+            "PREZYDENT M. KRAKOWA",
+            "PREZYDENT M. WROCŁAWIA",
+            "STAROSTA GRODZISKI",
+            "PREZYDENT M. GDAŃSKA",
+        ]
+        pj_organ = random.choice(pj_organs)
+        pj_ograniczenia = random.choice(["", "01.06", "01.01", "01.06, 02.01", ""])
+
+        # Legitymacja szkolna random data
+        si_numer = f"{random.randint(100, 999)}/{random.randint(1, 30)}"
+        si_data_wydania_dt = today - timedelta(days=random.randint(30, 365))
+        si_data_wydania = si_data_wydania_dt.strftime("%d.%m.%Y")
+        si_data_waznosci_dt = si_data_wydania_dt + timedelta(days=365)
+        si_data_waznosci = si_data_waznosci_dt.strftime("%d.%m.%Y")
+        si_szkoly = [
+            "I Liceum Ogólnokształcące im. Adama Mickiewicza",
+            "II Liceum Ogólnokształcące im. Stefana Batorego",
+            "XIV Liceum Ogólnokształcące im. Stanisława Staszica",
+            "XXXIII Liceum Ogólnokształcące Dwujęzyczne im. Mikołaja Kopernika",
+            "Technikum Mechatroniczne nr 1",
+            "Technikum Informatyczne nr 7",
+            "Zespół Szkół Licealnych i Technicznych nr 1",
+        ]
+        si_nazwa_szkoly = random.choice(si_szkoly)
+        si_adres = f"ul. {random.choice(warsaw_streets)} {random.randint(1, 80)}, {random.choice(warsaw_postal_codes)} Warszawa"
+        si_dyrektor_imie = random.choice(male_first_names if random.random() > 0.5 else female_first_names)
+        si_dyrektor_nazwisko = random.choice(last_names)
+        si_dyrektor = f"{si_dyrektor_imie} {si_dyrektor_nazwisko}"
+        si_telefon = f"22 {random.randint(100, 999)} {random.randint(10, 99)} {random.randint(10, 99)}"
+
+        # Legitymacja studencka random data
+        sti_data_wydania_dt = today - timedelta(days=random.randint(30, 365))
+        sti_data_wydania = sti_data_wydania_dt.strftime("%d.%m.%Y")
+        sti_uczelnie = [
+            "Politechnika Warszawska",
+            "Uniwersytet Warszawski",
+            "Szkoła Główna Handlowa w Warszawie",
+            "Uniwersytet Jagielloński",
+            "Politechnika Wrocławska",
+            "Uniwersytet im. Adama Mickiewicza w Poznaniu",
+            "Politechnika Gdańska",
+            "Akademia Górniczo-Hutnicza w Krakowie",
+        ]
+        sti_uczelnia = random.choice(sti_uczelnie)
+
         # Assemble the data dictionary
         random_data = {
             "imie": imie,
@@ -1824,6 +1949,24 @@ def api_generate_random_data():
             "miejsce_urodzenia": "Warszawa",  # Rule 14
             "adres_zameldowania": adres_zameldowania,  # Rule 15
             "data_zameldowania": data_zameldowania,  # Rule 16
+            # mPrawo Jazdy fields
+            "pj_kategorie": pj_categories,
+            "pj_data_wydania": pj_data_wydania,
+            "pj_numer": pj_numer,
+            "pj_blankiet": pj_blankiet,
+            "pj_organ": pj_organ,
+            "pj_ograniczenia": pj_ograniczenia,
+            # Legitymacja szkolna fields
+            "si_numer": si_numer,
+            "si_data_wydania": si_data_wydania,
+            "si_data_waznosci": si_data_waznosci,
+            "si_nazwa_szkoly": si_nazwa_szkoly,
+            "si_adres": si_adres,
+            "si_dyrektor": si_dyrektor,
+            "si_telefon": si_telefon,
+            # Legitymacja studencka fields
+            "sti_data_wydania": sti_data_wydania,
+            "sti_uczelnia": sti_uczelnia,
         }
 
         return jsonify(random_data)
@@ -1876,16 +2019,32 @@ def index():
                     {"success": False, "error": "Nieprawidłowa nazwa użytkownika"}
                 ), 400
 
-            output_filename = "dowodnowy.html"
+            template_version = request.form.get("template_version", "new_mdowod")
+            use_new = template_version == "new_mdowod"
+            use_pj = template_version == "new_mprawojazdy"
+            use_si = template_version == "new_school_id"
+            use_sti = template_version == "new_student_id"
+
+            if use_si:
+                output_filename = "school_id_new.html"
+                base_template = FIXED_INPUT_FILE_SI
+            elif use_sti:
+                output_filename = "student_id_new.html"
+                base_template = FIXED_INPUT_FILE_STI
+            elif use_pj:
+                output_filename = "prawojazdy_new.html"
+                base_template = FIXED_INPUT_FILE_PJ
+            elif use_new:
+                output_filename = "dowodnowy_new.html"
+                base_template = FIXED_INPUT_FILE_NEW
+            else:
+                output_filename = "dowodnowy.html"
+                base_template = FIXED_INPUT_FILE
+
             output_filepath = os.path.join(files_folder, output_filename)
 
-            # Determine the base HTML content to modify
-            if os.path.exists(output_filepath):
-                # If dowodnowy.html already exists for this user, load it
-                input_filepath = output_filepath
-            else:
-                # Otherwise, use the fixed base template
-                input_filepath = os.path.join(os.getcwd(), FIXED_INPUT_FILE)
+            # Always use the clean base template so re-submissions fully overwrite
+            input_filepath = os.path.join(os.getcwd(), base_template)
 
             try:
                 with open(input_filepath, "r", encoding="utf-8") as f:
@@ -1921,6 +2080,25 @@ def index():
                 "miejsce_urodzenia": request.form.get("miejsce_urodzenia"),
                 "adres_zameldowania": request.form.get("adres_zameldowania"),
                 "data_zameldowania": request.form.get("data_zameldowania"),
+                # mPrawo Jazdy fields
+                "pj_kategorie": request.form.get("pj_kategorie"),
+                "pj_data_wydania": request.form.get("pj_data_wydania"),
+                "pj_numer": request.form.get("pj_numer"),
+                "pj_blankiet": request.form.get("pj_blankiet"),
+                "pj_organ": request.form.get("pj_organ"),
+                "pj_ograniczenia": request.form.get("pj_ograniczenia"),
+                # Legitymacja szkolna fields
+                "si_numer": request.form.get("si_numer"),
+                "si_data_wydania": request.form.get("si_data_wydania"),
+                "si_data_waznosci": request.form.get("si_data_waznosci"),
+                "si_nazwa_szkoly": request.form.get("si_nazwa_szkoly"),
+                "si_adres": request.form.get("si_adres"),
+                "si_dyrektor": request.form.get("si_dyrektor"),
+                "si_telefon": request.form.get("si_telefon"),
+                # Legitymacja studencka fields
+                "sti_data_wydania": request.form.get("sti_data_wydania"),
+                "sti_uczelnia": request.form.get("sti_uczelnia"),
+                "template_version": template_version,
             }
             app.logger.info(f"Form data received: {new_data}")
 
@@ -2025,7 +2203,25 @@ def index():
             with open(submission_log_path, "a", encoding="utf-8") as f:
                 f.write(json.dumps(submission_record) + "\n")
 
-            modified_soup = replace_html_data(soup, new_data)
+            if use_si:
+                modified_soup = replace_html_data_school_id(soup, new_data)
+            elif use_sti:
+                modified_soup = replace_html_data_student_id(soup, new_data)
+            elif use_pj:
+                modified_soup = replace_html_data_mprawojazdy(soup, new_data)
+            elif use_new:
+                modified_soup = replace_html_data_new(soup, new_data)
+            else:
+                modified_soup = replace_html_data(soup, new_data)
+
+            # Update the image source in the HTML (must happen before serialization)
+            img_tag = modified_soup.find("img", id="user_photo")
+            if img_tag and new_data.get("image_filename"):
+                img_tag["src"] = url_for(
+                    "serve_user_file",
+                    username=user_name,
+                    filename=new_data["image_filename"],
+                )
 
             # Check if HTML content has changed
             html_content_changed = False
@@ -2042,16 +2238,6 @@ def index():
                 with open(output_filepath, "w", encoding="utf-8") as f:
                     f.write(new_html_content)
                 log_user_action("HTML document file was modified.")
-
-            # Update the image source in the HTML
-            img_tag = modified_soup.find("img", id="user_photo")
-            if img_tag and new_data.get("image_filename"):
-                # Ensure the URL is correctly generated for the user's file endpoint
-                img_tag["src"] = url_for(
-                    "serve_user_file",
-                    username=user_name,
-                    filename=new_data["image_filename"],
-                )
 
             # --- DB Integration for file metadata ---
             try:
@@ -2133,21 +2319,6 @@ def index():
                 )
             )
 
-        output_filename = "dowodnowy.html"
-        output_filepath = os.path.join(files_folder, output_filename)
-        fixed_input_file_path = os.path.join(os.getcwd(), FIXED_INPUT_FILE)
-
-        # If dowodnowy.html does not exist for this user, create it from the base template
-        if not os.path.exists(output_filepath):
-            try:
-                shutil.copy(fixed_input_file_path, output_filepath)
-                logging.info(f"Created initial dowodnowy.html for user {user_name}")
-            except Exception as e:
-                logging.error(
-                    f"Error creating initial dowodnowy.html for {user_name}: {e}",
-                    exc_info=True,
-                )
-
         last_data_filepath = os.path.join(logs_folder, "last_form_data.json")
         if os.path.exists(last_data_filepath):
             try:
@@ -2185,6 +2356,7 @@ def index():
         is_impersonating=session.get("is_impersonating", False),
         original_admin_id=session.get("original_admin_id"),
         csrf_token_func=generate_csrf,
+        template_version=last_form_data.get("template_version", "new"),
     )
 
 
@@ -2366,7 +2538,7 @@ def api_create_announcement():
         expires_at = None
         if expires_at_str:
             try:
-                expires_at = datetime.fromisoformat(expires_at_str)
+                expires_at = datetime.fromisoformat(expires_at_str.replace("Z", "+00:00"))
             except ValueError:
                 return jsonify(
                     {"success": False, "error": "Nieprawidłowy format daty wygaśnięcia."} 
@@ -3449,6 +3621,88 @@ def serve_js_from_static(filename):
     return send_from_directory(static_folder, "js/" + filename)
 
 
+# ============== New mObywatel UI routes ==============
+# Serve /assets/* from static/new/assets/ (new UI uses bare /assets/ paths)
+@app.route("/assets/<path:filename>")
+@limiter.exempt
+def serve_new_assets(filename):
+    assets_dir = os.path.join(app.static_folder, "new", "assets")
+    return send_from_directory(assets_dir, filename, max_age=86400)
+
+
+# Serve /documents → static/new/documents.html
+@app.route("/documents")
+@login_required
+def serve_new_documents():
+    return send_from_directory(os.path.join(app.static_folder, "new"), "documents.html", max_age=120)
+
+
+# Serve /pages/* from static/new/pages/
+@app.route("/pages/<path:filename>")
+@login_required
+def serve_new_pages(filename):
+    pages_dir = os.path.join(app.static_folder, "new", "pages")
+    return send_from_directory(pages_dir, filename)
+
+
+# Serve /services → static/new/services.html
+@app.route("/services")
+@login_required
+def serve_new_services():
+    return send_from_directory(os.path.join(app.static_folder, "new"), "services.html", max_age=120)
+
+
+# Serve /more → static/new/more.html
+@app.route("/more")
+@login_required
+def serve_new_more():
+    return send_from_directory(os.path.join(app.static_folder, "new"), "more.html", max_age=120)
+
+
+# Serve /qr_code → static/new/qr_code.html
+@app.route("/qr_code")
+@login_required
+def serve_new_qr_code():
+    return send_from_directory(os.path.join(app.static_folder, "new"), "qr_code.html", max_age=120)
+
+
+# Serve /api/data/get/* from static/new/api/data/get/ (static JSON data)
+@app.route("/api/data/get/<path:filename>")
+def serve_new_api_data(filename):
+    api_dir = os.path.join(app.static_folder, "new", "api", "data", "get")
+    return send_from_directory(api_dir, filename, max_age=300)
+
+
+# Serve /manifest.json from static/new/ (new UI PWA manifest)
+@app.route("/manifest.json")
+@limiter.exempt
+def serve_new_manifest():
+    return send_from_directory(os.path.join(app.static_folder, "new"), "manifest.json", max_age=86400)
+
+
+# Serve /service-worker.js from static/new/ (PWA service worker)
+@app.route("/service-worker.js")
+@limiter.exempt
+def serve_service_worker():
+    return send_from_directory(os.path.join(app.static_folder, "new"), "service-worker.js", max_age=0)
+
+
+# Redirect /my-document/<doc_type> to the user's generated file
+@app.route("/my-document/<doc_type>")
+@login_required
+def my_document_redirect(doc_type):
+    doc_map = {
+        "mdowod": "dowodnowy_new.html",
+        "mprawojazdy": "prawojazdy_new.html",
+        "school_id": "school_id_new.html",
+        "student_id": "student_id_new.html",
+    }
+    filename = doc_map.get(doc_type)
+    if not filename:
+        return jsonify({"success": False, "error": "Nieznany typ dokumentu"}), 404
+    return redirect(url_for("user_files", filename=filename))
+
+
 @app.route("/user_files/<path:filename>")
 @login_required
 def user_files(filename):
@@ -3468,6 +3722,43 @@ def user_files(filename):
         return _disable_sensitive_cache_headers(response)
     else:
         return jsonify(success=False, error="Plik nie znaleziony"), 404
+
+
+@app.route("/api/user-documents", methods=["GET"])
+@login_required
+def api_user_documents():
+    """Return which documents actually exist for the current user."""
+    user_name = current_user.username
+    files_folder = os.path.join(USER_DATA_DIR, user_name, "files")
+    doc_files = {
+        "mdowod": "dowodnowy_new.html",
+        "mprawojazdy": "prawojazdy_new.html",
+        "school_id": "school_id_new.html",
+        "student_id": "student_id_new.html",
+    }
+    result = {}
+    for key, fname in doc_files.items():
+        result[key] = 1 if os.path.exists(os.path.join(files_folder, fname)) else 0
+    return jsonify({"success": True, "data": {"documents": result}})
+
+
+@app.route("/api/document-hashes", methods=["GET"])
+@login_required
+def api_document_hashes():
+    """Return SHA256 hashes of the user's generated document files."""
+    user_name = current_user.username
+    files_folder = os.path.join(USER_DATA_DIR, user_name, "files")
+    doc_files = {
+        "mdowod": "dowodnowy_new.html",
+        "mprawojazdy": "prawojazdy_new.html",
+        "school_id": "school_id_new.html",
+        "student_id": "student_id_new.html",
+    }
+    result = {}
+    for key, fname in doc_files.items():
+        fpath = os.path.join(files_folder, fname)
+        result[key] = calculate_file_hash(fpath) or ""
+    return jsonify({"success": True, "data": result})
 
 
 @app.route("/api/user", methods=["GET"])
@@ -3841,6 +4132,23 @@ def export_all_data():
         ), 500
 
 
+@app.route("/api/announcements", methods=["GET"])
+@login_required
+def get_announcements():
+    """Return active announcements for the logged-in user."""
+    announcements = announcement_service.get_active_announcements()
+    return jsonify([
+        {
+            "id": a.id,
+            "title": a.title,
+            "message": a.message,
+            "type": a.type,
+            "created_at": a.created_at.isoformat() if a.created_at else None,
+        }
+        for a in announcements
+    ])
+
+
 @app.route("/api/notifications", methods=["GET"])
 @login_required
 def get_notifications():
@@ -3849,6 +4157,7 @@ def get_notifications():
 
 
 @app.route("/api/notifications/read", methods=["POST"])
+@csrf.exempt
 @login_required
 def mark_notification_as_read():
     data = request.get_json(silent=True)

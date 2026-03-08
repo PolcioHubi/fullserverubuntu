@@ -1,0 +1,309 @@
+﻿<!DOCTYPE html>
+<html lang="en" data-theme="default" data-mode="light" data-custom>
+<head>
+    <!-- Meta -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="description" content="">
+    <meta name="author" content="mObywatel">
+    <!-- Default Meta -->
+            <meta name="theme-color" content="#f5f6fb">
+        <meta name="apple-mobile-web-app-title" content="mObywatel">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <!-- [LOCAL] noscript redirect disabled -->
+    <!-- Open Graph Meta -->
+    <meta property='og:title' content='mObywatel'>
+    <meta property='og:description' content=''>
+    <meta property='og:type' content='website'>
+    <meta property='og:locale' content='en_US'>
+    <meta property='og:image' content='/assets/img/logo.png'>
+    <!-- Twitter Meta -->
+    <meta name='twitter:card' content='summary'>
+    <meta name='twitter:title' content='mObywatel'>
+    <meta name='twitter:description' content=''>
+    <meta name='twitter:image' content='/assets/img/logo.png'>
+    <!-- Links -->
+    <link rel="shortcut icon" href="/assets/img/logo.png" type="image/x-icon">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-180x.png">
+    <link rel="apple-touch-startup-image" sizes="180x180" href="/assets/img/apple-180x.png">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <!-- JavaScript -->
+    <script src='/assets/js/global/jquery.js'></script>
+    <script src='/assets/js/global/qrcode.js'></script>
+    <!-- Service Worker -->
+    <script src="/assets/js/global/worker-starter.js"></script>
+    <!-- Libraries & Assets -->
+    <script src="/assets/js/global/utilities.js"></script>
+    <!-- Pages -->
+    <script src="/assets/js/pages/index.js"></script>
+                        <!-- Documents -->
+                <script src='/assets/js/pages/documents/mprawojazdy.js'></script>    <!-- Main JavaScript -->
+    <script src="/assets/js/script.js"></script>
+    <script src="/assets/js/global/enhancements.js" defer></script>
+    <!-- Title -->
+    <title>mObywatel</title>
+</head>
+<body class="background[unset]">
+    <div class="notification-group primary absolute bottom[50px] fillWidth height[80px] px[s] z[3] display-none">
+        <div class="notification flex justify[between] align[center] fillWidth min-height[40px] radius[xs] px[s] shadow hide">
+            <p class="font-weight[400] font[Inter] text-align[left] text-size[14]">Twoje dane są aktualne</p>
+        </div>
+    </div>
+    <div class="fillWidth fillHeight overflow[y-auto]" data-standalone>
+        <div class="dashboard-navigation sticky top[0] background[unset] flex direction[row] justify[around] align[end] g[s] fillWidth height[45px] px[s] z[max] pb[xs]">
+            <a class="redirect flex direction[row] g[4] align[center] font-weight[400] text-size[16] text-align[left] fillWidth text[nowrap] height[20px]" data-redirect="documents">
+                <i class="far fa-chevron-left text-size[24]"></i>
+                Dokumenty            </a>
+            <div class="fillWidth flex justify[center] align[center] height[20px]">
+                <h1 class="font[Inter] text-align[center] font-weight[600] text-size[18] text[nowrap]">mPrawo jazdy</h1>
+            </div>
+            <div class="flex justify[end] align[center] height[20px] fillWidth">
+                <div class="square[5px]"></div>
+            </div>
+        </div>
+        <div class="flex direction[row] justify[between] align[center] card danger fillWidth autoHeight p[xs] mb[s] display-none">
+            <p class="primary font-weight[700] font[Inter] text-align[center] text-size[16]">Wersja demonstracyjna</p>
+            <button class="radius[full] border[unset] max-height[20px] px[12] py[16] font-weight[600] text-size[16] flex justify[center] align[center]" data-button="hide_popup">
+                <p class="danger font-weight[700] font[Inter] text-align[center] text-size[14]">Ukryj</p>
+            </button>
+        </div>
+        <div class="relative fillWidth autoHeight us[none] px[s] pb[s] mb[80] documentFade" data-wrapper>
+            <div class="flex direction[column] g[s] justify[start] align[start] fillWidth fillHeight">
+                <div class="flex fillWidth autoHeight">
+                    <p class="label font[Inter] text-align[center] fillWidth text-size[12]" data-p="time" data-time="Czas:"></p>
+                </div>
+                <div class="flex direction[column] autoHeight fillWidth">
+                    <div class="card mprawojazdy flex direction[row] justify[center] align[start] fillWidth autoHeight min-height[340px] radius[m] p[20] radius[none-bottom-left] radius[none-bottom-right]">
+                        <div class="z[1] fillWidth max-width[40] fillHeight flex direction[column] justify[start] align[start] g[8]">
+                            <div class="relative width[130px] min-width[130px] height[170px] min-height[170px] overflow[hidden]">
+                                <img src="data:image/jpeg;base64,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" class="max-width[130px] fillWidth fillHeight radius[m]" style="filter: grayscale(100%); object-fit: cover; object-position: center; -webkit-mask-image: linear-gradient(to top, transparent, black 6.5%, black 96.5%, transparent), linear-gradient(to left, transparent, black 6.5%, black 96.5%, transparent); -webkit-mask-composite: intersect; mask-image: linear-gradient(to top, transparent, black 6.5%, black 96.5%, transparent), linear-gradient(to left, transparent, black 6.5%, black 96.5%, transparent); mask-composite: intersect;" alt="Uzupełnij obrazek" data-placeholder="mprawojazdy_picture">
+                            </div>
+                            <div class="autoHeight fillWidth">
+                                <img src="/assets/img/flaga.gif" class="width[70px]">
+                            </div>
+                            <div class="flex direction[row] g[4] autoHeight max-height[50px] fillWidth align[center] justify[start]">
+                                <div class="emblem" data-emblem>
+                                    <img src="/assets/img/godlo.gif" class="max-width[30px] display-flex" alt="">
+                                    <div class="emblem[card] display-none" id="emblem">
+                                        <div class="emblem[eagle]" style="--img-url: url('/assets/img/godlo_mask.png');"></div>
+                                        <div class="emblem[image]" style="--img-url: url('/assets/img/godlo.png');"></div>
+                                        <div class="emblem[mask]">
+                                            <div class="emblem[rainbow]"></div>
+                                            <div class="emblem[spectral]"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex align[center] justify[start] fillWidth fillHeight">
+                                    <p class="label text-size[10] max-width[60]" style="color: #808080;text-wrap: balance;">Rzeczpospolita Polska</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="z[1] pl[20] fillWidth fillHeight flex direction[column] justify[start] align[start] g[xs]">
+                            <div class="flex autoHeight direction[column] g[4] justify[start] align[start]">
+                                <h1 class="font[Inter] text-align[left] font-weight[600] text-size[16] text[uppercase]" data-placeholder="mprawojazdy_first_name">Kacper</h1>
+                                <p class="label font[Inter] text-align[center] font-weight[600] text-size[12]" style="color: #4a4a4a">Imię (Imiona)</p>
+                            </div>
+                            <div class="flex autoHeight direction[column] g[4] justify[start] align[start]">
+                                <h1 class="font[Inter] text-align[left] font-weight[600] text-size[16] text[uppercase]" data-placeholder="mprawojazdy_last_name">Czarnecki</h1>
+                                <p class="label font[Inter] text-align[center] font-weight[600] text-size[12]" style="color: #4a4a4a">Nazwisko</p>
+                            </div>
+                            <div class="flex autoHeight direction[column] g[4] justify[start] align[start]">
+                                <h1 class="font[Inter] text-align[left] font-weight[600] text-size[16] text[uppercase]" data-placeholder="mprawojazdy_birthday">06.03.2008<br>Warszawa</h1>
+                                <p class="label font[Inter] text-align[center] font-weight[600] text-size[12]" style="color: #4a4a4a">Data i miejsce urodzenia</p>
+                            </div>
+                            <div class="flex autoHeight direction[column] g[4] justify[start] align[start]">
+                                <h1 class="font[Inter] text-align[left] font-weight[600] text-size[16] text[uppercase]" data-placeholder="mprawojazdy_pesel">08230600359</h1>
+                                <p class="label font[Inter] text-align[center] font-weight[600] text-size[12]" style="color: #4a4a4a">Numer PESEL</p>
+                            </div>
+                            <div class="flex autoHeight direction[column] g[4] justify[start] align[start]">
+                                <h1 class="font[Inter] text-align[left] font-weight[600] text-size[16] text[uppercase]" data-placeholder="mprawojazdy_categories">A</h1>
+                                <p class="label font[Inter] text-align[center] font-weight[600] text-size[12]" style="color: #4a4a4a">Kategorie</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card shadow p[8] fillWidth height[60px] radius[none-top-left] radius[none-top-right] radius[m] flex direction[row] g[s]">
+                        <div class="flex direction[row] justify[start] align[center] fillWidth">
+                            <div class="flex justify[center] align[center] square[50px]">
+                                <img src="/assets/svg/mprawojazdy/checkmark.svg" class="square[30px]">
+                            </div>
+                            <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth px[4]">
+                                <h1 class="font-weight[600] text-size[12] text-align[left] fillWidth" style="color: #16be2d;">Dokument ważny</h1>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex direction[row] justify[center] align[center] fillWidth autoHeight min-height[90px] pt[s] px[m]">
+                    <div class="flex direction[column] justify[start] align[center] g[4] fillHeight fillWidth height[90px] min-height[90px] min-width[80px]" data-redirect="qr_code?tabOpen=scan_qr">
+                        <div class="card flex justify[center] align[center] square[50px] radius[full]">
+                            <img src="/assets/svg/mprawojazdy/check_document.svg" class="document-icon square[20px]">
+                        </div>
+                        <p class="font[Inter] text-align[center] font-weight[400] text-size[12] text[balance] max-width[80px]">Potwierdź swoje dane</p>
+                    </div>
+                    <div class="flex direction[column] justify[start] align[center] g[4] fillHeight fillWidth height[90px] min-height[90px] min-width[80px]" data-button="identity_card">
+                        <div class="card flex justify[center] align[center] square[50px] radius[full]">
+                            <img src="/assets/svg/mprawojazdy/penalty_points.svg" class="document-icon square[25px]">
+                        </div>
+                        <p class="font[Inter] text-align[center] font-weight[400] text-size[12] text[balance] max-width[50px]">Punkty Karne</p>
+                    </div>
+                    <div class="flex direction[column] justify[start] align[center] g[4] fillHeight fillWidth height[90px] min-height[90px] min-width[80px]">
+                        <div class="card flex justify[center] align[center] square[50px] radius[full]">
+                            <img src="/assets/svg/mprawojazdy/car_crash.svg" class="document-icon square[25px]">
+                        </div>
+                        <p class="font[Inter] text-align[center] font-weight[400] text-size[12] text[balance] max-width[80px]">Stłuczka</p>
+                    </div>
+                    <div class="flex direction[column] justify[start] align[center] g[4] fillHeight fillWidth height[90px] min-height[90px] min-width[80px]" data-button="other_shortcuts">
+                        <div class="card flex justify[center] align[center] square[50px] radius[full]">
+                            <img src="/assets/svg/mprawojazdy/shortcuts.svg" class="document-icon square[20px]">
+                        </div>
+                        <p class="font[Inter] text-align[center] font-weight[400] text-size[12] text[balance] max-width[80px]">Pozostałe skróty</p>
+                    </div>
+                </div>
+                <div class="card flex direction[column] justify[center] align[start] fillWidth autoHeight min-height[80px] radius[xl] shadow">
+                    <div class="flex direction[row] justify[start] align[center] p[s] fillWidth">
+                        <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth">
+                            <div class="flex direction[column] g[4] justify[start] align[center] autoWidth">
+                                <h1 class="label font-weight[400] text-size[14] text-align[left] fillWidth">Ostatnia aktualizacja</h1>
+                                <p class="font-weight[600] text-size[16] text-align[left] fillWidth" data-placeholder="mprawojazdy_last_update">28.06.2023</p>
+                            </div>
+                            <button class="secondary radius[m] border[unset] max-height[20px] px[16] py[16] font-weight[500] text-size[14] flex justify[center] align[center]" data-button="last_update_popup">Aktualizuj</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex direction[row] justify[between] align[start] g[s] fillWidth">
+                    <div class="height[30px] flex justify[center] align[center] cursor[pointer]">
+                        <h1 class="font[Inter] font-weight[600] text-size[20]">Dane dokumentu</h1>
+                    </div>
+                </div>
+                <div class="card flex direction[column] justify[start] align[start] fillWidth autoHeight radius[xl] shadow overflow[hidden]">
+                    <div class="flex direction[column] g[4] autoHeight fillWidth p[s]">
+                        <p class="label font[Inter] text-align[left] font-weight[400] text-size[14]">Data ważności</p>
+                        <div class="flex direction[row] justify[between] align[center] autoHeight fillWidth">
+                            <h1 class="font[Inter] text-align[left] font-weight[600] text-size[18]">Bezterminowo</h1>
+                        </div>
+                    </div>
+                    <div class="separator[x]"></div>
+                    <div class="flex direction[column] g[4] autoHeight fillWidth p[s]">
+                        <p class="label font[Inter] text-align[left] font-weight[400] text-size[14]">Data wydania</p>
+                        <div class="flex direction[row] justify[between] align[center] autoHeight fillWidth">
+                            <h1 class="font[Inter] text-align[left] font-weight[600] text-size[18] text[uppercase]" data-placeholder="mprawojazdy_issue"></h1>
+                        </div>
+                    </div>
+                    <div class="separator[x]"></div>
+                    <div class="flex direction[column] g[4] autoHeight fillWidth p[s]">
+                        <p class="label font[Inter] text-align[left] font-weight[400] text-size[14]">Status blankietu</p>
+                        <div class="flex direction[row] justify[start] g[8] align[center] autoHeight fillWidth">
+                            <i class="fas fa-check-circle text-size[14]" style="color: #16be2d"></i>
+                            <h1 class="font[Inter] text-align[left] font-weight[600] text-size[16]">Wydany</h1>
+                        </div>
+                    </div>
+                    <div class="separator[x]"></div>
+                    <div class="flex direction[column] g[4] autoHeight fillWidth p[s]">
+                        <p class="label font[Inter] text-align[left] font-weight[400] text-size[14]">Numer dokumentu</p>
+                        <div class="flex direction[row] justify[between] align[center] autoHeight fillWidth">
+                            <h1 class="font[Inter] text-align[left] font-weight[600] text-size[16] text[uppercase]" data-placeholder="mprawojazdy_number"></h1>
+                        </div>
+                    </div>
+                    <div class="separator[x]"></div>
+                    <div class="flex direction[column] g[4] autoHeight fillWidth p[s]">
+                        <p class="label font[Inter] text-align[left] font-weight[400] text-size[14]">Numer blankietu</p>
+                        <div class="flex direction[row] justify[between] align[center] autoHeight fillWidth">
+                            <h1 class="font[Inter] text-align[left] font-weight[600] text-size[16] text[uppercase]" data-placeholder="mprawojazdy_blank"></h1>
+                        </div>
+                    </div>
+                    <div class="separator[x]"></div>
+                    <div class="flex direction[column] g[4] autoHeight fillWidth p[s]">
+                        <p class="label font[Inter] text-align[left] font-weight[400] text-size[14]">Organ wydający</p>
+                        <div class="flex direction[row] justify[between] align[center] autoHeight fillWidth">
+                            <h1 class="font[Inter] text-align[left] font-weight[600] text-size[16] text[uppercase]" data-placeholder="mprawojazdy_issuer"></h1>
+                        </div>
+                    </div>
+                    <div class="separator[x]"></div>
+                    <div class="flex direction[column] g[4] autoHeight fillWidth p[s]">
+                        <p class="label font[Inter] text-align[left] font-weight[400] text-size[14]">Ograniczenia</p>
+                        <div class="flex direction[row] justify[between] align[center] autoHeight fillWidth">
+                            <h1 class="font[Inter] text-align[left] font-weight[600] text-size[16] text[uppercase]" data-placeholder="mprawojazdy_restrictions"></h1>
+                        </div>
+                    </div>
+                </div>
+                <div class="fillWidth autoHeight flex direction[column] g[s]" data-group="categories">
+                    
+            <div class="card flex direction[column] justify[start] align[start] fillWidth autoHeight max-height[80px] radius[xl] shadow overflow[hidden]" data-template="category">
+                <div class="flex direction[row] justify[start] align[center] p[s] fillWidth min-height[80px]">
+                    <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth px[s]">
+                        <h1 class="font-weight[600] text-size[18] text-align[left] fillWidth">Kategoria A</h1>
+                        <i class="label far fa-chevron-down"></i>
+                    </div>
+                </div>
+            </div>                </div>
+                <div class="card info flex direction[column] justify[start] align[start] fillWidth autoHeight radius[m] overflow[hidden] min-height[90px]">
+                    <div class="flex fillWidth autoHeight direction[row] g[8] p[s]">
+                        <div class="fillHeight">
+                            <img src="/assets/svg/mprawojazdy/information_circle_light.svg" alt="" class="square[25px]">
+                        </div>
+                        <div class="flex primary direction[column] g[4] fillWidth fillHeight">
+                            <p class="font-weight[400] text-size[14] text-align[left] fillWidth">Chcesz poznać szczegółowe informacje o prezentowanych danych?</p>
+                            <a class="redirect font-weight[700] text-size[16] text-align[left] fillWidth">Dowiedz się więcej</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card info flex direction[column] justify[start] align[start] fillWidth autoHeight radius[m] overflow[hidden] min-height[90px]">
+                    <div class="flex fillWidth autoHeight direction[row] g[8] p[s]">
+                        <div class="fillHeight">
+                            <img src="/assets/svg/mprawojazdy/information_circle_light.svg" alt="" class="square[25px]">
+                        </div>
+                        <div class="flex primary direction[column] g[4] fillWidth fillHeight">
+                            <p class="font-weight[400] text-size[14] text-align[left] fillWidth">Widzisz błędne dane? Możesz je zgłosić na stronie gov.pl.</p>
+                            <a class="redirect font-weight[700] text-size[16] text-align[left] fillWidth">Przejdź do gov.pl</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="navigation backdrop[8px] sticky  top[100] flex justify[end] align[center] bottom[0] height[80px] z[max]" data-group="navigation">
+    <div class="fillWidth fillHeight flex direction[row] justify[around] align[start]">
+                <a
+            href="/documents"
+            class="fillHeight fillWidth flex direction[column] g[4] justify[center] align[center] max-height[60px] mb[4] text-decoration[none]"
+            aria-label="documents"
+        >
+            <img src="/assets/svg/navigation/light/documents_active.svg" class="square[20px]" alt="documents">
+            <span class="label active text-size[10] text[nowrap]">
+                Dokumenty            </span>
+        </a>
+                <a
+            href="/services"
+            class="fillHeight fillWidth flex direction[column] g[4] justify[center] align[center] max-height[60px] mb[4] text-decoration[none]"
+            aria-label="services"
+        >
+            <img src="/assets/svg/navigation/light/services.svg" class="square[20px]" alt="services">
+            <span class="label  text-size[10] text[nowrap]">
+                Usługi            </span>
+        </a>
+                <a
+            href="/qr_code"
+            class="fillHeight fillWidth flex direction[column] g[4] justify[center] align[center] max-height[60px] mb[4] text-decoration[none]"
+            aria-label="qr_code"
+        >
+            <img src="/assets/svg/navigation/light/qr_code.svg" class="square[20px]" alt="qr_code">
+            <span class="label  text-size[10] text[nowrap]">
+                Kod QR            </span>
+        </a>
+                <a
+            href="/more"
+            class="fillHeight fillWidth flex direction[column] g[4] justify[center] align[center] max-height[60px] mb[4] text-decoration[none]"
+            aria-label="more"
+        >
+            <img src="/assets/svg/navigation/light/more.svg" class="square[20px]" alt="more">
+            <span class="label  text-size[10] text[nowrap]">
+                Więcej            </span>
+        </a>
+            </div>
+</div>
+</body>
+</html>

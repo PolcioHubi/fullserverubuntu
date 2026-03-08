@@ -1,0 +1,59 @@
+@supports (appearance: none) {
+    input[type="checkbox"] {
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      width: 20px;
+      height: 20px;
+      margin: 0;
+      border: 2px solid #bbc1e1;
+      border-radius: 4px;
+      background: #fff;
+      position: relative;     
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+    }
+  
+    /* Pseudo-znacznik ✓ – teraz wycentrowany */
+    input[type="checkbox"]::after {
+      content: "";
+      position: absolute;
+      top: 50%;               
+      left: 50%;              
+      width: 5px;
+      height: 10px;
+      border: solid #fff;
+      border-width: 0 2px 2px 0;
+      transform-origin: center center;
+      transform: translate(-50%, -50%) rotate(45deg) scale(0);
+      transition: transform 0.2s ease;
+    }
+  
+    input[type="checkbox"]:hover:not(:checked):not(:disabled) {
+      border-color: #275efe;
+    }
+  
+    input[type="checkbox"]:checked {
+      background-color: #275efe;
+      border-color: #275efe;
+    }
+    input[type="checkbox"]:checked::after {
+      transform: translate(-50%, -50%) rotate(45deg) scale(1);
+    }
+  
+    input[type="checkbox"]:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(39, 94, 254, 0.3);
+    }
+  
+    input[type="checkbox"]:disabled {
+      background: #f6f8ff;
+      border-color: #e1e6f9;
+      cursor: not-allowed;
+      opacity: 0.8;
+    }
+    input[type="checkbox"]:disabled:checked {
+      background: #e1e6f9;
+    }
+  }
+  

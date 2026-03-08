@@ -1,0 +1,33 @@
+.radius\[xl\]   { border-radius: var(--radius-xl) }
+.radius\[l\]    { border-radius: var(--radius-l) }
+.radius\[m\]    { border-radius: var(--radius-m) }
+.radius\[s\]    { border-radius: var(--radius-s) }
+.radius\[xs\]   { border-radius: var(--radius-xs) }
+.radius\[full\] { border-radius: var(--radius-full) }
+
+.radius\[0\] { border-radius:var(--static-space-0)}
+.radius\[1\] { border-radius:var(--static-space-1)}
+.radius\[2\] { border-radius:var(--static-space-2)}
+.radius\[4\] { border-radius:var(--static-space-4)}
+.radius\[8\] { border-radius:var(--static-space-8)}
+.radius\[12\] { border-radius:var(--static-space-12)}
+.radius\[16\] { border-radius:var(--static-space-16)}
+.radius\[20\] { border-radius:var(--static-space-20)}
+.radius\[24\] { border-radius:var(--static-space-24)}
+.radius\[32\] { border-radius:var(--static-space-32)}
+.radius\[40\] { border-radius:var(--static-space-40)}
+.radius\[48\] { border-radius:var(--static-space-48)}
+.radius\[56\] { border-radius:var(--static-space-56)}
+.radius\[60\] { border-radius:var(--static-space-60)}
+.radius\[64\] { border-radius:var(--static-space-64)}
+.radius\[80\] { border-radius:var(--static-space-80)}
+.radius\[104\] { border-radius:var(--static-space-104)}
+.radius\[128\] { border-radius:var(--static-space-128)}
+.radius\[160\] { border-radius:var(--static-space-160)}
+
+.radius\[none-top-left\]    {  border-top-left-radius:     0; }
+.radius\[none-top-right\]   {  border-top-right-radius:    0; }
+.radius\[none-bottom-left\] {  border-bottom-left-radius:  0; }
+.radius\[none-bottom-right\]{  border-bottom-right-radius: 0; }
+.radius\[none-top\]{  border-top-right-radius: 0;  border-top-left-radius: 0; }
+.radius\[none-bottom\]{  border-bottom-right-radius: 0;  border-bottom-left-radius: 0; }

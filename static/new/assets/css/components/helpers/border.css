@@ -1,0 +1,15 @@
+.border\[unset\] { border: unset !important; }
+
+.border-solid-1 { border-width: 1px; border-style: solid !important; }
+.border-solid-2 { border-width: 3px; border-style: solid !important; }
+
+.border-dashed-1 { border-width: 1px; border-style: dashed !important; }
+.border-dashed-2 { border-width: 3px; border-style: dashed !important; }
+
+.border-x-none { border-left: none !important; border-right: none !important; }
+.border-y-none { border-top: none !important; border-bottom: none !important; }
+
+.border-r-none { border-right: none !important; }
+.border-l-none { border-left: none !important; }
+.border-t-none { border-top: none !important; }
+.border-b-none { border-bottom: none !important; }

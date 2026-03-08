@@ -1,0 +1,458 @@
+﻿<!DOCTYPE html>
+<html lang="en" data-theme="default" data-mode="light" data-custom>
+<head>
+    <!-- Meta -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="description" content="">
+    <meta name="author" content="mObywatel">
+    <!-- Default Meta -->
+            <meta name="theme-color" content="#f5f6fb">
+        <meta name="apple-mobile-web-app-title" content="mObywatel">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <!-- [LOCAL] noscript redirect disabled -->
+    <!-- Open Graph Meta -->
+    <meta property='og:title' content='mObywatel'>
+    <meta property='og:description' content=''>
+    <meta property='og:type' content='website'>
+    <meta property='og:locale' content='en_US'>
+    <meta property='og:image' content='/assets/img/logo.png'>
+    <!-- Twitter Meta -->
+    <meta name='twitter:card' content='summary'>
+    <meta name='twitter:title' content='mObywatel'>
+    <meta name='twitter:description' content=''>
+    <meta name='twitter:image' content='/assets/img/logo.png'>
+    <!-- Links -->
+    <link rel="shortcut icon" href="/assets/img/logo.png" type="image/x-icon">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-180x.png">
+    <link rel="apple-touch-startup-image" sizes="180x180" href="/assets/img/apple-180x.png">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <!-- JavaScript -->
+    <script src='/assets/js/global/jquery.js'></script>
+    <script src='/assets/js/global/qrcode.js'></script>
+    <!-- Service Worker -->
+    <script src="/assets/js/global/worker-starter.js"></script>
+    <!-- Libraries & Assets -->
+    <script src="/assets/js/global/utilities.js"></script>
+    <!-- Pages -->
+    <script src="/assets/js/pages/index.js"></script>
+            <script src='/assets/js/pages/services.js'></script>            <!-- Documents -->
+                    <!-- Main JavaScript -->
+    <script src="/assets/js/script.js"></script>
+    <script src="/assets/js/global/enhancements.js" defer></script>
+    <!-- Title -->
+    <title>mObywatel</title>
+</head>
+<body class="background[unset]">
+    <div class="fillWidth fillHeight overflow[y-auto]" data-standalone>
+        <div class="dashboard-navigation sticky top[0] background[unset] flex direction[row] justify[between] align[end] g[s] fillWidth height[60px] px[s] z[max] pb[s]">
+            <div class="flex autoHeight direction[row] justify[start] align[center] g[m] min-width[50px]">
+                <img class="square[35px]" src="/assets/svg/logo.svg" alt="">
+            </div>
+            <div class="dashboard-navigation-small-title flex autoHeight direction[row] justify[end] align[center] g[m] min-width[50px]">
+                <h1 class="font[Inter] font-weight[700] text-size[18]">Usługi</h1>
+            </div>
+            <div class="flex autoHeight direction[row] justify[end] align[center] g[m] min-width[50px]"></div>
+        </div>
+        <div class="relative fillWidth autoHeight us[none] px[s] pb[s]" data-wrapper>
+            <div class="dashboard-navigation-large-title flex fillWidth height[50px]">
+                <div class="height[30px] flex justify[center] align[center] cursor[pointer]">
+                    <h1 class="font[Inter] font-weight[700] text-size[36]">Usługi</h1>
+                </div>
+            </div>
+            <div class="flex direction[column] g[s] justify[start] align[start] fillWidth fillHeight pagePop">
+                <div class="relative flex justify[center] align[center] max-height[40px] fillWidth">
+                    <div class="absolute flex justify[center] align[center] top[0] left[0] square[40px]">
+                        <i class="fas fa-magnifying-glass" style="color: var(--custom-input-color);"></i>
+                    </div>
+                    <input class="secondary pl[l] p[s] radius[m] border-solid-1 fillWidth max-height[40px]" placeholder="Szukaj" type="text">
+                </div>
+                <div class="flex direction[row] justify[end] align[center] g[s] fillWidth autoHeight">
+                    <div class="flex direction[row] g[16] justify[center] align[center] cursor[pointer]">
+                        <a class="redirect font-weight[500] text-size[14] text-align[left]">Dostosuj swój widok</a>
+                    </div>
+                </div>
+                <div class="flex justify[start] align[start] fillWidth height[30px]" data-title="data_security">
+                    <div class="height[40px] flex justify[center] align[center] cursor[pointer]">
+                        <p class="font[Inter] font-weight[600] text-size[16]">Ochrona danych</p>
+                    </div>
+                </div>
+                <div class="card flex direction[column] justify[center] align[start] fillWidth autoHeight min-height[80px] radius[xl] shadow" data-group="data_security">
+                    <div class="flex direction[row] justify[start] align[center] p[s] fillWidth" data-button="service">
+                        <div class="flex justify[center] align[center] square[50px]">
+                            <img src="/assets/img/schemes/ochrona_danych/bezpiecznie_w_sieci.png" class="square[40px]">
+                        </div>
+                        <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth px[s]">
+                            <h1 class="font-weight[500] text-size[18] text-align[left] fillWidth">Bezpiecznie w sieci</h1>
+                            <i class="label far fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    <div class="separator[x]"></div>
+                    <div class="flex direction[row] justify[start] align[center] p[s] fillWidth" data-button="service">
+                        <div class="flex justify[center] align[center] square[50px]">
+                            <img src="/assets/img/schemes/ochrona_danych/sprawdz_dowod.png" class="square[40px]">
+                        </div>
+                        <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth px[s]">
+                            <h1 class="font-weight[500] text-size[18] text-align[left] fillWidth">Sprawdź dowód</h1>
+                            <i class="label far fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    <div class="separator[x]"></div>
+                    <div class="flex direction[row] justify[start] align[center] p[s] fillWidth" data-button="service">
+                        <div class="flex justify[center] align[center] square[50px]">
+                            <img src="/assets/img/schemes/ochrona_danych/zastrzez_pesel.png" class="square[40px]">
+                        </div>
+                        <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth px[s]">
+                            <h1 class="font-weight[500] text-size[18] text-align[left] fillWidth">Zastrzeż PESEL</h1>
+                            <i class="label far fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    <div class="separator[x]"></div>
+                    <div class="flex direction[row] justify[start] align[center] p[s] fillWidth" data-button="service">
+                        <div class="flex justify[center] align[center] square[50px]">
+                            <img src="/assets/img/schemes/ochrona_danych/sprawdz_pesel.png" class="square[40px]">
+                        </div>
+                        <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth px[s]">
+                            <h1 class="font-weight[500] text-size[18] text-align[left] fillWidth">Sprawdź PESEL</h1>
+                            <i class="label far fa-chevron-right"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify[start] align[start] fillWidth height[30px]" data-title="security">
+                    <div class="height[40px] flex justify[center] align[center] cursor[pointer]">
+                        <p class="font[Inter] font-weight[600] text-size[16]">Bezpieczeństwo</p>
+                    </div>
+                </div>
+                <div class="card flex direction[column] justify[center] align[start] fillWidth autoHeight min-height[80px] radius[xl] shadow" data-group="security">
+                    <div class="flex direction[row] justify[start] align[center] p[s] fillWidth" data-button="service">
+                        <div class="flex justify[center] align[center] square[50px]">
+                            <img src="/assets/img/schemes/bezpieczenstwo/szkolenia_obronne.png" class="square[40px]">
+                        </div>
+                        <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth px[s]">
+                            <h1 class="font-weight[500] text-size[18] text-align[left] fillWidth">Szkolenia obronne</h1>
+                            <i class="label far fa-chevron-right"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify[start] align[start] fillWidth height[30px]" data-title="health">
+                    <div class="height[40px] flex justify[center] align[center] cursor[pointer]">
+                        <p class="font[Inter] font-weight[600] text-size[16]">Zdrowie</p>
+                    </div>
+                </div>
+                <div class="card flex direction[column] justify[center] align[start] fillWidth autoHeight min-height[80px] radius[xl] shadow" data-group="health">
+                    <div class="flex direction[row] justify[start] align[center] p[s] fillWidth" data-button="service">
+                        <div class="flex justify[center] align[center] square[50px]">
+                            <img src="/assets/img/schemes/zdrowie/recepty.png" class="square[40px]">
+                        </div>
+                        <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth px[s]">
+                            <h1 class="font-weight[500] text-size[18] text-align[left] fillWidth">Recepty</h1>
+                            <i class="label far fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    <div class="separator[x]"></div>
+                    <div class="flex direction[row] justify[start] align[center] p[s] fillWidth" data-button="service">
+                        <div class="flex justify[center] align[center] square[50px]">
+                            <img src="/assets/img/schemes/zdrowie/moje_ikp.png" class="square[40px]">
+                        </div>
+                        <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth px[s]">
+                            <h1 class="font-weight[500] text-size[18] text-align[left] fillWidth">Moje IKP</h1>
+                            <i class="label far fa-chevron-right"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify[start] align[start] fillWidth height[30px]" data-title="goverment">
+                    <div class="height[40px] flex justify[center] align[center] cursor[pointer]">
+                        <p class="font[Inter] font-weight[600] text-size[16]">Sprawy urzędowe</p>
+                    </div>
+                </div>
+                <div class="card flex direction[column] justify[center] align[start] fillWidth autoHeight min-height[80px] radius[xl] shadow" data-group="goverment">
+                    <div class="flex direction[row] justify[start] align[center] p[s] fillWidth" data-button="service">
+                        <div class="flex justify[center] align[center] square[50px]">
+                            <img src="/assets/img/schemes/sprawy_urzedowe/podpis_kwalifikowany.png" class="square[40px]">
+                        </div>
+                        <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth px[s]">
+                            <h1 class="font-weight[500] text-size[18] text-align[left] fillWidth">Podpis kwalifikowany</h1>
+                            <i class="label far fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    <div class="separator[x]"></div>
+                    <div class="flex direction[row] justify[start] align[center] p[s] fillWidth" data-button="service">
+                        <div class="flex justify[center] align[center] square[50px]">
+                            <img src="/assets/img/schemes/sprawy_urzedowe/zalatw_sprawe.png" class="square[40px]">
+                        </div>
+                        <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth px[s]">
+                            <h1 class="font-weight[500] text-size[18] text-align[left] fillWidth">Załatw sprawę</h1>
+                            <i class="label far fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    <div class="separator[x]"></div>
+                    <div class="flex direction[row] justify[start] align[center] p[s] fillWidth" data-button="service">
+                        <div class="flex justify[center] align[center] square[50px]">
+                            <img src="/assets/img/schemes/sprawy_urzedowe/twoje_sprawy.png" class="square[40px]">
+                        </div>
+                        <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth px[s]">
+                            <h1 class="font-weight[500] text-size[18] text-align[left] fillWidth">Twoje sprawy</h1>
+                            <i class="label far fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    <div class="separator[x]"></div>
+                    <div class="flex direction[row] justify[start] align[center] p[s] fillWidth" data-button="service">
+                        <div class="flex justify[center] align[center] square[50px]">
+                            <img src="/assets/img/schemes/sprawy_urzedowe/odbior_dowodu_osobistego.png" class="square[40px]">
+                        </div>
+                        <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth px[s]">
+                            <h1 class="font-weight[500] text-size[18] text-align[left] fillWidth">Odbiór dowodu</h1>
+                            <i class="label far fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    <div class="separator[x]"></div>
+                    <div class="flex direction[row] justify[start] align[center] p[s] fillWidth" data-button="service">
+                        <div class="flex justify[center] align[center] square[50px]">
+                            <img src="/assets/img/schemes/sprawy_urzedowe/e_wizyta_w_zus.png" class="square[40px]">
+                        </div>
+                        <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth px[s]">
+                            <h1 class="font-weight[500] text-size[18] text-align[left] fillWidth">E-wizyta w ZUS</h1>
+                            <i class="label far fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    <div class="separator[x]"></div>
+                    <div class="flex direction[row] justify[start] align[center] p[s] fillWidth" data-button="service">
+                        <div class="flex justify[center] align[center] square[50px]">
+                            <img src="/assets/img/schemes/sprawy_urzedowe/wybory.png" class="square[40px]">
+                        </div>
+                        <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth px[s]">
+                            <h1 class="font-weight[500] text-size[18] text-align[left] fillWidth">Wybory</h1>
+                            <i class="label far fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    <div class="separator[x]"></div>
+                    <div class="flex direction[row] justify[start] align[center] p[s] fillWidth" data-button="service">
+                        <div class="flex justify[center] align[center] square[50px]">
+                            <img src="/assets/img/schemes/sprawy_urzedowe/podpis_osobisty.png" class="square[40px]">
+                        </div>
+                        <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth px[s]">
+                            <h1 class="font-weight[500] text-size[18] text-align[left] fillWidth">Podpis osobisty</h1>
+                            <i class="label far fa-chevron-right"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify[start] align[start] fillWidth height[30px]" data-title="drivers">
+                    <div class="height[40px] flex justify[center] align[center] cursor[pointer]">
+                        <p class="font[Inter] font-weight[600] text-size[16]">Kierowca i pojazdy</p>
+                    </div>
+                </div>
+                <div class="card flex direction[column] justify[center] align[start] fillWidth autoHeight min-height[80px] radius[xl] shadow" data-group="drivers">
+                    <div class="flex direction[row] justify[start] align[center] p[s] fillWidth" data-button="service">
+                        <div class="flex justify[center] align[center] square[50px]">
+                            <img src="/assets/img/schemes/kierowca_i_pojazdy/mstluczka.png" class="square[40px]">
+                        </div>
+                        <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth px[s]">
+                            <h1 class="font-weight[500] text-size[18] text-align[left] fillWidth">mStłuczka</h1>
+                            <i class="label far fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    <div class="separator[x]"></div>
+                    <div class="flex direction[row] justify[start] align[center] p[s] fillWidth" data-button="service">
+                        <div class="flex justify[center] align[center] square[50px]">
+                            <img src="/assets/img/schemes/kierowca_i_pojazdy/punkty_karne.png" class="square[40px]">
+                        </div>
+                        <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth px[s]">
+                            <h1 class="font-weight[500] text-size[18] text-align[left] fillWidth">Punkty Karne</h1>
+                            <i class="label far fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    <div class="separator[x]"></div>
+                    <div class="flex direction[row] justify[start] align[center] p[s] fillWidth" data-button="service">
+                        <div class="flex justify[center] align[center] square[50px]">
+                            <img src="/assets/img/schemes/kierowca_i_pojazdy/uprawnienia_kierowcy.png" class="square[40px]">
+                        </div>
+                        <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth px[s]">
+                            <h1 class="font-weight[500] text-size[18] text-align[left] fillWidth">Uprawnienia kierowcy</h1>
+                            <i class="label far fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    <div class="separator[x]"></div>
+                    <div class="flex direction[row] justify[start] align[center] p[s] fillWidth" data-button="service">
+                        <div class="flex justify[center] align[center] square[50px]">
+                            <img src="/assets/img/schemes/kierowca_i_pojazdy/historia_pojazdu.png" class="square[40px]">
+                        </div>
+                        <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth px[s]">
+                            <h1 class="font-weight[500] text-size[18] text-align[left] fillWidth">Historia Pojazdu</h1>
+                            <i class="label far fa-chevron-right"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify[start] align[start] fillWidth height[30px]" data-title="finances">
+                    <div class="height[40px] flex justify[center] align[center] cursor[pointer]">
+                        <p class="font[Inter] font-weight[600] text-size[16]">Opłaty i podatki</p>
+                    </div>
+                </div>
+                <div class="card flex direction[column] justify[center] align[start] fillWidth autoHeight min-height[80px] radius[xl] shadow" data-group="finances">
+                    <div class="flex direction[row] justify[start] align[center] p[s] fillWidth" data-button="service">
+                        <div class="flex justify[center] align[center] square[50px]">
+                            <img src="/assets/img/schemes/oplaty_i_podatki/ePlatnosci.png" class="square[40px]">
+                        </div>
+                        <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth px[s]">
+                            <h1 class="font-weight[500] text-size[18] text-align[left] fillWidth">ePłatności</h1>
+                            <i class="label far fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    <div class="separator[x]"></div>
+                    <div class="flex direction[row] justify[start] align[center] p[s] fillWidth" data-button="service">
+                        <div class="flex justify[center] align[center] square[50px]">
+                            <img src="/assets/img/schemes/oplaty_i_podatki/mandaty.png" class="square[40px]">
+                        </div>
+                        <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth px[s]">
+                            <h1 class="font-weight[500] text-size[18] text-align[left] fillWidth">Mandaty</h1>
+                            <i class="label far fa-chevron-right"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify[start] align[start] fillWidth height[30px]" data-title="business">
+                    <div class="height[40px] flex justify[center] align[center] cursor[pointer]">
+                        <p class="font[Inter] font-weight[600] text-size[16]">Przedsiębiorca</p>
+                    </div>
+                </div>
+                <div class="card flex direction[column] justify[center] align[start] fillWidth autoHeight min-height[80px] radius[xl] shadow" data-group="business">
+                    <div class="flex direction[row] justify[start] align[center] p[s] fillWidth" data-button="service">
+                        <div class="flex justify[center] align[center] square[50px]">
+                            <img src="/assets/img/schemes/przedsiebiorca/firma.png" class="square[40px]">
+                        </div>
+                        <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth px[s]">
+                            <h1 class="font-weight[500] text-size[18] text-align[left] fillWidth">Firma</h1>
+                            <i class="label far fa-chevron-right"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify[start] align[start] fillWidth height[30px]" data-title="nature">
+                    <div class="height[40px] flex justify[center] align[center] cursor[pointer]">
+                        <p class="font[Inter] font-weight[600] text-size[16]">Środowisko</p>
+                    </div>
+                </div>
+                <div class="card flex direction[column] justify[center] align[start] fillWidth autoHeight min-height[80px] radius[xl] shadow" data-group="nature">
+                    <div class="flex direction[row] justify[start] align[center] p[s] fillWidth" data-button="service">
+                        <div class="flex justify[center] align[center] square[50px]">
+                            <img src="/assets/img/schemes/ochrona_srodowiska/naruszenie_srodowiskowe.png" class="square[40px]">
+                        </div>
+                        <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth px[s]">
+                            <h1 class="font-weight[500] text-size[18] text-align[left] fillWidth">Naruszenie środowiskowe</h1>
+                            <i class="label far fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    <div class="separator[x]"></div>
+                    <div class="flex direction[row] justify[start] align[center] p[s] fillWidth" data-button="service">
+                        <div class="flex justify[center] align[center] square[50px]">
+                            <img src="/assets/img/schemes/ochrona_srodowiska/jakosc_powietrza.png" class="square[40px]">
+                        </div>
+                        <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth px[s]">
+                            <h1 class="font-weight[500] text-size[18] text-align[left] fillWidth">Jakość powietrza</h1>
+                            <i class="label far fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    <div class="separator[x]"></div>
+                    <div class="flex direction[row] justify[start] align[center] p[s] fillWidth" data-button="service">
+                        <div class="flex justify[center] align[center] square[50px]">
+                            <img src="/assets/img/schemes/ochrona_srodowiska/alert_powodziowy.png" class="square[40px]">
+                        </div>
+                        <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth px[s]">
+                            <h1 class="font-weight[500] text-size[18] text-align[left] fillWidth">Alert powodziowy</h1>
+                            <i class="label far fa-chevron-right"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify[start] align[start] fillWidth height[30px]" data-title="travel">
+                    <div class="height[40px] flex justify[center] align[center] cursor[pointer]">
+                        <p class="font[Inter] font-weight[600] text-size[16]">Podróż</p>
+                    </div>
+                </div>
+                <div class="card flex direction[column] justify[center] align[start] fillWidth autoHeight min-height[80px] radius[xl] shadow" data-group="travel">
+                    <div class="flex direction[row] justify[start] align[center] p[s] fillWidth" data-button="service">
+                        <div class="flex justify[center] align[center] square[50px]">
+                            <img src="/assets/img/schemes/podroze/bezpieczny_autobus.png" class="square[40px]">
+                        </div>
+                        <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth px[s]">
+                            <h1 class="font-weight[500] text-size[18] text-align[left] fillWidth">Bezpieczny autobus</h1>
+                            <i class="label far fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    <div class="separator[x]"></div>
+                    <div class="flex direction[row] justify[start] align[center] p[s] fillWidth" data-button="service">
+                        <div class="flex justify[center] align[center] square[50px]">
+                            <img src="/assets/img/schemes/podroze/bilkom.png" class="square[40px]">
+                        </div>
+                        <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth px[s]">
+                            <h1 class="font-weight[500] text-size[18] text-align[left] fillWidth">Bilkom</h1>
+                            <i class="label far fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    <div class="separator[x]"></div>
+                    <div class="flex direction[row] justify[start] align[center] p[s] fillWidth" data-button="service">
+                        <div class="flex justify[center] align[center] square[50px]">
+                            <img src="/assets/img/schemes/podroze/malopolska_karta_aglomeracyjna.png" class="square[40px]">
+                        </div>
+                        <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth px[s]">
+                            <h1 class="font-weight[500] text-size[18] text-align[left] fillWidth">Karta MKA</h1>
+                            <i class="label far fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    <div class="separator[x]"></div>
+                    <div class="flex direction[row] justify[start] align[center] p[s] fillWidth" data-button="service">
+                        <div class="flex justify[center] align[center] square[50px]">
+                            <img src="/assets/img/schemes/podroze/polak_za_granica.png" class="square[40px]">
+                        </div>
+                        <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth px[s]">
+                            <h1 class="font-weight[500] text-size[18] text-align[left] fillWidth">Polak za granicą</h1>
+                            <i class="label far fa-chevron-right"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="navigation backdrop[8px] sticky  flex justify[end] align[center] bottom[0] height[80px] z[max]" data-group="navigation">
+    <div class="fillWidth fillHeight flex direction[row] justify[around] align[start]">
+                <a
+            href="/documents"
+            class="fillHeight fillWidth flex direction[column] g[4] justify[center] align[center] max-height[60px] mb[4] text-decoration[none]"
+            aria-label="documents"
+        >
+            <img src="/assets/svg/navigation/light/documents.svg" class="square[20px]" alt="documents">
+            <span class="label  text-size[10] text[nowrap]">
+                Dokumenty            </span>
+        </a>
+                <a
+            href="/services"
+            class="fillHeight fillWidth flex direction[column] g[4] justify[center] align[center] max-height[60px] mb[4] text-decoration[none]"
+            aria-label="services"
+        >
+            <img src="/assets/svg/navigation/light/services_active.svg" class="square[20px]" alt="services">
+            <span class="label active text-size[10] text[nowrap]">
+                Usługi            </span>
+        </a>
+                <a
+            href="/qr_code"
+            class="fillHeight fillWidth flex direction[column] g[4] justify[center] align[center] max-height[60px] mb[4] text-decoration[none]"
+            aria-label="qr_code"
+        >
+            <img src="/assets/svg/navigation/light/qr_code.svg" class="square[20px]" alt="qr_code">
+            <span class="label  text-size[10] text[nowrap]">
+                Kod QR            </span>
+        </a>
+                <a
+            href="/more"
+            class="fillHeight fillWidth flex direction[column] g[4] justify[center] align[center] max-height[60px] mb[4] text-decoration[none]"
+            aria-label="more"
+        >
+            <img src="/assets/svg/navigation/light/more.svg" class="square[20px]" alt="more">
+            <span class="label  text-size[10] text[nowrap]">
+                Więcej            </span>
+        </a>
+            </div>
+</div>
+    </div>
+</body>
+</html>

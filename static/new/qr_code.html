@@ -1,0 +1,371 @@
+﻿<!DOCTYPE html>
+<html lang="en" data-theme="default" data-mode="light" data-custom>
+<head>
+    <!-- Meta -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="description" content="">
+    <meta name="author" content="mObywatel">
+    <!-- Default Meta -->
+            <meta name="theme-color" content="#f5f6fb">
+        <meta name="apple-mobile-web-app-title" content="mObywatel">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <!-- [LOCAL] noscript redirect disabled -->
+    <!-- Open Graph Meta -->
+    <meta property='og:title' content='mObywatel'>
+    <meta property='og:description' content=''>
+    <meta property='og:type' content='website'>
+    <meta property='og:locale' content='en_US'>
+    <meta property='og:image' content='/assets/img/logo.png'>
+    <!-- Twitter Meta -->
+    <meta name='twitter:card' content='summary'>
+    <meta name='twitter:title' content='mObywatel'>
+    <meta name='twitter:description' content=''>
+    <meta name='twitter:image' content='/assets/img/logo.png'>
+    <!-- Links -->
+    <link rel="shortcut icon" href="/assets/img/logo.png" type="image/x-icon">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-180x.png">
+    <link rel="apple-touch-startup-image" sizes="180x180" href="/assets/img/apple-180x.png">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <!-- JavaScript -->
+    <script src='/assets/js/global/jquery.js'></script>
+    <script src='/assets/js/global/qrcode.js'></script>
+    <!-- Service Worker -->
+    <script src="/assets/js/global/worker-starter.js"></script>
+    <!-- Libraries & Assets -->
+    <script src="/assets/js/global/utilities.js"></script>
+    <!-- Pages -->
+    <script src="/assets/js/pages/index.js"></script>
+                <script src='/assets/js/pages/qr_code.js'></script>        <!-- Documents -->
+                    <!-- Main JavaScript -->
+    <script src="/assets/js/script.js"></script>
+    <script src="/assets/js/global/enhancements.js" defer></script>
+    <!-- Title -->
+    <title>mObywatel</title>
+</head>
+<body class="background[unset]">
+    <div class="fillWidth fillHeight overflow[hidden]" data-standalone>
+        <div class="dashboard-navigation sticky top[0] background[unset] flex direction[row] justify[between] align[end] g[s] fillWidth height[60px] px[s] z[1] pb[s]">
+            <div class="flex autoHeight direction[row] justify[start] align[center] g[m] min-width[50px]">
+                <img class="square[35px]" src="/assets/svg/logo.svg" alt="">
+            </div>
+            <div class="flex autoHeight direction[row] justify[end] align[center] g[m] min-width[50px]"></div>
+            <div class="flex autoHeight direction[row] justify[end] align[center] g[m] min-width[50px]"></div>
+        </div>
+        <div class="relative fillWidth fillHeight us[none] px[s] pb[s] " data-wrapper>
+            <div class="flex direction[column] g[16] justify[start] align[start] fillWidth autoHeight pagePop">
+                <div class="flex fillWidth height[60px]">
+                    <div class="height[30px] flex justify[center] align[center] cursor[pointer]">
+                        <h1 class="font[Inter] font-weight[700] text-size[36]">Kod QR</h1>
+                    </div>
+                </div>
+                <div class="flex fillWidth height[50px]">
+                    <div class="height[30px] flex justify[center] align[center] cursor[pointer]">
+                        <p class="font[Inter] font-weight[400] text-size[14]">Dzięki tej funkcji zalogujesz się do usług w internecie i potwierdzisz cyfrowe dokumenty - zarówno swoje, jak i drugiej osoby.</p>
+                    </div>
+                </div>
+                <div class="flex direction[column] g[8] justify[start] align[start] fillWidth autoHeight">
+                    <div class="card flex direction[column] justify[center] align[start] fillWidth autoHeight min-height[90px] radius[xl] shadow">
+                        <div class="flex direction[row] justify[start] align[center] p[s] fillWidth" data-button="scan_qr">
+                            <div class="flex justify[center] align[center] square[30px]">
+                                <img src="/assets/svg/qr_code/scan.svg" class="square[20px]">
+                            </div>
+                            <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth px[s]">
+                                <div class="flex fillHeight direction[column] g[4] justify[center] align[center]">
+                                    <h1 class="font-weight[700] text-size[18] text-align[left] fillWidth">Zeskanuj kod QR</h1>
+                                    <p class="label font-weight[500] text-size[14] text-align[left] fillWidth">Zaloguj się do strony internetowej lub potwierdź swój cyfrowy dokument.</p>
+                                </div>
+                                <i class="label far fa-chevron-right"></i>
+                            </div>
+                        </div>
+                        <div class="separator[x]"></div>
+                        <div class="flex direction[row] justify[start] align[center] p[s] fillWidth" data-button="show_qr">
+                            <div class="flex justify[center] align[center] square[30px]">
+                                <img src="/assets/svg/qr_code/show.svg" class="square[20px]">
+                            </div>
+                            <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth px[s]">
+                                <div class="flex fillHeight direction[column] g[4] justify[center] align[center]">
+                                    <h1 class="font-weight[700] text-size[18] text-align[left] fillWidth">Pokaż kod QR</h1>
+                                    <p class="label font-weight[500] text-size[14] text-align[left] fillWidth">Sprawdź cyfrowy dokument drugiej osoby.</p>
+                                </div>
+                                <i class="label far fa-chevron-right"></i>
+                            </div>
+                        </div>
+                        <div class="separator[x]"></div>
+                        <div class="flex direction[row] justify[start] align[center] p[s] fillWidth" data-button="scan_qr">
+                            <div class="flex justify[center] align[center] square[30px]">
+                                <img src="/assets/svg/qr_code/sign.svg" class="square[20px]">
+                            </div>
+                            <div class="flex text-align[center] justify[between] align[center] min-height[80px] autoHeight max-height[110px] fillWidth px[s]">
+                                <div class="flex fillHeight direction[column] g[4] justify[center] align[center]">
+                                    <h1 class="font-weight[700] text-size[18] text-align[left] fillWidth">Zeskanuj kod QR do podpisu kwalifikowanego</h1>
+                                    <p class="label font-weight[500] text-size[14] text-align[left] fillWidth">Wybierz, gdy chcesz użyć kodu ze strony dostawcy podpisu.</p>
+                                </div>
+                                <i class="label far fa-chevron-right"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="show_qr absolute top[0] z[2] fillWidth fillHeight background[unset]" style="transform: translateX(100%);">
+            <div class="dashboard-navigation sticky top[0] background[backdrop] flex direction[row] justify[around] align[end] g[s] fillWidth height[45px] px[s] z[2] pb[xs]">
+                <a class="redirect flex direction[row] g[4] align[center] font-weight[400] text-size[16] text-align[left] fillWidth text[nowrap] height[20px]"  data-button="show_qr_back">
+                    <i class="far fa-chevron-left text-size[24]"></i>
+                    Kod QR                </a>
+                <div class="fillWidth flex justify[center] align[center] height[20px]">
+                    <h1 class="font[Inter] text-align[center] font-weight[600] text-size[18]">Kod QR</h1>
+                </div>
+                <div class="flex justify[end] align[center] height[20px] fillWidth">
+                    <div class="square[25px]"></div>
+                </div>
+            </div>
+            <div class="relative fillWidth fillHeight us[none] px[s] py[s]" class-wrapper="show_qr">
+                <div class="flex direction[column] justify[start] align[center] g[xs] fillWidth autoHeight pb[m]">
+                    <div class="autoHeight fillWidth flex justify[start] align[center]">
+                        <h1 class="font[Inter] text-align[left] font-weight[700] text-size[24]">Pokaż kod QR</h1>
+                    </div>
+                    <div class="autoHeight fillWidth flex justify[start] align[center]">
+                        <p class="font[Inter] font-weight[400] text-size[14] text-align[left]">Poproś osobę, której sprawdzasz dokument, aby zeskanowała lub przepisała ten kod w swojej aplikacji mObywatel.</p>
+                    </div>
+                    <div class="card shadow fillWidth autoHeight radius[xl] p[s] pt[s] flex direction[column] g[s]">
+                        <div class="fillWidth pt[4] flex justify[center] align[center]" data-parent="show_qr"></div>
+                        <div class="fillWidth autoHeight min-height[80px] flex direction[column] g[s] px[m]">
+                            <div class="autoHeight fillWidth flex justify[center] align[center]">
+                                <h1 class="font[Inter] text-align[center] font-weight[500] text-size[48]" data-h1="code"></h1>
+                            </div>
+                            <div class="expiry[time-blank] radius[full]">
+                                <div class="expiry[time-fill]" data-div="expiry-fill"></div>
+                            </div>
+                            <div class="autoHeight fillWidth flex direction[row] g[4] justify[center] align[center]" data-p="expires" data-prefix="Kod wygaśnie za:" data-minute="min" data-second="sek">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card shadow fillWidth autoHeight radius[xl] p[m] pt[s] flex">
+                        <div class="height[40px] fillWidth flex direction[row] justify[center] align[center] px[l]">
+                            <div class="flex justify[center] align[center] fillHeight fillWidth">
+                                <div class="flex width[65px] height[40px] direction[column] border-solid-1" style="border-color: rgba(var(--primary), 0.25);">
+                                    <div class="fillWidth fillHeight" style="background-color: #fff;"></div>
+                                    <div class="fillWidth fillHeight" style="background-color: #dc143c;"></div>
+                                </div>
+                            </div>
+                            <div class="flex justify[center] align[center] fillHeight fillWidth">
+                                <div class="emblem" data-emblem>
+                                    <img src="/assets/img/godlo.gif" class="max-width[40px] display-flex" alt="">
+                                    <div class="emblem[card] width[40px] display-none" id="emblem">
+                                        <div class="emblem[eagle]" style="--img-url: url('/assets/img/godlo_mask.png');"></div>
+                                        <div class="emblem[image]" style="--img-url: url('/assets/img/godlo.png');"></div>
+                                        <div class="emblem[mask]">
+                                            <div class="emblem[rainbow]"></div>
+                                            <div class="emblem[spectral]"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="scan_qr absolute top[0] z[2] fillWidth fillHeight background[unset]" style="transform: translateX(100%);">
+            <div class="dashboard-navigation sticky top[0] background[backdrop] flex direction[row] justify[around] align[end] g[s] fillWidth height[45px] px[s] z[2] pb[xs]">
+                <a class="redirect flex direction[row] g[4] align[center] font-weight[400] text-size[16] text-align[left] fillWidth text[nowrap] height[20px]" data-button="scan_qr_back">
+                    <i class="far fa-chevron-left text-size[24]"></i>
+                    Wróć                </a>
+                <div class="fillWidth flex justify[center] align[center] height[20px]">
+                    <h1 class="font[Inter] text-align[center] font-weight[600] text-size[18] text[nowrap]">Zeskanuj kod QR</h1>
+                </div>
+                <div class="flex justify[end] align[center] height[20px] fillWidth">
+                    <div class="square[25px]"></div>
+                </div>
+            </div>
+            <div class="relative fillWidth fillHeight us[none] px[s] py[s] pt[0]" class-wrapper="scan_qr">
+                <div class="flex direction[column] justify[start] align[center] g[s] fillWidth halfHeight">
+                    <div class="autoHeight fillWidth flex justify[start] align[center]">
+                        <p class="label font[Inter] font-weight[400] text-size[16] text-align[left]">Umieść kod QR w ramce, aby go zeskanować</p>
+                    </div>
+                    <div class="fillWidth autoHeight radius[m] flex direction[column] g[s]">
+                        <div class="relative fillWidth height[550px] flex justify[center] align[center] overflow[hidden] radius[xl]" data-parent="scan_qr">
+                            <video id="camera" class="absolute fillWidth fillHeight top[0] left[0] display[block]" style="object-fit:cover;" autoplay muted playsinline webkit-playsinline></video>
+                            <div class="absolute fillWidth top[0] z[2] flex justify[center] align[center] p[s]" data-div="scan_warning">
+                                <div class="relative card warning flex direction[column] justify[start] align[start] fillWidth autoHeight radius[m] overflow[hidden]">
+                                    <div class="flex fillWidth autoHeight direction[row] g[8] p[s]">
+                                        <div class="fillHeight">
+                                            <div class="flex justify[center] align[center] square[25px]">
+                                                <i class="far fa-circle-exclamation text-size[20]"></i>
+                                            </div>
+                                        </div>
+                                        <div class="flex primary direction[column] g[4] fillWidth fillHeight">
+                                            <p class="font-weight[400] text-size[14] text-align[left] fillWidth">Upewnij się, że kod QR pochodzi z wiarygodnego źródła</p>
+                                        </div>
+                                    </div>
+                                    <div class="absolute flex justify[center] align[center] square[40px] top[0] right[0]" data-button="scan_close_warning">
+                                        <i class="fat fa-times primary text-size[20]"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="absolute fillWidth fillHeight z[1] flex justify[center] align[center]">
+                                <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="250px" height="250px" viewBox="0,0,256,256"><g fill="none" fill-rule="nonzero" stroke="none" stroke-width="none" stroke-linecap="none" stroke-linejoin="none" stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0" font-family="none" font-weight="none" font-size="none" text-anchor="none" style="mix-blend-mode: normal"><g transform="scale(5.33333,5.33333)"><path d="M14.5,7.5h-3c-2.21,0 -4,1.79 -4,4v3" fill="none" stroke="#ffffff" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"></path><path d="M40.5,14.5v-3c0,-2.21 -1.79,-4 -4,-4h-3" fill="none" stroke="#ffffff" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"></path><path d="M7.5,33.5v3c0,2.21 1.79,4 4,4h3" fill="none" stroke="#ffffff" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"></path><path d="M33.5,40.5h3c2.21,0 4,-1.79 4,-4v-3" fill="none" stroke="#ffffff" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"></path></g></g></svg>
+                            </div>
+                        </div>
+                        <div class="fillWidth autoHeight flex direction[column] g[s] mt[x]">
+                            <div class="height[40px] fillWidth flex direction[row] justify[center] align[center]">
+                                <button class="alternative fillWidth radius[m] border-solid-1 py[s]" data-button="type_code">Wpisz kod</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="type_code absolute top[0] z[3] fillWidth fillHeight background[unset] display-none" style="transform: translateY(100%);">
+            <div class="dashboard-navigation sticky top[0] background[unset] flex direction[row] justify[around] align[end] g[s] fillWidth height[60px] px[s] z[max] pb[s]">
+                <div class="flex justify[end] align[center] height[20px] fillWidth">
+                    <div class="square[25px]"></div>
+                </div>
+                <div class="fillWidth flex justify[center] align[center] height[20px]">
+                    <h1 class="font[Inter] text-align[center] font-weight[700] text-size[24] text[nowrap]">Kod</h1>
+                </div>
+                <a class="redirect direction[row] g[xs] align[center] font-weight[500] text-size[20] text-align[right] fillWidth text[nowrap] height[20px]" data-button="type_code_back">
+                    Zamknij                </a>
+            </div>
+            <div class="relative fillWidth autoHeight us[none] px[s] py[s] pt[0] mb[80]" class-wrapper="type-code">
+                <div class="flex direction[column] justify[start] align[center] g[s] fillWidth halfHeight">
+                    <div class="autoHeight fillWidth flex justify[center] align[center]">
+                        <p class="label font[Inter] font-weight[400] text-size[16] text-align[left]">Wpisz lub wklej kod.</p>
+                    </div>
+                    <div class="shadow fillWidth autoHeight radius[m] flex direction[column] g[s]">
+                        <div class="fillWidth autoHeight flex direction[column] g[s] mt[s]">
+                            <div class="height[60px] fillWidth flex direction[row] justify[center] align[center]">
+                                <input class="p[s] radius[xs] border-solid-1 fillWidth min-height[60px] letter-spacing[s] text-align[center]" maxlength="6" type="text" inputmode="numeric" pattern="[0-9]*" data-input="type_code">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="absolute bottom[0] fillWidth autoHeight py[s] px[s] mb[80]">
+                <button class="primary fillWidth radius[m] border[unset] py[s]" data-button="type_code_submit">Dalej</button>
+            </div>
+        </div>
+        <div class="share_data absolute top[0] z[3] fillWidth fillHeight background[unset] display-none" style="transform: translateX(100%);">
+            <div class="dashboard-navigation sticky top[0] background[backdrop] flex direction[row] justify[around] align[end] g[s] fillWidth height[45px] px[s] z[2] pb[xs]">
+                <a class="redirect flex direction[row] g[4] align[center] font-weight[400] text-size[16] text-align[left] fillWidth text[nowrap] height[20px]" data-button="share_data_back">
+                    <i class="far fa-chevron-left text-size[24]"></i>
+                    Wróć                </a>
+                <div class="fillWidth flex justify[center] align[center] height[20px]">
+                    <h1 class="font[Inter] text-align[center] font-weight[600] text-size[18] text[nowrap]">Sprawdzanie dokumentu</h1>
+                </div>
+                <div class="flex justify[end] align[center] height[20px] fillWidth">
+                    <div class="square[25px]"></div>
+                </div>
+            </div>
+            <div class="relative fillWidth autoHeight us[none] px[s] py[s] pt[0]">
+                <div class="flex direction[column] justify[start] align[center] g[s] fillWidth autoHeight">
+                    <div class="autoHeight fillWidth flex justify[center] align[center]">
+                        <h1 class="font[Inter] font-weight[700] text-size[20] text-align[left]">Dokument, który potwierdzasz</h1>
+                    </div>
+                    <div class="card fillWidth autoHeight radius[xl] flex justify[center] align[center] direction[column] g[s] p[xs] min-height[80px] shadow">
+                        <div class="flex direction[row] justify[start] align[center] g[xs] px[xs] fillWidth fillHeight">
+                            <img src="/assets/img/mdowod_card.png" class="max-width[45px]" alt="">
+                            <h1 class="font[Inter] font-weight[600] text-size[16] text-align[left]">mDowód</h1>
+                        </div>
+                    </div>
+                    <div class="card fillWidth autoHeight radius[xl] flex direction[column] g[s] p[xs] min-height[80px] shadow">
+                        <div class="flex direction[column] justify[start] align[start] g[xs] fillHeight">
+                            <p class="label font[Inter] font-weight[400] text-size[14] text-align[left]">Podmiot, któremu udostepniasz dane</p>
+                            <h1 class="font[Inter] font-weight[600] text-size[18] text-align[left]">Użytkownik internetowej obsługi weryfikacji mDowodu</h1>
+                        </div>
+                    </div>
+                    <div class="card fillWidth autoHeight radius[xl] flex direction[column] g[s] p[xs] min-height[80px] shadow">
+                        <div class="flex direction[column] justify[start] align[start] g[xs] fillHeight">
+                            <p class="label font[Inter] font-weight[400] text-size[14] text-align[left]">Dane, które udostępnisz</p>
+                            <p class="font[Inter] font-weight[600] text-size[16] text-align[left]">• Zdjęcie</p>
+                            <p class="font[Inter] font-weight[600] text-size[16] text-align[left]">• Nazwisko</p>
+                            <p class="font[Inter] font-weight[600] text-size[16] text-align[left]">• Imię (Imiona)</p>
+                            <p class="font[Inter] font-weight[600] text-size[16] text-align[left]">• Numer PESEL</p>
+                            <p class="font[Inter] font-weight[600] text-size[16] text-align[left]">• Data urodzenia</p>
+                            <p class="font[Inter] font-weight[600] text-size[16] text-align[left]">• Obywatelstwo</p>
+                            <p class="font[Inter] font-weight[600] text-size[16] text-align[left]">• Imię ojca</p>
+                            <p class="font[Inter] font-weight[600] text-size[16] text-align[left]">• Imię matki</p>
+                            <p class="font[Inter] font-weight[600] text-size[16] text-align[left]">• Seria i nr dokumentu mDowód</p>
+                            <p class="font[Inter] font-weight[600] text-size[16] text-align[left]">• Termin ważności dokumentu mDowód</p>
+                            <p class="font[Inter] font-weight[600] text-size[16] text-align[left]">• Data wydania dokumentu mDowód</p>
+                        </div>
+                    </div>
+                    <div class="fillWidth autoHeight pb[m]">
+                        <button class="primary fillWidth radius[xl] border[unset] py[s]" data-button="share_data">Udostępnij dane</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="shared_error absolute top[0] z[3] fillWidth fillHeight background[unset] display-none" style="transform: translateY(100%);">
+            <div class="dashboard-navigation sticky top[0] background[unset] flex direction[row] justify[around] align[end] g[s] fillWidth height[60px] px[s] z[max] pb[s]">
+                <div class="flex justify[end] align[center] height[20px] fillWidth">
+                    <div class="square[25px]"></div>
+                </div>
+                <div class="fillWidth flex justify[center] align[center] height[20px]">
+                    <div class="square[25px]"></div>
+                </div>
+                <a class="direction[row] g[xs] align[center] font-weight[500] text-size[20] text-align[right] fillWidth text[nowrap] height[20px]" data-button="shared_error_back">
+                    <i class="fal fa-times"></i>
+                </a>
+            </div>
+            <div class="relative fillWidth fillHeight us[none] px[s] py[s] pt[0] pb[80]">
+                <div class="flex direction[column] justify[center] align[center] g[s] fillWidth fillHeight px[l]">
+                    <i class="danger fal fa-circle-x text-size[64]"></i>
+                    <p class="font[Inter] font-weight[600] text-size[22] text-align[center]">Wystąpił błąd</p>
+                    <p class="font[Inter] font-weight[400] text-size[16] text-align[center]">Nie możemy wyświetlić Twoich danych. Spróbuj ponownie później.</p>
+                </div>
+            </div>
+            <div class="absolute bottom[0] flex direction[column] justify[center] g[8] align[center] fillWidth autoHeight py[s] px[s]">
+                <button class="primary fillWidth radius[xl] border[unset] py[s]">Spróbuj ponownie</button>
+                <button class="alternative fillWidth radius[xl] border-solid-1 py[s]" data-button="shared_error_back">Zamknij</button>
+            </div>
+        </div>
+    </div>
+    <div class="navigation backdrop[8px] sticky  top[100] flex justify[end] align[center] bottom[0] height[80px] z[max]" data-group="navigation">
+    <div class="fillWidth fillHeight flex direction[row] justify[around] align[start]">
+                <a
+            href="/documents"
+            class="fillHeight fillWidth flex direction[column] g[4] justify[center] align[center] max-height[60px] mb[4] text-decoration[none]"
+            aria-label="documents"
+        >
+            <img src="/assets/svg/navigation/light/documents.svg" class="square[20px]" alt="documents">
+            <span class="label  text-size[10] text[nowrap]">
+                Dokumenty            </span>
+        </a>
+                <a
+            href="/services"
+            class="fillHeight fillWidth flex direction[column] g[4] justify[center] align[center] max-height[60px] mb[4] text-decoration[none]"
+            aria-label="services"
+        >
+            <img src="/assets/svg/navigation/light/services.svg" class="square[20px]" alt="services">
+            <span class="label  text-size[10] text[nowrap]">
+                Usługi            </span>
+        </a>
+                <a
+            href="/qr_code"
+            class="fillHeight fillWidth flex direction[column] g[4] justify[center] align[center] max-height[60px] mb[4] text-decoration[none]"
+            aria-label="qr_code"
+        >
+            <img src="/assets/svg/navigation/light/qr_code_active.svg" class="square[20px]" alt="qr_code">
+            <span class="label active text-size[10] text[nowrap]">
+                Kod QR            </span>
+        </a>
+                <a
+            href="/more"
+            class="fillHeight fillWidth flex direction[column] g[4] justify[center] align[center] max-height[60px] mb[4] text-decoration[none]"
+            aria-label="more"
+        >
+            <img src="/assets/svg/navigation/light/more.svg" class="square[20px]" alt="more">
+            <span class="label  text-size[10] text[nowrap]">
+                Więcej            </span>
+        </a>
+            </div>
+</div>
+        </body>
+</html>

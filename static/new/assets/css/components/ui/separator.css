@@ -1,0 +1,15 @@
+.separator\[y\] {
+    width: 2px !important;
+    height: 100% !important;
+    background-color: rgba(var(--border), 0.5);
+    border-radius: 50%;
+    flex-shrink:0!important;
+}
+
+.separator\[x\] {
+    height: 2px !important;
+    width: 100% !important;
+    background-color: rgba(var(--border), 0.5);
+    border-radius: 50%;
+    flex-shrink:0!important;
+}

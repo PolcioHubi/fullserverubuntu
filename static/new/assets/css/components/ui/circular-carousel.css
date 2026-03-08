@@ -1,0 +1,19 @@
+[data-circular-carousel] {
+    will-change: transform;
+}
+
+
+[data-circular-carousel-item] {
+    transition: transform 2s ease;
+    will-change: transform;
+}
+
+[data-circular-carousel-content] {
+    color: rgba(var(--primary), 1) !important;
+    border-color: rgba(var(--border), 0.5) !important;
+    transition: transform 2s ease !important;
+    background-color: rgba(11, 11, 14, 0.1) !important;
+    backdrop-filter: blur(2px) !important;
+    box-shadow: inset 45px -45px 90px -45px rgba(var(--card-shadow), 0.1) !important;
+    will-change: transform;
+}

@@ -1,0 +1,39 @@
+.tab-navigation {
+    position: relative;
+    display: flex;
+    user-select: none;
+    width: max-content;
+    gap: var(--tab-navigation-gap, 4px);
+    padding: var(--tab-navigation-padding, 6px);
+}
+  
+.tab-btn[data-tab] {
+    position: relative;
+    background: none;
+    border: none;
+    color: rgba(var(--primary), 0.7);
+    cursor: pointer;
+    z-index: 2;
+    padding: var(--tab-navigation-tab-padding);
+    transition: color 0.3s ease;
+}
+  
+.tab-btn[data-tab]:hover {
+    color: rgba(var(--primary), 1);
+  }
+  
+.tab-btn[data-tab].active {
+    color: rgba(var(--primary), 1);
+}
+  
+.highlight[data-highlight] {
+    position: absolute;
+    top: var(--tab-navigation-highlight-offset, 6px);
+    left: 0;
+    height: calc(100% - 2 * var(--tab-navigation-highlight-offset, 6px));
+    background-color: rgba(var(--secondary), 1);
+    transition: all 0.3s ease;
+    z-index: 1;
+    width: 0;
+}
+  

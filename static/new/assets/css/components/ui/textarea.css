@@ -1,0 +1,27 @@
+textarea {
+    font-family: var(--font-primary);
+    font-weight: 450;
+    font-size: var(--text-size-default);
+}
+
+textarea {
+    background-color: rgba(var(--background, 1));
+    color: rgba(var(--primary), 1);
+    border-color: rgba(var(--border, 1));
+}
+
+textarea:focus {
+    outline: 1px ridge rgba(var(--ring), 0.5);
+}
+
+textarea::placeholder {
+    color: rgba(var(--muted-foreground), 1);
+}
+
+textarea:disabled {
+    opacity: 0.5;
+}
+
+textarea.noresize {
+    resize: none;
+}

@@ -1,0 +1,84 @@
+﻿{
+    "success": true,
+    "message": "Data retrieved successfully",
+    "data": {
+        "mdowod": {
+            "main": {
+                "first_name": "JAN",
+                "last_name": "KOWALSKI",
+                "birthday": "01.01.2000",
+                "pesel": "00210112345"
+            },
+            "personal": {
+                "series": "CDB 123456",
+                "issuer": "PREZYDENT M.ST. WARSZAWY",
+                "expiration": "01.01.2035",
+                "issue": "01.01.2025",
+                "last_update": "08.03.2026, 12:00"
+            },
+            "other": {
+                "series": "AAA 1234567",
+                "expiration": "01.01.2035",
+                "issue": "01.01.2025",
+                "fathers_name": "ADAM",
+                "mothers_name": "EWA"
+            },
+            "additional": {
+                "family_name": "KOWALSKI",
+                "fathers_family": "KOWALSKI",
+                "mothers_family": "NOWAK",
+                "place_of_birth": "WARSZAWA",
+                "residence": "MARSZALKOWSKA 1, 00-001 WARSZAWA",
+                "residence_date": "01.01.2020"
+            }
+        },
+        "mprawojazdy": {
+            "main": {
+                "first_name": "JAN",
+                "last_name": "KOWALSKI",
+                "birthdate": "01.01.2000",
+                "pesel": "00210112345",
+                "categories": "B"
+            },
+            "other": {
+                "issue": "15.06.2020",
+                "number": "12345/20/0001",
+                "blank": "AK 1234567",
+                "issuer": "STAROSTA WARSZAWSKI",
+                "restrictions": "01.05 - OKULARY LUB SOCZEWKI KONTAKTOWE",
+                "last_update": "08.03.2026, 12:00"
+            }
+        },
+        "student": {
+            "main": {
+                "first_name": "JAN",
+                "last_name": "KOWALSKI",
+                "birthday": "01.01.2000",
+                "pesel": "00210112345",
+                "issue": "01.10.2024",
+                "university": "POLITECHNIKA WARSZAWSKA"
+            },
+            "other": {
+                "last_update": "08.03.2026, 12:00"
+            }
+        },
+        "school": {
+            "main": {
+                "first_name": "JAN",
+                "last_name": "KOWALSKI",
+                "birthdate": "01.01.2000",
+                "pesel": "00210112345",
+                "number": "SCH/2024/00123"
+            },
+            "other": {
+                "issue": "01.09.2024",
+                "expiration": "30.09.2025",
+                "name": "XIV LICEUM OGOLNOKSZTALCACE IM. STANISLAWA STASZICA",
+                "address": "NOWY SWIAT 49, 00-042 WARSZAWA",
+                "principal": "MGR ANNA WISNIEWSKA",
+                "phone": "+48 22 123 45 67",
+                "last_update": "08.03.2026, 12:00"
+            }
+        }
+    }
+}

@@ -1,0 +1,426 @@
+﻿<!DOCTYPE html>
+<html lang="en" data-theme="default" data-mode="light" data-custom>
+<head>
+    <!-- Meta -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="description" content="">
+    <meta name="author" content="mObywatel">
+    <!-- Default Meta -->
+            <meta name="theme-color" content="#f5f6fb">
+        <meta name="apple-mobile-web-app-title" content="mObywatel">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <!-- [LOCAL] noscript redirect disabled -->
+    <!-- Open Graph Meta -->
+    <meta property='og:title' content='mObywatel'>
+    <meta property='og:description' content=''>
+    <meta property='og:type' content='website'>
+    <meta property='og:locale' content='en_US'>
+    <meta property='og:image' content='/assets/img/logo.png'>
+    <!-- Twitter Meta -->
+    <meta name='twitter:card' content='summary'>
+    <meta name='twitter:title' content='mObywatel'>
+    <meta name='twitter:description' content=''>
+    <meta name='twitter:image' content='/assets/img/logo.png'>
+    <!-- Links -->
+    <link rel="shortcut icon" href="/assets/img/logo.png" type="image/x-icon">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-180x.png">
+    <link rel="apple-touch-startup-image" sizes="180x180" href="/assets/img/apple-180x.png">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <!-- JavaScript -->
+    <script src='/assets/js/global/jquery.js'></script>
+    <script src='/assets/js/global/qrcode.js'></script>
+    <!-- Service Worker -->
+    <script src="/assets/js/global/worker-starter.js"></script>
+    <!-- Libraries & Assets -->
+    <script src="/assets/js/global/utilities.js"></script>
+    <!-- Pages -->
+    <script src="/assets/js/pages/index.js"></script>
+                    <script src='/assets/js/pages/more.js'></script>    <!-- Documents -->
+                    <!-- Main JavaScript -->
+    <script src="/assets/js/script.js"></script>
+    <script src="/assets/js/global/enhancements.js" defer></script>
+    <!-- Title -->
+    <title>mObywatel</title>
+</head>
+<body class="background[unset]">
+    <div class="fillWidth fillHeight overflow[y-auto]" data-standalone>
+        <div class="dashboard-navigation sticky top[0] background[unset] flex direction[row] justify[between] align[end] g[s] fillWidth height[60px] px[s] z[max] pb[s]">
+            <div class="flex autoHeight direction[row] justify[start] align[center] g[m] min-width[50px]">
+                <img class="square[35px]" src="/assets/svg/logo.svg" alt="">
+            </div>
+            <div class="dashboard-navigation-small-title flex autoHeight direction[row] justify[end] align[center] g[m] min-width[50px]">
+                <h1 class="font[Inter] font-weight[700] text-size[18]">Więcej</h1>
+            </div>
+            <div class="flex autoHeight direction[row] justify[end] align[center] g[m] min-width[50px]">
+                <a class="redirect font-weight[400] text-size[16] text-align[left]" data-button="logout">Wyloguj</a>
+            </div>
+        </div>
+        <div class="relative fillWidth autoHeight us[none] mb[80] px[s] pb[s] " data-wrapper>
+            <div class="dashboard-navigation-large-title flex fillWidth height[50px]">
+                <div class="height[30px] flex justify[center] align[center] cursor[pointer]">
+                    <h1 class="font[Inter] font-weight[700] text-size[36]">Więcej</h1>
+                </div>
+            </div>
+            <div class="flex direction[column] g[s] justify[start] align[start] fillWidth fillHeight pagePop">
+                <div class="flex justify[start] align[start] fillWidth height[30px]">
+                    <div class="height[40px] flex justify[center] align[center] cursor[pointer]">
+                        <p class="font[Inter] font-weight[600] text-size[20]">Twoje dane</p>
+                    </div>
+                </div>
+                <div class="card flex direction[column] justify[center] align[start] fillWidth autoHeight min-height[90px] radius[xl] shadow">
+                    <div class="flex direction[row] justify[start] align[center] p[8] fillWidth">
+                        <div class="flex justify[center] align[center] square[50px]">
+                            <img src="/assets/svg/more/contact.svg" class="theme-icon square[20px]">
+                        </div>
+                        <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth px[s]" data-button="contact">
+                            <h1 class="font-weight[500] text-size[18] text-align[left] fillWidth">Dane kontaktowe</h1>
+                            <i class="label far fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    <div class="separator[x]"></div>
+                    <div class="flex direction[row] justify[start] align[center] p[8] fillWidth">
+                        <div class="flex justify[center] align[center] square[50px]">
+                            <img src="/assets/svg/more/address.svg" class="theme-icon square[25px]">
+                        </div>
+                        <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth px[s]">
+                            <h1 class="font-weight[500] text-size[18] text-align[left] fillWidth">Dane zameldowania</h1>
+                            <i class="label far fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    <div class="separator[x]"></div>
+                    <div class="flex direction[row] justify[start] align[center] p[8] fillWidth">
+                        <div class="flex justify[center] align[center] square[50px]">
+                            <img src="/assets/svg/more/passport.svg" class="theme-icon square[20px]">
+                        </div>
+                        <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth px[s]">
+                            <h1 class="font-weight[500] text-size[18] text-align[left] fillWidth">Dane paszportu</h1>
+                            <i class="label far fa-chevron-right"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify[start] align[start] fillWidth height[30px]">
+                    <div class="height[40px] flex justify[center] align[center] cursor[pointer]">
+                        <p class="font[Inter] font-weight[600] text-size[20]">Ustawienia</p>
+                    </div>
+                </div>
+                <div class="card flex direction[column] justify[center] align[start] fillWidth autoHeight min-height[90px] radius[xl] shadow">
+                    <div class="flex direction[row] justify[start] align[center] p[8] fillWidth">
+                        <div class="flex justify[center] align[center] square[50px]">
+                            <img src="/assets/svg/more/password.svg" class="theme-icon square[20px]">
+                        </div>
+                        <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth px[s]">
+                            <h1 class="font-weight[500] text-size[18] text-align[left] fillWidth">Zmień hasło</h1>
+                            <i class="label far fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    <div class="separator[x]"></div>
+                    <div class="flex direction[row] justify[start] align[center] p[8] fillWidth">
+                        <div class="flex justify[center] align[center] square[50px]">
+                            <img src="/assets/svg/more/biometric.svg" class="theme-icon square[20px]">
+                        </div>
+                        <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth px[s]">
+                            <h1 class="font-weight[500] text-size[18] text-align[left] fillWidth">Logowanie biometryczne</h1>
+                            <i class="label far fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    <div class="separator[x]"></div>
+                    <div class="flex direction[row] justify[start] align[center] p[8] fillWidth">
+                        <div class="flex justify[center] align[center] square[50px]">
+                            <img src="/assets/svg/more/notifications.svg" class="theme-icon square[20px]">
+                        </div>
+                        <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth px[s]">
+                            <h1 class="font-weight[500] text-size[18] text-align[left] fillWidth">Powiadomienia</h1>
+                            <i class="label far fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    <div class="separator[x]"></div>
+                    <div class="flex direction[row] justify[start] align[center] p[8] fillWidth" data-button="language">
+                        <div class="flex justify[center] align[center] square[50px]">
+                            <img src="/assets/svg/more/language.svg" class="theme-icon square[20px]">
+                        </div>
+                        <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth px[s]">
+                            <h1 class="font-weight[500] text-size[18] text-align[left] fillWidth">Język aplikacji</h1>
+                            <i class="label far fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    <div class="separator[x]"></div>
+                    <div class="flex direction[row] justify[start] align[center] p[8] fillWidth" data-button="theme">
+                        <div class="flex justify[center] align[center] square[50px]">
+                            <img src="/assets/svg/more/appearance.svg" class="theme-icon square[20px]">
+                        </div>
+                        <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth px[s]">
+                            <h1 class="font-weight[500] text-size[18] text-align[left] fillWidth">Wygląd</h1>
+                            <i class="label far fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    <div class="separator[x]"></div>
+                    <div class="flex direction[row] justify[start] align[center] p[8] fillWidth">
+                        <div class="flex justify[center] align[center] square[50px]">
+                            <img src="/assets/svg/more/certificates.svg" class="theme-icon square[20px]">
+                        </div>
+                        <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth px[s]">
+                            <h1 class="font-weight[500] text-size[18] text-align[left] fillWidth">Wydane certyfikaty</h1>
+                            <i class="label far fa-chevron-right"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify[start] align[start] fillWidth height[30px]">
+                    <div class="height[40px] flex justify[center] align[center] cursor[pointer]">
+                        <p class="font[Inter] font-weight[600] text-size[20]">Pozostałe</p>
+                    </div>
+                </div>
+                <div class="card flex direction[column] justify[center] align[start] fillWidth autoHeight min-height[90px] radius[xl] shadow">
+                    <div class="flex direction[row] justify[start] align[center] p[8] fillWidth">
+                        <div class="flex justify[center] align[center] square[50px]">
+                            <img src="/assets/svg/more/activity.svg" class="theme-icon square[20px]">
+                        </div>
+                        <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth px[s]">
+                            <h1 class="font-weight[500] text-size[18] text-align[left] fillWidth">Historia aktywności</h1>
+                            <i class="label far fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    <div class="separator[x]"></div>
+                    <div class="flex direction[row] justify[start] align[center] p[8] fillWidth">
+                        <div class="flex justify[center] align[center] square[50px]">
+                            <img src="/assets/svg/more/about.svg" class="theme-icon square[20px]">
+                        </div>
+                        <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth px[s]">
+                            <h1 class="font-weight[500] text-size[18] text-align[left] fillWidth">O aplikacji</h1>
+                            <i class="label far fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    <div class="separator[x]"></div>
+                    <div class="flex direction[row] justify[start] align[center] p[8] fillWidth">
+                        <div class="flex justify[center] align[center] square[50px]">
+                            <img src="/assets/svg/more/support.svg" class="theme-icon square[20px]">
+                        </div>
+                        <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth px[s]">
+                            <h1 class="font-weight[500] text-size[18] text-align[left] fillWidth">Pomoc techniczna</h1>
+                            <i class="label far fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    <div class="separator[x]"></div>
+                    <div class="flex direction[row] justify[start] align[center] p[8] fillWidth">
+                        <div class="flex justify[center] align[center] square[50px]">
+                            <img src="/assets/svg/more/rate.svg" class="theme-icon square[20px]">
+                        </div>
+                        <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth px[s]">
+                            <h1 class="font-weight[500] text-size[18] text-align[left] fillWidth">Oceń aplikację</h1>
+                            <i class="label far fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    <div class="separator[x]"></div>
+                    <div class="flex direction[row] justify[start] align[center] p[8] fillWidth">
+                        <div class="flex justify[center] align[center] square[50px]">
+                            <img src="/assets/svg/more/ai.svg" class="theme-icon square[20px]">
+                        </div>
+                        <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth px[s]">
+                            <h1 class="font-weight[500] text-size[18] text-align[left] fillWidth">Wirtualny asystent</h1>
+                            <i class="label far fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    <div class="separator[x]"></div>
+                    <div class="flex direction[row] justify[start] align[center] p[8] fillWidth">
+                        <div class="flex justify[center] align[center] square[50px]">
+                            <img src="/assets/svg/more/vote.svg" class="theme-icon square[20px]">
+                        </div>
+                        <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth px[s]">
+                            <h1 class="font-weight[500] text-size[18] text-align[left] fillWidth">Zagłosuj na pomysł</h1>
+                            <i class="label far fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    <div class="separator[x]"></div>
+                    <div class="flex direction[row] justify[start] align[center] p[8] fillWidth">
+                        <div class="flex justify[center] align[center] square[50px]">
+                            <img src="/assets/svg/more/deactivate.svg" class="theme-icon square[20px]">
+                        </div>
+                        <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth px[s]" data-button="refreshCache">
+                            <h1 class="font-weight[500] text-size[18] text-align[left] fillWidth">Dezaktywuj aplikację</h1>
+                            <i class="label far fa-chevron-right"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="language absolute top[0] z[max] fillWidth fillHeight background[unset]" style="transform: translateX(100%);">
+            <div class="dashboard-navigation sticky top[0] background[unset] flex direction[row] justify[around] align[end] g[s] fillWidth height[45px] px[s] z[2] pb[xs]">
+                <a class="redirect flex direction[row] g[4] align[center] font-weight[400] text-size[16] text-align[left] fillWidth text[nowrap] height[20px]" data-button="language_back">
+                    <i class="far fa-chevron-left text-size[24]"></i>
+                    Wróć                </a>
+                <div class="fillWidth flex justify[center] align[center] height[20px]">
+                    <h1 class="font[Inter] text-align[center] text[nowrap] font-weight[600] text-size[18]">Język aplikacji</h1>
+                </div>
+                <div class="flex justify[end] align[center] height[20px] fillWidth">
+                    <div class="square[25px]"></div>
+                </div>
+            </div>
+            <div class="relative fillWidth fillHeight us[none] px[s]">
+                <div class="flex direction[column] g[s] justify[start] align[start] fillWidth fillHeight">
+                    <div class="flex justify[start] align[start] fillWidth autoHeight">
+                        <div class="height[40px] flex justify[center] align[center] cursor[pointer]">
+                            <p class="font[Inter] font-weight[600] text-size[20]">Wybierz język</p>
+                        </div>
+                    </div>
+                    <div class="card flex direction[column] justify[center] align[start] fillWidth autoHeight min-height[90px] radius[xl] shadow">
+                        <div class="flex direction[row] justify[start] align[center] p[8] fillWidth" data-button="polish">
+                            <div class="flex justify[center] align[center] square[50px]">
+                                <div class="indicator active square[10px] radius[full]"></div>
+                            </div>
+                            <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth">
+                                <h1 class="font[Inter] font-weight[700] text-size[16] text[uppercase]">Polski</h1>
+                            </div>
+                        </div>
+                        <div class="separator[x]"></div>
+                        <div class="flex direction[row] justify[start] align[center] p[8] fillWidth" data-button="english">
+                            <div class="flex justify[center] align[center] square[50px]">
+                                <div class="indicator inactive square[10px] radius[full]"></div>
+                            </div>
+                            <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth">
+                                <h1 class="font[Inter] font-weight[700] text-size[16] text[uppercase]">English</h1>
+                            </div>
+                        </div>
+                        <div class="separator[x]"></div>
+                        <div class="flex direction[row] justify[start] align[center] p[8] fillWidth" data-button="ukrainian">
+                            <div class="flex justify[center] align[center] square[50px]">
+                                <div class="indicator inactive square[10px] radius[full]"></div>
+                            </div>
+                            <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth">
+                                <h1 class="font[Inter] font-weight[700] text-size[16] text[uppercase]">Українська</h1>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="theme absolute top[0] z[max] fillWidth fillHeight background[unset]" style="transform: translateX(100%);">
+            <div class="dashboard-navigation sticky top[0] background[unset] flex direction[row] justify[around] align[end] g[s] fillWidth height[45px] px[s] z[2] pb[xs]">
+                <a class="redirect flex direction[row] g[4] align[center] font-weight[400] text-size[16] text-align[left] fillWidth text[nowrap] height[20px]" data-button="theme_back">
+                    <i class="far fa-chevron-left text-size[24]"></i>
+                    Wróć                </a>
+                <div class="fillWidth flex justify[center] align[center] height[20px]">
+                    <h1 class="font[Inter] text-align[center] text[nowrap] font-weight[600] text-size[18]">Wygląd</h1>
+                </div>
+                <div class="flex justify[end] align[center] height[20px] fillWidth">
+                    <div class="square[25px]"></div>
+                </div>
+            </div>
+            <div class="relative fillWidth fillHeight us[none] px[s]">
+                <div class="flex direction[column] g[s] justify[start] align[start] fillWidth fillHeight">
+                    <div class="card flex direction[column] justify[center] align[start] fillWidth autoHeight min-height[90px] radius[xl] shadow">
+                        <div class="flex direction[row] justify[start] align[center] p[8] fillWidth" data-button="light">
+                            <div class="flex justify[center] align[center] square[50px]">
+                                <div class="indicator active square[10px] radius[full]"></div>
+                            </div>
+                            <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth">
+                                <h1 class="font[Inter] font-weight[700] text-size[16] text[uppercase]">Jasny</h1>
+                            </div>
+                        </div>
+                        <div class="separator[x]"></div>
+                        <div class="flex direction[row] justify[start] align[center] p[8] fillWidth" data-button="dark">
+                            <div class="flex justify[center] align[center] square[50px]">
+                                <div class="indicator inactive square[10px] radius[full]"></div>
+                            </div>
+                            <div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth">
+                                <h1 class="font[Inter] font-weight[700] text-size[16] text[uppercase]">Ciemny</h1>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="contact absolute top[0] z[max] fillWidth fillHeight background[unset]" style="transform: translateX(100%);">
+            <div class="dashboard-navigation sticky top[0] background[unset] flex direction[row] justify[around] align[end] g[s] fillWidth height[45px] px[s] z[2] pb[xs]">
+                <a class="redirect flex direction[row] g[4] align[center] font-weight[400] text-size[16] text-align[left] fillWidth text[nowrap] height[20px]" data-button="contact_back">
+                    <i class="far fa-chevron-left text-size[24]"></i>
+                    Wróć                </a>
+                <div class="fillWidth flex justify[center] align[center] height[20px]">
+                    <h1 class="font[Inter] text-align[center] text[nowrap] font-weight[600] text-size[18]">Dane kontaktowe</h1>
+                </div>
+                <div class="flex justify[end] align[center] height[20px] fillWidth">
+                    <img src="/assets/svg/more/support.svg" class="theme-icon square[20px]" alt="">
+                </div>
+            </div>
+            <div class="relative fillWidth fillHeight us[none] px[s] py[s]">
+                <div class="flex direction[column] g[s] fillWidth autoHeight">
+                    <div class="flex justify[center] align[center] radius[full] square[80px]" style="background-color: rgb(var(--blue-inactive), 1);">
+                        <img src="/assets/svg/more/contacts_blue.svg" class="square[45px] z[1]">
+                    </div>
+                    <div class="autoHeight fillWidth flex justify[start] align[center]">
+                        <h1 class="font[Inter] font-weight[700] text-size[32]">Dodaj lub zmień dane</h1>
+                    </div>
+                    <div class="autoHeight fillWidth flex justify[start] align[center]">
+                        <p class="label font[Inter] font-weight[400] text-size[16]">To Twoje dane z Rejestru Danych Kontaktowych. Ułatwiają kontakt z Tobą w sprawach urzędowych. Tymi danymi uzupełniamy formularze, które wypełniasz w aplikacji mObywatel.</p>
+                    </div>
+                    <div class="card fillWidth autoHeight p[s] flex direction[column] g[12] radius[xl] shadow">
+                        <div class="flex direction[column] justify[center] g[4] autoHeight fillWidth min-height[40px]">
+                            <div class="flex direction[row] justify[between] align[center] autoHeight fillWidth">
+                            <div class="flex direction[column] g[4]">
+                                    <h1 class="font[Inter] text-align[left] font-weight[600] text-size[20]">Adres e-mail</h1>
+                                    <p class="label font[Inter] text-align[left] font-weight[400] text-size[16]">Dodaj adres e-mail</p>
+                                </div>
+                                <i class="label far fa-chevron-right"></i>
+                            </div>
+                        </div>
+                        <div class="separator[x]"></div>
+                        <div class="flex direction[column] justify[center] g[4] autoHeight fillWidth min-height[40px]">
+                            <div class="flex direction[row] justify[between] g[4] align[center] autoHeight fillWidth">
+                                <div class="flex direction[column] g[4]">
+                                    <h1 class="font[Inter] text-align[left] font-weight[600] text-size[20]">Numer telefonu</h1>
+                                    <p class="label font[Inter] text-align[left] font-weight[400] text-size[16]">Dodaj numer telefonu</p>
+                                </div>
+                                <i class="label far fa-chevron-right"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="navigation backdrop[8px] sticky  top[100] flex justify[end] align[center] bottom[0] height[80px] z[max]" data-group="navigation">
+    <div class="fillWidth fillHeight flex direction[row] justify[around] align[start]">
+                <a
+            href="/documents"
+            class="fillHeight fillWidth flex direction[column] g[4] justify[center] align[center] max-height[60px] mb[4] text-decoration[none]"
+            aria-label="documents"
+        >
+            <img src="/assets/svg/navigation/light/documents.svg" class="square[20px]" alt="documents">
+            <span class="label  text-size[10] text[nowrap]">
+                Dokumenty            </span>
+        </a>
+                <a
+            href="/services"
+            class="fillHeight fillWidth flex direction[column] g[4] justify[center] align[center] max-height[60px] mb[4] text-decoration[none]"
+            aria-label="services"
+        >
+            <img src="/assets/svg/navigation/light/services.svg" class="square[20px]" alt="services">
+            <span class="label  text-size[10] text[nowrap]">
+                Usługi            </span>
+        </a>
+                <a
+            href="/qr_code"
+            class="fillHeight fillWidth flex direction[column] g[4] justify[center] align[center] max-height[60px] mb[4] text-decoration[none]"
+            aria-label="qr_code"
+        >
+            <img src="/assets/svg/navigation/light/qr_code.svg" class="square[20px]" alt="qr_code">
+            <span class="label  text-size[10] text[nowrap]">
+                Kod QR            </span>
+        </a>
+                <a
+            href="/more"
+            class="fillHeight fillWidth flex direction[column] g[4] justify[center] align[center] max-height[60px] mb[4] text-decoration[none]"
+            aria-label="more"
+        >
+            <img src="/assets/svg/navigation/light/more_active.svg" class="square[20px]" alt="more">
+            <span class="label active text-size[10] text[nowrap]">
+                Więcej            </span>
+        </a>
+            </div>
+</div>
+</body>
+</html>

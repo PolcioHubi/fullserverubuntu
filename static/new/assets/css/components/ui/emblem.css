@@ -1,0 +1,113 @@
+.emblem {
+    transition: none !important;
+}
+
+.emblem\[card\] {
+    position: relative;
+    width: 30px;
+    aspect-ratio: 107/126;
+    overflow: hidden;
+    transition: none !important;
+}
+
+.emblem\[image\] {
+    position: absolute;
+    inset: 0;
+    background: var(--img-url) center/contain no-repeat;
+    filter: contrast(1.04) brightness(1.03);
+    transition: none !important;
+    z-index: 1;
+}
+
+.emblem\[mask\] {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    -webkit-mask-image: var(--mask-url);
+    mask-image: var(--mask-url);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    mask-mode: alpha;
+    transition: none !important;
+    z-index: 2;
+}
+
+.emblem\[rainbow\] {
+    position: absolute;
+    inset: calc(-1 * var(--em-bleed));
+    pointer-events: none;
+    opacity: 0.5;
+    transition: none !important;
+    transform: translate(var(--em-tx), var(--em-ty)) rotate(var(--em-ang));
+    will-change: transform, opacity;
+    mix-blend-mode: color-dodge;
+    filter: saturate(var(--em-sat)) blur(var(--em-blur));
+    background:
+        linear-gradient(180deg,
+        /* czysty czerwony i więcej miejsca na starcie */
+        hsl(0 92% 62%)    0%,
+        hsl(0 92% 62%)   14%,
+        hsl(15 92% 61%)  22%,
+        hsl(26 92% 60%)  30%,
+        hsl(42 92% 58%)  38%,
+        hsl(60 92% 57%)  46%,
+        hsl(120 88% 52%) 56%,
+        hsl(190 85% 56%) 68%,
+        hsl(240 82% 60%) 80%,
+        hsl(285 78% 62%) 91%,
+        hsl(256 85% 60%) 100%
+    );
+    background-position: center top;
+    background-size: 220% 100%;
+  
+    -webkit-mask-image: linear-gradient(0deg,
+            transparent calc(50% - var(--em-band) - var(--feather)),
+            #000 calc(50% - var(--em-band)),
+            #000 calc(50% + var(--em-band)),
+            transparent calc(50% + var(--em-band) + var(--feather)));
+    mask-image: linear-gradient(0deg,
+            transparent calc(50% - var(--em-band) - var(--feather)),
+            #000 calc(50% - var(--em-band)),
+            #000 calc(50% + var(--em-band)),
+            transparent calc(50% + var(--em-band) + var(--feather)));
+}
+
+.emblem\[spectral\] {
+    position: absolute;
+    inset: calc(-1 * var(--em-bleed));
+    pointer-events: none;
+    opacity: calc(var(--em-alpha) * var(--em-spec-alpha));
+    transition: none !important;
+    transform: translate(var(--em-tx), var(--em-ty)) rotate(var(--em-ang));
+    mix-blend-mode: soft-light;
+    background:
+        linear-gradient(0deg, rgba(255, 255, 255, .0) 35%, rgba(255, 255, 255, .85) 50%, rgba(255, 255, 255, .0) 65%);
+    -webkit-mask-image: linear-gradient(0deg,
+            transparent calc(50% - var(--em-band) - var(--feather)),
+            #000 calc(50% - var(--em-band)),
+            #000 calc(50% + var(--em-band)),
+            transparent calc(50% + var(--em-band) + var(--feather)));
+    mask-image: linear-gradient(0deg,
+            transparent calc(50% - var(--em-band) - var(--feather)),
+            #000 calc(50% - var(--em-band)),
+            #000 calc(50% + var(--em-band)),
+            transparent calc(50% + var(--em-band) + var(--feather)));
+    filter: blur(0.7px)
+}
+
+.emblem\[eagle\]   {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: var(--eagle-url) center/contain no-repeat;
+    mix-blend-mode: normal;
+    filter: none;
+    opacity: 1;
+    transform: none;
+    transition: none !important;
+    z-index: 3;
+}

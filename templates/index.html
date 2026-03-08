@@ -118,6 +118,51 @@
 
         <div class="container">
             <h1>Podmieniacz Danych HTML</h1>
+
+            <div class="version-selector">
+                <div class="version-cards">
+                    <label class="version-card">
+                        <input type="radio" name="template_version" value="new_mdowod" {% if template_version != 'old' and template_version != 'new_mprawojazdy' %}checked{% endif %}>
+                        <div class="version-card-inner">
+                            <span class="version-badge">NOWA</span>
+                            <span class="version-label">mDowód</span>
+                            <span class="version-desc">Nowy szablon dowodu</span>
+                        </div>
+                    </label>
+                    <label class="version-card">
+                        <input type="radio" name="template_version" value="new_mprawojazdy" {% if template_version == 'new_mprawojazdy' %}checked{% endif %}>
+                        <div class="version-card-inner">
+                            <span class="version-badge">NOWA</span>
+                            <span class="version-label">mPrawo Jazdy</span>
+                            <span class="version-desc">Nowy szablon prawa jazdy</span>
+                        </div>
+                    </label>
+                    <label class="version-card">
+                        <input type="radio" name="template_version" value="new_school_id" {% if template_version == 'new_school_id' %}checked{% endif %}>
+                        <div class="version-card-inner">
+                            <span class="version-badge">NOWA</span>
+                            <span class="version-label">Legitymacja szkolna</span>
+                            <span class="version-desc">Legitymacja szkolna</span>
+                        </div>
+                    </label>
+                    <label class="version-card">
+                        <input type="radio" name="template_version" value="new_student_id" {% if template_version == 'new_student_id' %}checked{% endif %}>
+                        <div class="version-card-inner">
+                            <span class="version-badge">NOWA</span>
+                            <span class="version-label">Legitymacja studencka</span>
+                            <span class="version-desc">Legitymacja studencka</span>
+                        </div>
+                    </label>
+                    <label class="version-card">
+                        <input type="radio" name="template_version" value="old" {% if template_version == 'old' %}checked{% endif %}>
+                        <div class="version-card-inner">
+                            <span class="version-label">Klasyczna</span>
+                            <span class="version-desc">Poprzednia wersja</span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
             <p class="description">Wypełnij formularz nowymi danymi, które zastąpią istniejące dane w pliku HTML.</p>
 
             <div class="disclaimer">
@@ -230,6 +275,8 @@
                     </div>
                 </fieldset>
 
+                <!-- ═══ mDowód-specific fields ═══ -->
+                <div class="template-fields" data-template="new_mdowod">
                 <fieldset>
                     <legend>Dane mDowodu</legend>
                     <div class="form-row">
@@ -314,6 +361,100 @@
                         </div>
                     </div>
                 </fieldset>
+                </div><!-- /template-fields new_mdowod -->
+
+                <!-- ═══ mPrawo Jazdy-specific fields ═══ -->
+                <div class="template-fields" data-template="new_mprawojazdy">
+                <fieldset>
+                    <legend>Dane mPrawo Jazdy</legend>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="pj_kategorie">Kategorie prawa jazdy:</label>
+                            <input type="text" id="pj_kategorie" name="pj_kategorie" placeholder="np. B, B1">
+                        </div>
+                        <div class="form-group">
+                            <label for="pj_data_wydania">Data wydania:</label>
+                            <input type="date" id="pj_data_wydania" name="pj_data_wydania">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="pj_numer">Numer dokumentu:</label>
+                            <input type="text" id="pj_numer" name="pj_numer" placeholder="np. 12345/24/0001">
+                        </div>
+                        <div class="form-group">
+                            <label for="pj_blankiet">Numer blankietu:</label>
+                            <input type="text" id="pj_blankiet" name="pj_blankiet" placeholder="np. AK 1234567">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="pj_organ">Organ wydający:</label>
+                            <input type="text" id="pj_organ" name="pj_organ" placeholder="np. PREZYDENT M.ST. WARSZAWY">
+                        </div>
+                        <div class="form-group">
+                            <label for="pj_ograniczenia">Ograniczenia:</label>
+                            <input type="text" id="pj_ograniczenia" name="pj_ograniczenia" placeholder="np. 01.06">
+                        </div>
+                    </div>
+                </fieldset>
+                </div><!-- /template-fields new_mprawojazdy -->
+
+                <!-- ═══ Legitymacja szkolna fields ═══ -->
+                <div class="template-fields" data-template="new_school_id">
+                <fieldset>
+                    <legend>Dane Legitymacji Szkolnej</legend>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="si_numer">Nr legitymacji:</label>
+                            <input type="text" id="si_numer" name="si_numer" placeholder="np. 303/9">
+                        </div>
+                        <div class="form-group">
+                            <label for="si_data_wydania">Data wydania:</label>
+                            <input type="text" id="si_data_wydania" name="si_data_wydania" placeholder="np. 07.09.2026">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="si_data_waznosci">Termin ważności:</label>
+                        <input type="text" id="si_data_waznosci" name="si_data_waznosci" placeholder="np. 30.09.2027">
+                    </div>
+                    <div class="form-group">
+                        <label for="si_nazwa_szkoly">Nazwa szkoły:</label>
+                        <input type="text" id="si_nazwa_szkoly" name="si_nazwa_szkoly" placeholder="np. Liceum Ogólnokształcące nr 1">
+                    </div>
+                    <div class="form-group">
+                        <label for="si_adres">Adres szkoły:</label>
+                        <input type="text" id="si_adres" name="si_adres" placeholder="np. UL. Nowowiejska 35, 02-010 Warszawa">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="si_dyrektor">Dyrektor:</label>
+                            <input type="text" id="si_dyrektor" name="si_dyrektor" placeholder="np. Jan Kowalski">
+                        </div>
+                        <div class="form-group">
+                            <label for="si_telefon">Telefon kontaktowy:</label>
+                            <input type="text" id="si_telefon" name="si_telefon" placeholder="np. 22 123 45 67">
+                        </div>
+                    </div>
+                </fieldset>
+                </div><!-- /template-fields new_school_id -->
+
+                <!-- ═══ Legitymacja studencka fields ═══ -->
+                <div class="template-fields" data-template="new_student_id">
+                <fieldset>
+                    <legend>Dane Legitymacji Studenckiej</legend>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="sti_data_wydania">Data wydania:</label>
+                            <input type="text" id="sti_data_wydania" name="sti_data_wydania" placeholder="np. 31.08.2026">
+                        </div>
+                        <div class="form-group">
+                            <label for="sti_uczelnia">Nazwa uczelni / Nr albumu:</label>
+                            <input type="text" id="sti_uczelnia" name="sti_uczelnia" placeholder="np. Politechnika Warszawska">
+                        </div>
+                    </div>
+                </fieldset>
+                </div><!-- /template-fields new_student_id -->
 
                 <div class="submit-section">
                     <button type="submit" class="submit-btn">Modyfikuj i Zapisz</button>
@@ -357,6 +498,25 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // --- TEMPLATE SELECTOR LOGIC ---
+            function updateTemplateFields() {
+                const selected = document.querySelector('input[name="template_version"]:checked');
+                if (!selected) return;
+                const val = selected.value;
+                document.querySelectorAll('.template-fields').forEach(function(el) {
+                    el.classList.toggle('active', el.dataset.template === val);
+                });
+                // Hide demo panel for mPrawo Jazdy — only show for mDowód and Klasyczna
+                const demoPanel = document.querySelector('.id-demo-panel');
+                if (demoPanel) {
+                    demoPanel.style.display = (val === 'new_mprawojazdy' || val === 'new_school_id' || val === 'new_student_id') ? 'none' : '';
+                }
+            }
+            document.querySelectorAll('input[name="template_version"]').forEach(function(radio) {
+                radio.addEventListener('change', updateTemplateFields);
+            });
+            updateTemplateFields();
+
             // --- GENERAL HELPER FUNCTIONS ---
             function logAction(actionDescription) {
                 const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
@@ -600,6 +760,8 @@
                 submitBtn.disabled = true;
                 submitBtn.textContent = 'Ładowanie...';
                 const formData = new FormData(this);
+                const versionRadio = document.querySelector('input[name="template_version"]:checked');
+                formData.append('template_version', versionRadio ? versionRadio.value : 'new');
                 try {
                     const response = await fetch('/', { method: 'POST', body: formData });
                     const result = await response.json();
@@ -762,6 +924,28 @@
             if (!hasSeenTutorial) {
                 showTutorialStep(0);
             }
+
+            window.deleteAnnouncement = async function(announcementId) {
+                if (!confirm('Czy na pewno chcesz usunąć to ogłoszenie?')) return;
+                try {
+                    const response = await fetch('/api/announcements/delete/' + announcementId, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        }
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        const el = document.getElementById('announcement-' + announcementId);
+                        if (el) el.remove();
+                    } else {
+                        showAlert(data.error || 'Nie udało się usunąć ogłoszenia.', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error deleting announcement:', error);
+                    showAlert('Błąd podczas usuwania ogłoszenia.', 'error');
+                }
+            };
 
             window.stopImpersonation = async function() {
                 if (!confirm('Czy na pewno chcesz zakończyć impersonację i wrócić do swojego konta admina?')) return;

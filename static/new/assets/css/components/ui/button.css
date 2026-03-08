@@ -1,0 +1,49 @@
+button { font-weight: 450; font-size: var(--text-size-default); padding: 10px; }
+
+button.primary {
+    background-color: rgba(var(--foreground), 1);
+    color: rgba(var(--background), 1);
+    border: 1px solid rgba(var(--border), 1);
+}
+
+button.primary:hover {
+    filter: brightness(0.8);
+}
+
+button.primary:active {
+    filter: brightness(0.6);
+}
+
+button.secondary {
+    background-color: rgba(var(--background), 0.5);
+    color: rgba(var(--primary), 1);
+    border: 1px solid rgba(var(--border), 1);
+}
+
+button.secondary.active,
+button.secondary:hover {
+    background-color: rgba(var(--border), 1);
+}
+
+button.secondary:active {
+    filter: brightness(0.8);
+}
+
+button.danger {
+    background-color: rgba(var(--destructive), 1);
+    color: rgba(var(--destructive-foreground), 1);
+    border: 1px solid rgba(var(--destructive), 1);
+}
+
+button.danger:hover {
+    filter: brightness(0.8);
+}
+
+button.danger:active {
+    filter: brightness(0.6);
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

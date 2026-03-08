@@ -1,0 +1,23 @@
+.overflow\[hidden\]   { overflow:   hidden !important;  }
+.overflow\[y-hidden\] { overflow-y: hidden !important;  }
+.overflow\[x-hidden\] { overflow-x: hidden !important;  }
+
+.overflow\[auto\]     { overflow:   auto   !important;  }
+.overflow\[y-auto\]   { overflow-y: auto   !important;  }
+.overflow\[x-auto\]   { overflow-x: auto   !important;  }
+
+.overflow\[scroll\]       { overflow:   scroll   !important;  }
+.overflow\[y-scroll\]     { overflow-y: auto   !important;  }
+.overflow\[x-scroll\]     { overflow-x: auto   !important;  }
+
+@media (max-width: 768px) {
+    .t-bypass-overflow-hidden   { overflow:   auto !important; }
+    .t-bypass-overflow-y-hidden { overflow-y: auto !important; }
+    .t-bypass-overflow-x-hidden { overflow-y: auto !important; }
+}
+
+@media (max-width: 480px) {
+    .m-bypass-overflow-hidden   { overflow:   auto !important; }
+    .m-bypass-overflow-y-hidden { overflow-y: auto !important; }
+    .m-bypass-overflow-x-hidden { overflow-y: auto !important; }
+}
