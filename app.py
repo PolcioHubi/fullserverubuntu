@@ -3473,6 +3473,12 @@ def login():
     if all_users:
         top_user = max(all_users, key=lambda user: user.hubert_coins)
 
+    if request.method == "GET" and current_user.is_authenticated:
+        next_target = request.args.get("next", "")
+        if isinstance(next_target, str) and next_target.startswith("/") and not next_target.startswith("//"):
+            return redirect(next_target)
+        return redirect("/documents")
+
     if request.method == "POST":
         try:
             data = request.get_json(silent=True)
@@ -3545,13 +3551,16 @@ def login():
             )  # Log response data
             return jsonify(response_json)
 
-    return render_template(
-        "login.html",
-        total_registered_users=total_registered_users,
-        num_active_users=num_active_users,
-        top_user=top_user,
-        csrf_token_func=generate_csrf,
+    response = app.make_response(
+        render_template(
+            "login.html",
+            total_registered_users=total_registered_users,
+            num_active_users=num_active_users,
+            top_user=top_user,
+            csrf_token_func=generate_csrf,
+        )
     )
+    return _disable_sensitive_cache_headers(response)
 
 
 @app.route("/logout")
@@ -3683,7 +3692,12 @@ def serve_new_assets(filename):
 @app.route("/documents")
 @login_required
 def serve_new_documents():
-    return send_from_directory(os.path.join(app.static_folder, "new"), "documents.html", max_age=120)
+    response = send_from_directory(
+        os.path.join(app.static_folder, "new"),
+        "documents.html",
+        max_age=0,
+    )
+    return _disable_sensitive_cache_headers(response)
 
 
 # Serve /pages/* from static/new/pages/

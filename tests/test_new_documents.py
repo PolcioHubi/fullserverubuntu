@@ -338,6 +338,13 @@ class TestServiceWorker:
         # max-age powinien być 0 albo nie ustawiony agresywnie
         assert "max-age=86400" not in cache_control
 
+    def test_service_worker_keeps_login_and_documents_network_only(self, client):
+        """Login i documents nie powinny być podawane ze stale cache SW."""
+        resp = client.get("/service-worker.js")
+        text = resp.get_data(as_text=True)
+        assert "path === '/login' || path === '/documents'" in text
+        assert "const HTML_ROUTE_PATTERN = /^\\/(services|more|qr_code)(\\/|$)/;" in text
+
 
 # ──────────────────────────────────────────────
 # Nowe route'y UI: /documents, /services, /more, /qr_code

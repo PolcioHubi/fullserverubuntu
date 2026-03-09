@@ -1,13 +1,9 @@
-const CACHE_NAME = 'mobywatel-v8';
-const APP_LOGIN_URL = '/login?pwa=1&next=%2Fdocuments';
-const HTML_ROUTE_PATTERN = /^\/(documents|services|more|qr_code|login)(\/|$)/;
+const CACHE_NAME = 'mobywatel-v9';
+const HTML_ROUTE_PATTERN = /^\/(services|more|qr_code)(\/|$)/;
 
 // Core assets to precache on install — everything needed for instant PWA load
 const PRECACHE_ASSETS = [
     // HTML pages (shell)
-    APP_LOGIN_URL,
-    '/login',
-    '/documents',
     '/services',
     '/more',
     '/qr_code',
@@ -153,6 +149,13 @@ self.addEventListener('fetch', (e) => {
                 });
             })
         );
+        return;
+    }
+
+    // Authentication entrypoint and documents shell must always come from network
+    // so remembered sessions and redirects are not masked by stale HTML.
+    if (path === '/login' || path === '/documents') {
+        e.respondWith(fetch(e.request));
         return;
     }
 
