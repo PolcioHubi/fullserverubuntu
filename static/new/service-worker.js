@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mobywatel-v14';
+const CACHE_NAME = 'mobywatel-v15';
 const HTML_ROUTE_PATTERN = /^\/(services|more|qr_code)(\/|$)/;
 
 // Core assets to precache on install — everything needed for instant PWA load
