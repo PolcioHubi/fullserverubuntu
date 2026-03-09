@@ -1,7 +1,12 @@
 const loginManager = {
     deviceId: null,
+    initialized: false,
 
     init() {
+        if (this.initialized) {
+            return;
+        }
+        this.initialized = true;
         this.setupLayout();
         this.functions();
         this.listeners();

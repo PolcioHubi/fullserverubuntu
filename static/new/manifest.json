@@ -4,7 +4,7 @@
   "display": "standalone",
   "orientation": "portrait",
   "scope": "/",
-  "start_url": "/login?pwa=1&next=%2Fdocuments",
+  "start_url": "/static/new/login.html",
   "background_color": "#f6f9fb",
   "theme_color": "#f6f9fb",
   "description": "Aplikacja mObywatel",

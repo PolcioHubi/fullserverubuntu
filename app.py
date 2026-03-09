@@ -3468,10 +3468,19 @@ def login():
     total_registered_users = len(all_users)
     active_users = [user for user in all_users if user.is_active]
     num_active_users = len(active_users)
+    is_pwa_login = request.args.get("pwa") == "1"
 
     top_user = None
     if all_users:
         top_user = max(all_users, key=lambda user: user.hubert_coins)
+
+    if request.method == "GET" and is_pwa_login:
+        response = send_from_directory(
+            os.path.join(app.static_folder, "new"),
+            "login.html",
+            max_age=0,
+        )
+        return _disable_sensitive_cache_headers(response)
 
     if request.method == "GET" and current_user.is_authenticated:
         next_target = request.args.get("next", "")
@@ -3740,7 +3749,12 @@ def serve_new_api_data(filename):
 @app.route("/manifest.json")
 @limiter.exempt
 def serve_new_manifest():
-    return send_from_directory(os.path.join(app.static_folder, "new"), "manifest.json", max_age=86400)
+    response = send_from_directory(
+        os.path.join(app.static_folder, "new"),
+        "manifest.json",
+        max_age=0,
+    )
+    return _disable_sensitive_cache_headers(response)
 
 
 # Serve /service-worker.js from static/new/ (PWA service worker)

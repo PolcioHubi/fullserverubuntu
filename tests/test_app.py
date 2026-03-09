@@ -117,6 +117,18 @@ def test_login_redirects_authenticated_user_to_safe_next_target(client, register
     assert response.headers["Location"] == "/documents"
 
 
+def test_pwa_login_renders_new_static_login_shell(client):
+    """
+    Testuje, czy literalny ekran startowy PWA wskazuje na static/new/login.html
+    i zawiera nowy shell logowania.
+    """
+    response = client.get("/static/new/login.html", follow_redirects=False)
+    assert response.status_code == 200
+    body = response.get_data(as_text=True)
+    assert "Dzień dobry!" in body
+    assert "/assets/js/pages/login.js" in body
+
+
 def test_notifications_api_flow(logged_in_client):
     """
     Testuje API powiadomień: pobieranie powiadomień i oznaczanie ich

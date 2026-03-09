@@ -289,13 +289,17 @@ $(async function() {
 
         const P = {
             dirY: -1,
+            dirX: 1,
             sensY: 62,
+            sensX: 48,
             maxY: 78,
+            maxX: 18,
+            maxAng: 11,
             base: {
-                tx: 0,
-                ty: 34,
-                ang: 0,
-                alpha: parseFloat(getComputedStyle($scope).getPropertyValue('--alpha')) || 0.12
+                tx: parseFloat(getComputedStyle($scope).getPropertyValue('--em-tx')) || 0,
+                ty: parseFloat(getComputedStyle($scope).getPropertyValue('--em-ty')) || 34,
+                ang: parseFloat(getComputedStyle($scope).getPropertyValue('--em-ang')) || 0,
+                alpha: parseFloat(getComputedStyle($scope).getPropertyValue('--em-alpha')) || 0.12
             },
             alphaMin: 0.055,
             alphaMax: 0.52,
@@ -307,9 +311,14 @@ $(async function() {
 
         const S = {
             ok: false,
-            beta0: 0,
-            last: { ty: P.base.ty, alpha: P.base.alpha },
-            live: { beta: 0 }
+            center: { tiltX: 0, tiltY: 0 },
+            last: {
+                tx: P.base.tx,
+                ty: P.base.ty,
+                ang: P.base.ang,
+                alpha: P.base.alpha
+            },
+            live: { tiltX: 0, tiltY: 0 }
         };
 
         const clamp = (v, min, max) => v < min ? min : (v > max ? max : v);
@@ -319,35 +328,68 @@ $(async function() {
             return t * t * (3 - 2 * t);
         };
 
-        function setVars(ty, alpha) {
-            $scope.style.setProperty('--em-tx', '0%');
+        function getViewportAngle() {
+            if (window.screen && window.screen.orientation && Number.isFinite(window.screen.orientation.angle)) {
+                return ((window.screen.orientation.angle % 360) + 360) % 360;
+            }
+            if (typeof window.orientation === 'number') {
+                return ((window.orientation % 360) + 360) % 360;
+            }
+            return window.innerWidth > window.innerHeight ? 90 : 0;
+        }
+
+        function getScreenAlignedTilt(beta, gamma) {
+            const rawX = Number.isFinite(gamma) ? gamma : 0;
+            const rawY = Number.isFinite(beta) ? beta : 0;
+            const angle = getViewportAngle();
+
+            switch (angle) {
+                case 90:
+                    return { tiltX: rawY, tiltY: -rawX };
+                case 180:
+                    return { tiltX: -rawX, tiltY: -rawY };
+                case 270:
+                    return { tiltX: -rawY, tiltY: rawX };
+                default:
+                    return { tiltX: rawX, tiltY: rawY };
+            }
+        }
+
+        function setVars(tx, ty, ang, alpha) {
+            $scope.style.setProperty('--em-tx', tx.toFixed(2) + '%');
             $scope.style.setProperty('--em-ty', ty.toFixed(2) + '%');
-            $scope.style.setProperty('--em-ang', '0deg');
+            $scope.style.setProperty('--em-ang', ang.toFixed(2) + 'deg');
             $scope.style.setProperty('--em-alpha', alpha.toFixed(3));
         }
 
-        function targetFrom(beta) {
-            const dB = clamp((beta - S.beta0) / P.sensY, -1, 1);
-            const signed = dB * (P.dirY ?? 1);
-            const mag = Math.abs(signed);
+        function targetFrom(tilt) {
+            const dY = clamp((tilt.tiltY - S.center.tiltY) / P.sensY, -1, 1);
+            const dX = clamp((tilt.tiltX - S.center.tiltX) / P.sensX, -1, 1);
+            const signedY = dY * (P.dirY ?? 1);
+            const signedX = dX * (P.dirX ?? 1);
+            const mag = clamp(Math.hypot(dX, dY), 0, 1);
 
-            const ty = P.base.ty - signed * P.maxY;
+            const tx = P.base.tx + signedX * P.maxX;
+            const ty = P.base.ty - signedY * P.maxY;
+            const ang = P.base.ang + signedX * P.maxAng;
             const baseA = P.alphaMin + mag * (P.alphaMax - P.alphaMin);
 
             const progressUp = clamp((P.base.ty - ty) / P.maxY, 0, 1);
             const topFade = 1 - smooth(P.topFadeStart, P.topFadeEnd, progressUp);
             const alpha = clamp(baseA * topFade, P.alphaMin * 0.55, P.alphaMax);
 
-            return { ty, alpha };
+            return { tx, ty, ang, alpha };
         }
 
         function animateTo(t) {
             const near = (a, b) => Math.abs(a - b) < P.deadband * (1 + Math.abs(b) / 100);
             const k = P.lerp;
 
+            S.last.tx = near(S.last.tx, t.tx) ? t.tx : lerp(S.last.tx, t.tx, k);
             S.last.ty = near(S.last.ty, t.ty) ? t.ty : lerp(S.last.ty, t.ty, k);
+            S.last.ang = near(S.last.ang, t.ang) ? t.ang : lerp(S.last.ang, t.ang, k);
             S.last.alpha = near(S.last.alpha, t.alpha) ? t.alpha : lerp(S.last.alpha, t.alpha, k);
-            setVars(S.last.ty, S.last.alpha);
+            setVars(S.last.tx, S.last.ty, S.last.ang, S.last.alpha);
         }
 
         (function setupPermissionsGate() {
@@ -381,7 +423,7 @@ $(async function() {
             function onOrient(e) {
                 if (!S.ok) return;
 
-                if (e.beta == null) return;
+                if (e.beta == null && e.gamma == null) return;
 
                 if (!motionActivated) {
                     motionActivated = true;
@@ -389,16 +431,26 @@ $(async function() {
                     persistGrantedIfAllowed();
                 }
 
-                S.live.beta = e.beta;
-                animateTo(targetFrom(e.beta));
+                const tilt = getScreenAlignedTilt(e.beta, e.gamma);
+                S.live.tiltX = tilt.tiltX;
+                S.live.tiltY = tilt.tiltY;
+                animateTo(targetFrom(tilt));
             }
 
             function startSensors() {
                 try {
                     S.ok = true;
                     window.addEventListener('deviceorientation', onOrient, true);
-                    setTimeout(() => { S.beta0 = S.live.beta; }, 180);
+                    setTimeout(() => {
+                        S.center.tiltX = S.live.tiltX;
+                        S.center.tiltY = S.live.tiltY;
+                    }, 180);
                 } catch (_) {}
+            }
+
+            function recenterToCurrentTilt() {
+                S.center.tiltX = S.live.tiltX;
+                S.center.tiltY = S.live.tiltY;
             }
 
             function probe(timeout = 220) {
@@ -455,7 +507,7 @@ $(async function() {
             }
 
             async function requestAndStartOnce() {
-                if (requesting) return;
+                if (requesting || S.ok) return;
                 requesting = true;
 
                 let ok = true;
@@ -493,27 +545,18 @@ $(async function() {
                 requestAndStartOnce();
             }, true);
 
-            if (isAppleMobile) {
-                startSensors();
-                probe(220).then(fired => {
-                    if (!fired && !motionActivated) showEmblemGif();
-                });
-
-                window.addEventListener('pageshow', () => {
-                    if (motionActivated) return;
-                    showEmblemGif();
-                    probe(220).then(fired => {
-                        if (!fired && !motionActivated) showEmblemGif();
-                    });
-                });
-
-                return;
-            }
-
             if (!needsMotionPerm && !needsOrientPerm) {
                 startSensors();
                 probe(220).then(fired => {
                     if (!fired && !motionActivated) showEmblemGif();
+                });
+                if (window.screen && window.screen.orientation && typeof window.screen.orientation.addEventListener === 'function') {
+                    window.screen.orientation.addEventListener('change', () => {
+                        setTimeout(recenterToCurrentTilt, 180);
+                    });
+                }
+                window.addEventListener('orientationchange', () => {
+                    setTimeout(recenterToCurrentTilt, 180);
                 });
                 return;
             }
@@ -526,9 +569,18 @@ $(async function() {
             } else {
                 armGesture(requestAndStartOnce);
             }
+
+            if (window.screen && window.screen.orientation && typeof window.screen.orientation.addEventListener === 'function') {
+                window.screen.orientation.addEventListener('change', () => {
+                    setTimeout(recenterToCurrentTilt, 180);
+                });
+            }
+            window.addEventListener('orientationchange', () => {
+                setTimeout(recenterToCurrentTilt, 180);
+            });
         })();
 
-        setVars(P.base.ty, P.base.alpha);
+        setVars(P.base.tx, P.base.ty, P.base.ang, P.base.alpha);
     }
 
     // Page transitions

@@ -292,7 +292,7 @@ class TestManifestJson:
         """start_url w manifeście wskazuje na ekran logowania PWA."""
         resp = client.get("/manifest.json")
         data = json.loads(resp.data)
-        assert data["start_url"] == "/login?pwa=1&next=%2Fdocuments"
+        assert data["start_url"] == "/static/new/login.html"
 
     def test_manifest_display_standalone(self, client):
         """display jest ustawiony na standalone (tryb PWA)."""
@@ -342,7 +342,7 @@ class TestServiceWorker:
         """Login i documents nie powinny być podawane ze stale cache SW."""
         resp = client.get("/service-worker.js")
         text = resp.get_data(as_text=True)
-        assert "path === '/login' || path === '/documents'" in text
+        assert "path === '/login' || path === '/documents' || path === '/static/new/login.html'" in text
         assert "const HTML_ROUTE_PATTERN = /^\\/(services|more|qr_code)(\\/|$)/;" in text
 
 

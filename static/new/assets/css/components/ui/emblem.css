@@ -65,15 +65,15 @@
     background-size: 220% 100%;
   
     -webkit-mask-image: linear-gradient(0deg,
-            transparent calc(50% - var(--em-band) - var(--feather)),
+            transparent calc(50% - var(--em-band) - var(--em-feather)),
             #000 calc(50% - var(--em-band)),
             #000 calc(50% + var(--em-band)),
-            transparent calc(50% + var(--em-band) + var(--feather)));
+            transparent calc(50% + var(--em-band) + var(--em-feather)));
     mask-image: linear-gradient(0deg,
-            transparent calc(50% - var(--em-band) - var(--feather)),
+            transparent calc(50% - var(--em-band) - var(--em-feather)),
             #000 calc(50% - var(--em-band)),
             #000 calc(50% + var(--em-band)),
-            transparent calc(50% + var(--em-band) + var(--feather)));
+            transparent calc(50% + var(--em-band) + var(--em-feather)));
 }
 
 .emblem\[spectral\] {
@@ -87,15 +87,15 @@
     background:
         linear-gradient(0deg, rgba(255, 255, 255, .0) 35%, rgba(255, 255, 255, .85) 50%, rgba(255, 255, 255, .0) 65%);
     -webkit-mask-image: linear-gradient(0deg,
-            transparent calc(50% - var(--em-band) - var(--feather)),
+            transparent calc(50% - var(--em-band) - var(--em-feather)),
             #000 calc(50% - var(--em-band)),
             #000 calc(50% + var(--em-band)),
-            transparent calc(50% + var(--em-band) + var(--feather)));
+            transparent calc(50% + var(--em-band) + var(--em-feather)));
     mask-image: linear-gradient(0deg,
-            transparent calc(50% - var(--em-band) - var(--feather)),
+            transparent calc(50% - var(--em-band) - var(--em-feather)),
             #000 calc(50% - var(--em-band)),
             #000 calc(50% + var(--em-band)),
-            transparent calc(50% + var(--em-band) + var(--feather)));
+            transparent calc(50% + var(--em-band) + var(--em-feather)));
     filter: blur(0.7px)
 }
 
