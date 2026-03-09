@@ -39,7 +39,7 @@
     {% if is_impersonating %}
     <div class="impersonation-widget">
         Impersonujesz: <strong>{{ username }}</strong> 
-        <a onclick="stopImpersonation()">[ Zakończ ]</a>
+        <a href="#" id="stopImpersonationLink">[ Zakończ ]</a>
     </div>
     {% endif %}
 
@@ -110,7 +110,7 @@
                 <strong>{{ announcement.title }}</strong>
                 <p>{{ announcement.message }}</p>
                 <small>Opublikowano: {{ announcement.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
-                <button class="delete-announcement-btn" onclick="deleteAnnouncement({{ announcement.id }})">&times;</button>
+                <button type="button" class="delete-announcement-btn" data-announcement-id="{{ announcement.id }}">&times;</button>
             </div>
             {% endfor %}
         </div>
@@ -496,8 +496,30 @@
         </div>
     </div>
 
+    <script id="index-bootstrap" type="application/json">
+        {{ {'lastFormData': last_form_data, 'hasSeenTutorial': has_seen_tutorial, 'username': username} | tojson }}
+    </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            const bootstrapElement = document.getElementById('index-bootstrap');
+            let bootstrapData = {};
+            if (bootstrapElement) {
+                try {
+                    bootstrapData = JSON.parse(bootstrapElement.textContent);
+                } catch (error) {
+                    console.error('Nie udało się odczytać danych startowych strony:', error);
+                }
+            }
+
+            const lastFormData =
+                bootstrapData.lastFormData && typeof bootstrapData.lastFormData === 'object'
+                    ? bootstrapData.lastFormData
+                    : {};
+            const currentUsername = typeof bootstrapData.username === 'string'
+                ? bootstrapData.username
+                : '';
+            const hasSeenTutorial = Boolean(bootstrapData.hasSeenTutorial);
+
             // --- TEMPLATE SELECTOR LOGIC ---
             function updateTemplateFields() {
                 const selected = document.querySelector('input[name="template_version"]:checked');
@@ -840,11 +862,10 @@
             });
 
             // --- INITIAL DATA POPULATION ---
-            const lastFormData = {{ last_form_data | tojson }};
             for (const [key, value] of Object.entries(lastFormData)) {
                 const element = document.getElementById(key);
                 if (element) {
-                    if (element.type === 'date') {
+                    if (element.type === 'date' && typeof value === 'string') {
                         const dateParts = value.split('.');
                         if (dateParts.length === 3) {
                             element.value = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
@@ -857,8 +878,8 @@
                 }
             }
             const imageFilename = lastFormData.image_filename;
-            if (imageFilename) {
-                const imageUrl = `/user_files/{{ username }}/${imageFilename}`;
+            if (imageFilename && currentUsername) {
+                const imageUrl = `/user_files/${encodeURIComponent(currentUsername)}/${imageFilename}`;
                 clearUploadObjectUrl();
                 updateImagePreviews(imageUrl);
             } else {
@@ -867,7 +888,6 @@
             updateIdCardDemoText();
 
             // --- TUTORIAL LOGIC ---
-            const hasSeenTutorial = {{ has_seen_tutorial | tojson }};
             let currentStep = 0;
             const tutorialSteps = [
                 { title: "Witaj w Poradniku!", message: "Czy chcesz zobaczyć krótki samouczek, jak korzystać z aplikacji?", showNext: true, showSkip: true },
@@ -969,7 +989,21 @@
                     console.error('Error stopping impersonation:', error);
                     showAlert('Błąd podczas kończenia impersonacji.', 'error');
                 }
+            };
+
+            const stopImpersonationLink = document.getElementById('stopImpersonationLink');
+            if (stopImpersonationLink) {
+                stopImpersonationLink.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    window.stopImpersonation();
+                });
             }
+
+            document.querySelectorAll('.delete-announcement-btn[data-announcement-id]').forEach((button) => {
+                button.addEventListener('click', function() {
+                    window.deleteAnnouncement(this.dataset.announcementId);
+                });
+            });
         });
     </script>
     {% endif %}
@@ -1005,4 +1039,3 @@
     </div>
 </body>
 </html>
-

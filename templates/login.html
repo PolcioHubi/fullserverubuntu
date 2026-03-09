@@ -73,6 +73,37 @@
     </div>
 
     <script>
+        function getSafeRedirectTarget(rawNext, fallback) {
+            if (!rawNext || typeof rawNext !== 'string') {
+                return fallback;
+            }
+
+            if (!rawNext.startsWith('/') || rawNext.startsWith('//')) {
+                return fallback;
+            }
+
+            return rawNext;
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const message = urlParams.get('message');
+        const isPwaLaunch = urlParams.get('pwa') === '1';
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+            || window.navigator.standalone === true;
+        const pwaLaunchGuardKey = 'pwa-login-launch-checked';
+        const redirectTarget = getSafeRedirectTarget(
+            urlParams.get('next'),
+            (isPwaLaunch || isStandalone) ? '/documents' : '/'
+        );
+
+        if (isStandalone) {
+            try {
+                sessionStorage.setItem(pwaLaunchGuardKey, '1');
+            } catch (error) {
+                console.warn('Nie udało się zapisać stanu startu PWA:', error);
+            }
+        }
+
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
@@ -116,7 +147,7 @@
 
                     // Przekieruj do strony głównej po 1 sekundzie
                     setTimeout(() => {
-                        window.location.href = '/';
+                        window.location.href = redirectTarget;
                     }, 1000);
                 } else {
                     showAlert(data.error, 'error');
@@ -171,8 +202,6 @@
         });
 
         // Sprawdź czy są parametry URL (np. po przekierowaniu z rejestracji)
-        const urlParams = new URLSearchParams(window.location.search);
-        const message = urlParams.get('message');
         if (message === 'registered') {
             showAlert('Rejestracja przebiegła pomyślnie! Możesz się teraz zalogować.', 'success');
         }
