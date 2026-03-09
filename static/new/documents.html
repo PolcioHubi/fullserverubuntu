@@ -28,7 +28,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-180x.png">
     <link rel="apple-touch-startup-image" sizes="180x180" href="/assets/img/apple-180x.png">
     <link rel="manifest" href="/manifest.json">
-    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/style.css?v=20260309-documents-layout-7">
     <!-- JavaScript -->
     <script src='/assets/js/global/jquery.js'></script>
     <script src='/assets/js/global/qrcode.js'></script>
@@ -38,11 +38,11 @@
     <script src="/assets/js/global/utilities.js"></script>
     <!-- Pages -->
     <script src="/assets/js/pages/index.js"></script>
-        <script src='/assets/js/pages/documents.js'></script>                <!-- Documents -->
+        <script src='/assets/js/pages/documents.js?v=20260309-documents-layout'></script>                <!-- Documents -->
     <script src='/assets/js/global/notifications-bell.js'></script>
-    <script src='/assets/js/global/chat-feed.js'></script>
+    <script src='/assets/js/global/chat-feed.js?v=20260309-chat-input'></script>
                     <!-- Main JavaScript -->
-    <script src="/assets/js/script.js"></script>
+    <script src="/assets/js/script.js?v=20260309-documents-layout"></script>
     <script src="/assets/js/global/enhancements.js" defer></script>
     <!-- Title -->
     <title>mObywatel</title>
@@ -76,16 +76,17 @@
                     </div>
                 </div>
             </div>
-            <div class="relative flex direction[column] g[xs] justify[start] align[start] fillWidth max-height[810px] pagePop">
-                                                        <div class="absolute z[1] flex top[0px] justify[center] align[center] fillWidth autoHeight px[s] " data-document-card="mdowod" data-redirect="my-document/mdowod">
+            <div class="documents-layout-root pagePop" data-documents-layout-root>
+                <div class="documents-layout-view documents-layout-overlap relative fillWidth max-height[810px]" data-layout-view="overlap">
+                    <div class="absolute z[1] flex top[0px] justify[center] align[center] fillWidth autoHeight px[s]" data-document-card="mdowod" data-layout-card="overlap" data-document-key="mdowod" data-redirect="my-document/mdowod">
                         <p class="doc_title absolute font[Inter] font-weight[600] text-size[18] top[20px] left[30px]">mDowód</p>
                         <img src="/assets/img/cards/documents/mdowod.png" class="fillWidth autoHeight radius[xl]" alt="">
-                        <div class="doc_background scale[0.8]">
+                        <div class="doc_background doc_background-eagle">
                             <div class="doc_filter"></div>
-                            <img class="doc_eagle" src="/assets/img/card_eagle.png">
+                            <img class="doc_eagle" src="/assets/svg/documents/ia001_card_logo_default.svg">
                         </div>
                     </div>
-                                                        <div class="absolute z[1] flex top[70px] justify[center] align[center] fillWidth autoHeight px[s] " data-document-card="mprawojazdy" data-redirect="my-document/mprawojazdy">
+                    <div class="absolute z[1] flex top[70px] justify[center] align[center] fillWidth autoHeight px[s]" data-document-card="mprawojazdy" data-layout-card="overlap" data-document-key="mprawojazdy" data-redirect="my-document/mprawojazdy">
                         <p class="doc_title absolute font[Inter] font-weight[600] text-size[18] top[20px] left[30px]">mPrawo jazdy</p>
                         <img src="/assets/img/cards/documents/mprawojazdy.png" class="fillWidth autoHeight radius[xl]" alt="">
                         <div class="doc_background scale[0.8]">
@@ -93,26 +94,91 @@
                             <img class="doc_eagle" src="/assets/img/card_stars.png">
                         </div>
                     </div>
-                                                        <div class="absolute z[1] flex top[140px] justify[center] align[center] fillWidth autoHeight px[s] " data-document-card="school_id" data-redirect="my-document/school_id">
+                    <div class="absolute z[1] flex top[140px] justify[center] align[center] fillWidth autoHeight px[s]" data-document-card="school_id" data-layout-card="overlap" data-document-key="school_id" data-redirect="my-document/school_id">
                         <p class="doc_title absolute font[Inter] font-weight[600] text-size[18] top[20px] left[30px]">Legitymacja szkolna</p>
                         <img src="/assets/img/cards/documents/school_id.png" class="fillWidth autoHeight radius[xl]" alt="">
-                        <div class="doc_background scale[0.8]">
+                        <div class="doc_background doc_background-eagle">
                             <div class="doc_filter"></div>
-                            <img class="doc_eagle" src="/assets/img/card_eagle.png">
+                            <img class="doc_eagle" src="/assets/svg/documents/ia001_card_logo_default.svg">
                         </div>
                     </div>
-                                                        <div class="absolute z[1] flex top[210px] justify[center] align[center] fillWidth autoHeight px[s] " data-document-card="student_id" data-redirect="my-document/student_id">
+                    <div class="absolute z[1] flex top[210px] justify[center] align[center] fillWidth autoHeight px[s]" data-document-card="student_id" data-layout-card="overlap" data-document-key="student_id" data-redirect="my-document/student_id">
                         <p class="doc_title absolute font[Inter] font-weight[600] text-size[18] top[20px] left[30px]">Legitymacja studencka</p>
                         <img src="/assets/img/cards/documents/student_id.png" class="fillWidth autoHeight radius[xl]" alt="">
-                        <div class="doc_background scale[0.8]">
+                        <div class="doc_background doc_background-eagle">
                             <div class="doc_filter"></div>
-                            <img class="doc_eagle" src="/assets/img/card_eagle.png">
+                            <img class="doc_eagle" src="/assets/svg/documents/ia001_card_logo_default.svg">
                         </div>
                     </div>
+                </div>
+                <div class="documents-layout-view documents-layout-grid display-none" data-layout-view="grid">
+                    <div class="documents-grid">
+                        <div class="document-card-compact document-card-compact-grid document-card-compact-mdowod" data-layout-card="grid" data-document-key="mdowod" data-redirect="my-document/mdowod">
+                            <img class="document-card-compact-bg" src="/assets/img/cards/small/mdowod_bg_small.png" alt="">
+                            <div class="document-card-compact-badge document-card-compact-badge-eagle" style="left: 1rem; right: auto;">
+                                <img class="document-card-compact-badge-icon document-card-compact-badge-icon-eagle" src="/assets/svg/documents/ia001_card_logo_default.svg" alt="">
                             </div>
+                            <p class="document-card-compact-title">mDowód</p>
+                        </div>
+                        <div class="document-card-compact document-card-compact-grid document-card-compact-mprawojazdy" data-layout-card="grid" data-document-key="mprawojazdy" data-redirect="my-document/mprawojazdy">
+                            <img class="document-card-compact-bg" src="/assets/img/cards/small/prawo_jazdy_bg_small.png" alt="">
+                            <div class="document-card-compact-badge" style="left: 1rem; right: auto;">
+                                <img class="document-card-compact-badge-icon" src="/assets/img/card_stars.png" alt="">
+                            </div>
+                            <p class="document-card-compact-title">mPrawo jazdy</p>
+                        </div>
+                        <div class="document-card-compact document-card-compact-grid document-card-compact-school" data-layout-card="grid" data-document-key="school_id" data-redirect="my-document/school_id">
+                            <img class="document-card-compact-bg" src="/assets/img/cards/small/leg_szkolna_bg_small.png" alt="">
+                            <div class="document-card-compact-badge document-card-compact-badge-eagle" style="left: 1rem; right: auto;">
+                                <img class="document-card-compact-badge-icon document-card-compact-badge-icon-eagle" src="/assets/svg/documents/ia001_card_logo_default.svg" alt="">
+                            </div>
+                            <p class="document-card-compact-title">Legitymacja szkolna</p>
+                        </div>
+                        <div class="document-card-compact document-card-compact-grid document-card-compact-student" data-layout-card="grid" data-document-key="student_id" data-redirect="my-document/student_id">
+                            <img class="document-card-compact-bg" src="/assets/img/cards/small/leg_studencka_bg_small.png" alt="">
+                            <div class="document-card-compact-badge document-card-compact-badge-eagle" style="left: 1rem; right: auto;">
+                                <img class="document-card-compact-badge-icon document-card-compact-badge-icon-eagle" src="/assets/svg/documents/ia001_card_logo_default.svg" alt="">
+                            </div>
+                            <p class="document-card-compact-title">Legitymacja studencka</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="documents-layout-view documents-layout-list display-none" data-layout-view="list">
+                    <div class="documents-list">
+                        <div class="document-card-compact document-card-compact-list document-card-compact-mdowod" data-layout-card="list" data-document-key="mdowod" data-redirect="my-document/mdowod">
+                            <img class="document-card-compact-bg" src="/assets/img/cards/small/mdowod_bg_small.png" alt="">
+                            <div class="document-card-compact-badge document-card-compact-badge-eagle" style="left: 1rem; right: auto;">
+                                <img class="document-card-compact-badge-icon document-card-compact-badge-icon-eagle" src="/assets/svg/documents/ia001_card_logo_default.svg" alt="">
+                            </div>
+                            <p class="document-card-compact-title">mDowód</p>
+                        </div>
+                        <div class="document-card-compact document-card-compact-list document-card-compact-mprawojazdy" data-layout-card="list" data-document-key="mprawojazdy" data-redirect="my-document/mprawojazdy">
+                            <img class="document-card-compact-bg" src="/assets/img/cards/small/prawo_jazdy_bg_small.png" alt="">
+                            <div class="document-card-compact-badge" style="left: 1rem; right: auto;">
+                                <img class="document-card-compact-badge-icon" src="/assets/img/card_stars.png" alt="">
+                            </div>
+                            <p class="document-card-compact-title">mPrawo jazdy</p>
+                        </div>
+                        <div class="document-card-compact document-card-compact-list document-card-compact-school" data-layout-card="list" data-document-key="school_id" data-redirect="my-document/school_id">
+                            <img class="document-card-compact-bg" src="/assets/img/cards/small/leg_szkolna_bg_small.png" alt="">
+                            <div class="document-card-compact-badge document-card-compact-badge-eagle" style="left: 1rem; right: auto;">
+                                <img class="document-card-compact-badge-icon document-card-compact-badge-icon-eagle" src="/assets/svg/documents/ia001_card_logo_default.svg" alt="">
+                            </div>
+                            <p class="document-card-compact-title">Legitymacja szkolna</p>
+                        </div>
+                        <div class="document-card-compact document-card-compact-list document-card-compact-student" data-layout-card="list" data-document-key="student_id" data-redirect="my-document/student_id">
+                            <img class="document-card-compact-bg" src="/assets/img/cards/small/leg_studencka_bg_small.png" alt="">
+                            <div class="document-card-compact-badge document-card-compact-badge-eagle" style="left: 1rem; right: auto;">
+                                <img class="document-card-compact-badge-icon document-card-compact-badge-icon-eagle" src="/assets/svg/documents/ia001_card_logo_default.svg" alt="">
+                            </div>
+                            <p class="document-card-compact-title">Legitymacja studencka</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="add_document_list absolute top[0] z[max] fillWidth fillHeight background[unset] overflow[x-hidden] overflow[y-auto] mb[64]" style="transform: translateX(100%);">
-            <div class="dashboard-navigation sticky top[0] background[unset] flex direction[row] justify[around] align[end] g[s] fillWidth height[45px] px[s] z[2] pb[xs]">
+        <div class="add_document_list add-document-list-panel absolute top[0] z[max] fillWidth overflow[hidden] flex direction[column] background[unset]" style="transform: translateX(100%);">
+            <div class="flex direction[row] justify[around] align[end] g[s] fillWidth px[s] pb[xs] background[unset]" style="flex: 0 0 auto; height: 45px; z-index: 2;">
                 <a class="redirect flex direction[row] g[4] align[center] font-weight[400] text-size[16] text-align[left] fillWidth text[nowrap] height[20px]" data-button="add_document_list_back">
                     <i class="far fa-chevron-left text-size[24]"></i>
                     Wróć                </a>
@@ -123,7 +189,7 @@
                     <div class="square[25px]"></div>
                 </div>
             </div>
-            <div class="flex fillWidth autoHeight direction[column] g[4] px[s]">
+            <div class="flex fillWidth direction[column] g[4] px[s]" style="flex: 0 0 auto;">
                 <div class="relative flex justify[center] align[center] max-height[40px] fillWidth">
                     <div class="absolute flex justify[center] align[center] top[0] left[0] square[40px]">
                         <i class="fas fa-magnifying-glass" style="color: var(--custom-input-color);"></i>
@@ -135,7 +201,9 @@
                         <p class="font[Inter] font-weight[600] text-size[16]">Zaznacz, które dokumenty chcesz dodać.</p>
                     </div>
                 </div>
-                <div class="card flex direction[column] justify[center] align[start] fillWidth autoHeight min-height[90px] radius[xl] shadow mb[104]">
+            </div>
+            <div class="flex fillWidth direction[column] g[4] px[s] overflow[y-auto] background[unset] add-document-list-scroll" style="flex: 1 1 auto; min-height: 0;">
+                <div class="card flex direction[column] justify[center] align[start] fillWidth autoHeight min-height[90px] radius[xl] shadow add-document-list-card">
                     <div class="flex fillWidth autoHeight min-height[90px] direction[row] justify[between] align[center] px[s]">
                         <div class="flex direction[row] g[8] align[center] autoWidth fillHeight">
                             <div class="flex justify[center] align[center] square[50px] checkbox[wrapper]">
@@ -171,7 +239,7 @@
                             <h1 class="font[Inter] text-align[center] font-weight[500] text-size[16] text[nowrap]">Legitymacja studencka</h1>
                         </div>
                     </div>
-                    <div class="separator[x]" display-none" data-document-separator="student_id"></div>
+                    <div class="separator[x] display-none" data-document-separator="student_id"></div>
                     <div class="flex fillWidth autoHeight min-height[90px] direction[row] justify[between] align[center] px[s] display-none" data-document-add="school_id">
                         <div class="flex direction[row] g[8] align[center] autoWidth fillHeight">
                             <div class="flex justify[center] align[center] square[50px] checkbox[wrapper]">
@@ -340,80 +408,115 @@
                     </div>
                 </div>
             </div>
-            <div class="navigation fixed bottom[0] fillWidth autoHeight py[s] pb[m] px[s] flex direction[column] g[s] border-solid-1 border-x-none border-b-none">
-                <button class="primary fillWidth radius[full] border[unset] py[s]">Dodaj</button>
+            <div class="fillWidth autoHeight py[s] pb[m] px[s] flex direction[column] g[s] add-document-list-footer" style="flex: 0 0 auto; background-color: rgba(var(--background-custom), 1); border: none;">
+                <button class="primary fillWidth radius[full] border[unset] py[s]" type="button" disabled>Dodaj</button>
             </div>
         </div>
-        <div class="customize_document_list absolute top[0] z[max] fillWidth fillHeight background[unset] overflow[x-hidden] overflow[y-auto] mb[64]" style="transform: translateX(100%);">
-            <div class="dashboard-navigation sticky top[0] background[unset] flex direction[row] justify[around] align[end] g[s] fillWidth height[45px] px[s] z[2] pb[xs]">
-                <a class="redirect flex direction[row] g[4] align[center] font-weight[400] text-size[16] text-align[left] fillWidth text[nowrap] height[20px]" data-button="customize_back">
-                    <i class="far fa-chevron-left text-size[24]"></i>
-                    Wróć
-                </a>
-                <div class="fillWidth flex justify[center] align[center] height[20px]">
-                    <h1 class="font[Inter] text-align[center] font-weight[600] text-size[18] text[nowrap]">Dostosuj dokumenty</h1>
-                </div>
-                <div class="flex justify[end] align[center] height[20px] fillWidth">
-                    <div class="square[25px]"></div>
+        <div class="customize_document_list customize-document-panel absolute top[0] z[max] fillWidth overflow[hidden] flex direction[column] background[unset]" style="transform: translateX(100%);">
+            <div class="customize-document-home fillWidth fillHeight overflow[y-auto]">
+                <div class="customize-document-scroll flex direction[column] g[s] fillWidth px[s]">
+                    <div class="customize-document-topbar fillWidth">
+                        <a class="redirect flex direction[row] g[4] align[center] font-weight[400] text-size[16] text-align[left] autoWidth" data-button="customize_back">
+                            <i class="far fa-chevron-left text-size[20]"></i>
+                            Dokumenty
+                        </a>
+                    </div>
+                    <div class="flex direction[column] g[4] fillWidth">
+                        <h1 class="font[Inter] font-weight[700] customize-document-title">Dostosuj widok</h1>
+                        <p class="customize-document-subtitle">Tu zmienisz kolejność i układ dokumentów.</p>
+                    </div>
+                    <button class="customize-document-action card radius[xl] border[unset] flex direction[row] justify[between] align[center] fillWidth px[s] py[s]" type="button" data-button="customize_order_view">
+                        <span class="font[Inter] font-weight[600] text-size[18]">Ustaw kolejność</span>
+                        <img src="/assets/svg/documents/customize/ab006_chevron_right.svg" class="square[24px] customize-document-chevron" alt="">
+                    </button>
+                    <div class="flex direction[column] g[s] fillWidth">
+                        <p class="font[Inter] font-weight[600] text-size[18]">Wybierz układ</p>
+                        <div class="card customize-layout-card fillWidth radius[xl] shadow">
+                            <div class="customize-layout-grid">
+                                <button class="customize-layout-option is-active" type="button" data-layout-option="overlap" data-layout-active-src="/assets/svg/documents/customize/id001_active_overlap_layout.svg" data-layout-inactive-src="/assets/svg/documents/customize/id004_inactive_overlap_layout.svg">
+                                    <img class="customize-layout-icon" data-layout-icon src="/assets/svg/documents/customize/id001_active_overlap_layout.svg" alt="">
+                                    <span class="customize-layout-label">Duże karty</span>
+                                    <span class="customize-layout-radio"></span>
+                                </button>
+                                <button class="customize-layout-option" type="button" data-layout-option="grid" data-layout-active-src="/assets/svg/documents/customize/id002_active_grid_layout.svg" data-layout-inactive-src="/assets/svg/documents/customize/id005_inactive_grid_layout.svg">
+                                    <img class="customize-layout-icon" data-layout-icon src="/assets/svg/documents/customize/id005_inactive_grid_layout.svg" alt="">
+                                    <span class="customize-layout-label">Małe karty</span>
+                                    <span class="customize-layout-radio"></span>
+                                </button>
+                                <button class="customize-layout-option" type="button" data-layout-option="list" data-layout-active-src="/assets/svg/documents/customize/id003_active_list_layout.svg" data-layout-inactive-src="/assets/svg/documents/customize/id006_inactive_list_layout.svg">
+                                    <img class="customize-layout-icon" data-layout-icon src="/assets/svg/documents/customize/id006_inactive_list_layout.svg" alt="">
+                                    <span class="customize-layout-label">Lista</span>
+                                    <span class="customize-layout-radio"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="flex fillWidth autoHeight direction[column] g[4] px[s]">
-                <div class="flex justify[start] align[start] fillWidth height[40px]">
-                    <div class="height[40px] flex justify[center] align[center]">
-                        <p class="font[Inter] font-weight[600] text-size[16]">Wybierz dokumenty do wyświetlenia</p>
+            <div class="customize_document_order_list absolute top[0] z[2] fillWidth fillHeight background[unset] overflow[hidden] flex direction[column]" style="transform: translateX(100%);">
+                <div class="customize-document-order-scroll flex direction[column] g[s] fillWidth fillHeight px[s] overflow[y-auto]">
+                    <div class="customize-document-topbar fillWidth">
+                        <a class="redirect flex direction[row] g[4] align[center] font-weight[400] text-size[16] text-align[left] autoWidth" data-button="customize_order_back">
+                            <i class="far fa-chevron-left text-size[20]"></i>
+                            Dostosuj widok
+                        </a>
                     </div>
-                </div>
-                <div class="card flex direction[column] justify[center] align[start] fillWidth autoHeight min-height[90px] radius[xl] shadow">
-                    <div class="flex fillWidth autoHeight min-height[70px] direction[row] justify[between] align[center] px[s]" data-customize="mdowod">
-                        <div class="flex direction[row] g[8] align[center]">
-                            <div class="flex justify[center] align[center] square[50px]">
-                                <img src="/assets/img/cards/documents/mdowod.png" class="max-width[40px] radius[s]">
-                            </div>
-                            <h1 class="font[Inter] font-weight[500] text-size[16]">mDowód</h1>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" checked data-doc-toggle="mdowod">
-                            <span class="toggle-slider"></span>
-                        </label>
+                    <div class="flex direction[column] g[4] fillWidth">
+                        <h1 class="font[Inter] font-weight[700] customize-document-title">Ustaw kolejność</h1>
+                        <p class="customize-document-subtitle">Wybierz dokumenty do wyświetlenia.</p>
                     </div>
-                    <div class="separator[x]"></div>
-                    <div class="flex fillWidth autoHeight min-height[70px] direction[row] justify[between] align[center] px[s]" data-customize="mprawojazdy">
-                        <div class="flex direction[row] g[8] align[center]">
-                            <div class="flex justify[center] align[center] square[50px]">
-                                <img src="/assets/img/cards/documents/mprawojazdy.png" class="max-width[40px] radius[s]">
+                    <div class="card flex direction[column] justify[center] align[start] fillWidth autoHeight min-height[90px] radius[xl] shadow customize-document-order-card">
+                        <div class="flex fillWidth autoHeight min-height[70px] direction[row] justify[between] align[center] px[s]" data-customize="mdowod">
+                            <div class="flex direction[row] g[8] align[center]">
+                                <div class="flex justify[center] align[center] square[50px]">
+                                    <img src="/assets/img/cards/documents/mdowod.png" class="max-width[40px] radius[s]">
+                                </div>
+                                <h1 class="font[Inter] font-weight[500] text-size[16]">mDowód</h1>
                             </div>
-                            <h1 class="font[Inter] font-weight[500] text-size[16]">mPrawo jazdy</h1>
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked data-doc-toggle="mdowod">
+                                <span class="toggle-slider"></span>
+                            </label>
                         </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" checked data-doc-toggle="mprawojazdy">
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                    <div class="separator[x]"></div>
-                    <div class="flex fillWidth autoHeight min-height[70px] direction[row] justify[between] align[center] px[s]" data-customize="school_id">
-                        <div class="flex direction[row] g[8] align[center]">
-                            <div class="flex justify[center] align[center] square[50px]">
-                                <img src="/assets/img/cards/documents/school_id.png" class="max-width[40px] radius[s]">
+                        <div class="separator[x]"></div>
+                        <div class="flex fillWidth autoHeight min-height[70px] direction[row] justify[between] align[center] px[s]" data-customize="mprawojazdy">
+                            <div class="flex direction[row] g[8] align[center]">
+                                <div class="flex justify[center] align[center] square[50px]">
+                                    <img src="/assets/img/cards/documents/mprawojazdy.png" class="max-width[40px] radius[s]">
+                                </div>
+                                <h1 class="font[Inter] font-weight[500] text-size[16]">mPrawo jazdy</h1>
                             </div>
-                            <h1 class="font[Inter] font-weight[500] text-size[16]">Legitymacja szkolna</h1>
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked data-doc-toggle="mprawojazdy">
+                                <span class="toggle-slider"></span>
+                            </label>
                         </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" checked data-doc-toggle="school_id">
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                    <div class="separator[x]"></div>
-                    <div class="flex fillWidth autoHeight min-height[70px] direction[row] justify[between] align[center] px[s]" data-customize="student_id">
-                        <div class="flex direction[row] g[8] align[center]">
-                            <div class="flex justify[center] align[center] square[50px]">
-                                <img src="/assets/img/cards/documents/student_id.png" class="max-width[40px] radius[s]">
+                        <div class="separator[x]"></div>
+                        <div class="flex fillWidth autoHeight min-height[70px] direction[row] justify[between] align[center] px[s]" data-customize="school_id">
+                            <div class="flex direction[row] g[8] align[center]">
+                                <div class="flex justify[center] align[center] square[50px]">
+                                    <img src="/assets/img/cards/documents/school_id.png" class="max-width[40px] radius[s]">
+                                </div>
+                                <h1 class="font[Inter] font-weight[500] text-size[16]">Legitymacja szkolna</h1>
                             </div>
-                            <h1 class="font[Inter] font-weight[500] text-size[16]">Legitymacja studencka</h1>
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked data-doc-toggle="school_id">
+                                <span class="toggle-slider"></span>
+                            </label>
                         </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" checked data-doc-toggle="student_id">
-                            <span class="toggle-slider"></span>
-                        </label>
+                        <div class="separator[x]"></div>
+                        <div class="flex fillWidth autoHeight min-height[70px] direction[row] justify[between] align[center] px[s]" data-customize="student_id">
+                            <div class="flex direction[row] g[8] align[center]">
+                                <div class="flex justify[center] align[center] square[50px]">
+                                    <img src="/assets/img/cards/documents/student_id.png" class="max-width[40px] radius[s]">
+                                </div>
+                                <h1 class="font[Inter] font-weight[500] text-size[16]">Legitymacja studencka</h1>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked data-doc-toggle="student_id">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -451,15 +554,19 @@
                 <div class="square[25px]"></div>
             </div>
         </div>
-        <div class="fillWidth px[s] pb[s]" style="display:flex;flex-direction:column;height:calc(100% - 45px);gap:12px;">
-            <div class="fillWidth" id="chat-list" style="flex:1 1 auto;min-height:0;overflow-y:auto;padding-bottom:8px;">
-                <p class="font[Inter] text-size[14] color[gray]" id="chat-empty" style="display:none;text-align:center;padding:40px 0">Brak wiadomości</p>
+        <div class="fillWidth px[s]" style="display:flex;flex-direction:column;height:calc(100% - 45px);gap:0;">
+            <div class="fillWidth" id="chat-list" style="flex:1 1 auto;min-height:0;overflow-y:auto;padding:8px 0 12px;">
+                <div id="chat-empty-wrap" style="display:none;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    <p class="font[Inter] text-size[14]" style="margin:0;">Brak wiadomości</p>
+                    <p class="font[Inter] text-size[12]" style="margin:0;">Napisz pierwszą wiadomość!</p>
+                </div>
             </div>
-            <div class="fillWidth" style="flex:0 0 auto;padding-bottom:88px;">
-                <div id="chat-error" class="font[Inter] text-size[12]" style="display:none;color:#c62828;padding:0 6px 8px;"></div>
-                <div style="display:flex;gap:10px;align-items:flex-end;">
-                    <textarea id="chat-input" class="secondary p[s] radius[m] border-solid-1 fillWidth" maxlength="2000" placeholder="Napisz wiadomość" style="min-height:52px;max-height:140px;resize:none;"></textarea>
-                    <button id="chat-send" class="primary radius[m] border[unset] px[s] py[s]" type="button" style="min-width:88px;">Wyślij</button>
+            <div class="fillWidth chat-composer-wrap" style="flex:0 0 auto;">
+                <div id="chat-error" class="font[Inter] text-size[12]" style="display:none;color:#c62828;padding:0 6px 6px;"></div>
+                <div class="chat-input-bar">
+                    <textarea id="chat-input" maxlength="2000" placeholder="Wpisz pytanie" rows="1"></textarea>
+                    <button id="chat-send" type="button" aria-label="Wyślij" disabled><svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button>
                 </div>
             </div>
         </div>

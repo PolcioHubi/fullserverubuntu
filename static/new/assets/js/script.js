@@ -173,34 +173,53 @@ $(async function() {
 
     let document_interval;
     if (path === 'documents') {
+        const getDocumentsLayoutMode = () => {
+            const savedLayout = localStorage.getItem('documents_layout_mode');
+            return ['overlap', 'grid', 'list'].includes(savedLayout) ? savedLayout : 'overlap';
+        };
+
         function updateDocumentCards(apiData) {
             const data = apiData || {};
             let saved = {};
             try { saved = JSON.parse(localStorage.getItem('doc_visibility') || '{}'); } catch(e) {}
+            const activeLayout = getDocumentsLayoutMode();
             let visibleIndex = 0;
             const offset = 70;
             const order = ['mdowod', 'mprawojazdy', 'school_id', 'student_id'];
+
+            $('[data-layout-view]').addClass('display-none');
+            $(`[data-layout-view="${activeLayout}"]`).removeClass('display-none');
+
             order.forEach((key) => {
                 const hasFile = Number(data[key]) === 1;
                 const enabled = hasFile && (saved[key] !== undefined ? Number(saved[key]) === 1 : true);
-                const $card = $(`[data-document-card="${key}"]`);
+                const $overlapCard = $(`[data-layout-card="overlap"][data-document-key="${key}"]`);
+                const $gridCard = $(`[data-layout-card="grid"][data-document-key="${key}"]`);
+                const $listCard = $(`[data-layout-card="list"][data-document-key="${key}"]`);
                 const $separator = $(`[data-document-separator="${key}"]`);
                 const $addButton = $(`[data-document-add="${key}"]`);
-                $card.removeClass(function(index, className) {
+                $overlapCard.removeClass(function(index, className) {
                     return (className.match(/top\[\d+px\]/g) || []).join(' ');
                 });
                 if (enabled) {
                     const newTopClass = `top[${visibleIndex * offset}px]`;
-                    $card.removeClass('display-none').addClass(newTopClass);
+                    $overlapCard.removeClass('display-none').addClass(newTopClass);
+                    $gridCard.removeClass('display-none');
+                    $listCard.removeClass('display-none');
                     $separator.addClass('display-none');
                     $addButton.addClass('display-none');
                     visibleIndex++;
                 } else {
-                    $card.addClass('display-none');
+                    $overlapCard.addClass('display-none');
+                    $gridCard.addClass('display-none');
+                    $listCard.addClass('display-none');
                     $separator.removeClass('display-none');
                     $addButton.removeClass('display-none');
                 }
             });
+
+            const overlapHeight = visibleIndex > 0 ? (235 + ((visibleIndex - 1) * offset)) : 0;
+            $('[data-layout-view="overlap"]').css('min-height', overlapHeight ? `${overlapHeight}px` : '0');
         }
         // Expose for instant toggle updates from documents.js
         window._updateDocumentCards = () => updateDocumentCards(window._lastDocData || {});
@@ -266,7 +285,7 @@ $(async function() {
         }, 30000);
     }
 
-    if (/(mdowod|mprawojazdy|school_id|student_id|qr_code)/.test(path)) {
+    if (/(mdowod|dowodnowy|mprawojazdy|prawojazdy|school_id|student_id|qr_code)/.test(path)) {
         const $wrap = document.querySelector('.emblem[data-emblem]');
         const $scope = document.getElementById('emblem');
         const $gif = $wrap ? $wrap.querySelector('img') : null;
@@ -290,8 +309,8 @@ $(async function() {
         const P = {
             dirY: -1,
             dirX: 1,
-            sensY: 62,
-            sensX: 48,
+            sensY: 24,
+            sensX: 18,
             maxY: 78,
             maxX: 18,
             maxAng: 11,
@@ -305,8 +324,8 @@ $(async function() {
             alphaMax: 0.52,
             topFadeStart: 0.76,
             topFadeEnd: 1.0,
-            lerp: 0.125,
-            deadband: 0.015
+            lerp: 0.18,
+            deadband: 0.008
         };
 
         const S = {

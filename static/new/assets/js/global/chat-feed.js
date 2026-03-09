@@ -6,16 +6,27 @@
     var css =
         '@keyframes chat-pulse{0%{transform:scale(1);box-shadow:0 0 0 0 rgba(13,110,253,.4)}70%{transform:scale(1.06);box-shadow:0 0 0 10px rgba(13,110,253,0)}100%{transform:scale(1);box-shadow:0 0 0 0 rgba(13,110,253,0)}}' +
         '.chat-pulse{animation:chat-pulse 1.2s ease-out infinite;border-radius:12px}' +
-        '.chat-row{display:flex;margin:0 0 10px}' +
+        '.chat-row{display:flex;margin:0 0 6px;padding:0 4px}' +
         '.chat-row.own{justify-content:flex-end}' +
         '.chat-row.other{justify-content:flex-start}' +
-        '.chat-card{max-width:86%;border-radius:18px;padding:12px 14px;box-shadow:0 1px 4px rgba(0,0,0,.06)}' +
-        '.chat-row.own .chat-card{background:#e8f1ff}' +
-        '.chat-row.other .chat-card{background:var(--card-background,#fff)}' +
-        '.chat-meta{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-bottom:4px;font-size:11px;opacity:.65}' +
-        '.chat-user{font-family:Inter,sans-serif;font-weight:700}' +
+        '.chat-card{max-width:82%;border-radius:18px;padding:10px 14px;box-shadow:0 1px 3px rgba(0,0,0,.06)}' +
+        '.chat-row.own .chat-card{background:#dce8ff;border-bottom-right-radius:6px}' +
+        '.chat-row.other .chat-card{background:var(--card-background,#f0f0f5);border-bottom-left-radius:6px}' +
+        '.chat-meta{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-bottom:3px;font-size:11px;opacity:.55}' +
+        '.chat-user{font-family:Inter,sans-serif;font-weight:600}' +
         '.chat-time{font-family:Inter,sans-serif;white-space:nowrap}' +
-        '.chat-message{font-family:Inter,sans-serif;font-size:14px;line-height:1.4;white-space:pre-wrap;word-break:break-word}';
+        '.chat-message{font-family:Inter,sans-serif;font-size:14px;line-height:1.45;white-space:pre-wrap;word-break:break-word}' +
+        '#chat-empty-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;opacity:.45;gap:8px}' +
+        '#chat-empty-wrap svg{width:48px;height:48px}' +
+        '.chat-composer-wrap{padding:8px 0 calc(env(safe-area-inset-bottom) + 8px)}' +
+        '.chat-input-bar{display:flex;gap:10px;align-items:center;padding:0;background:transparent;border:none;border-radius:0}' +
+        '.chat-input-bar textarea{flex:1;min-height:42px;max-height:140px;resize:none;border:1px solid rgba(161,167,178,.68);border-radius:13px;padding:10px 15px;font-family:Inter,sans-serif;font-size:14px;font-weight:500;line-height:1.35;outline:none;background:rgba(255,255,255,.74);box-sizing:border-box;color:rgba(85,89,99,1);box-shadow:0 1px 1px rgba(255,255,255,.45) inset}' +
+        '.chat-input-bar textarea::placeholder{color:rgba(123,127,137,.92)}' +
+        '.chat-input-bar textarea:focus{border-color:rgba(161,167,178,.92)}' +
+        '.chat-input-bar button{flex-shrink:0;width:40px;height:40px;border-radius:999px;border:none;background:rgba(var(--blue-active,40,95,244),1);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .15s,background-color .15s,color .15s;padding:0;box-shadow:none}' +
+        '.chat-input-bar button:active{transform:scale(.92)}' +
+        '.chat-input-bar button:disabled{background:rgba(236,238,243,1);color:rgba(172,176,184,1);cursor:default;transform:none}' +
+        '.chat-input-bar button svg{width:20px;height:20px;fill:currentColor}';
     var style = document.createElement('style');
     style.textContent = css;
     document.head.appendChild(style);
@@ -38,6 +49,7 @@ var chatFeed = {
         $('#chat-input').on('input', function () {
             self._clearError();
             self._resizeInput();
+            self._updateComposerState();
         });
         $('#chat-input').on('keydown', function (event) {
             if (event.key === 'Enter' && !event.shiftKey) {
@@ -54,6 +66,7 @@ var chatFeed = {
         });
 
         this.fetchUnread().always(function () {
+            self._updateComposerState();
             self._schedulePoll();
         });
     },
@@ -121,6 +134,7 @@ var chatFeed = {
         this._open = true;
         this._clearError();
         this._applyUnreadState(0);
+        this._updateComposerState();
         $wrapper.addClass('scale[0.9]');
         $standalone.addClass('overflow[x-hidden] overflow[y-auto]').removeClass('overflow[hidden]');
         $('[data-group="navigation"]').addClass('display-none');
@@ -207,7 +221,7 @@ var chatFeed = {
 
         if (this._sending) return;
         if (!message) {
-            this._setError('Wiadomość nie może być pusta.');
+            this._updateComposerState();
             return;
         }
         if (message.length > 2000) {
@@ -217,7 +231,7 @@ var chatFeed = {
 
         this._sending = true;
         this._clearError();
-        $button.prop('disabled', true).text('Wysyłanie...');
+        this._updateComposerState();
 
         this._request({
             url: '/api/chat/messages',
@@ -235,6 +249,7 @@ var chatFeed = {
             self._scrollToBottom();
             $input.val('');
             self._resizeInput(true);
+            self._updateComposerState();
 
             if (!document.hidden && self._lastMessageId > 0) {
                 self._markRead(self._lastMessageId);
@@ -246,7 +261,7 @@ var chatFeed = {
             self._setError((response && response.error) || 'Nie udało się wysłać wiadomości.');
         }).always(function () {
             self._sending = false;
-            $button.prop('disabled', false).text('Wyślij');
+            self._updateComposerState();
             self._schedulePoll();
         });
     },
@@ -272,11 +287,11 @@ var chatFeed = {
         $list.find('.chat-row').remove();
 
         if (!items.length) {
-            $('#chat-empty').show();
+            $('#chat-empty-wrap').show();
             return;
         }
 
-        $('#chat-empty').hide();
+        $('#chat-empty-wrap').hide();
         this._appendMessages(items);
     },
 
@@ -290,7 +305,7 @@ var chatFeed = {
                 return;
             }
 
-            $('#chat-empty').hide();
+            $('#chat-empty-wrap').hide();
             $list.append(self._buildMessageElement(item));
         });
     },
@@ -336,9 +351,18 @@ var chatFeed = {
         var $input = $('#chat-input');
         if (!$input.length) return;
 
-        $input.css('height', '52px');
+        $input.css('height', '42px');
         if (resetOnly) return;
         $input.css('height', Math.min($input[0].scrollHeight, 140) + 'px');
+    },
+
+    _updateComposerState: function () {
+        var $input = $('#chat-input');
+        var $button = $('#chat-send');
+        if (!$input.length || !$button.length) return;
+
+        var hasMessage = String($input.val() || '').trim().length > 0;
+        $button.prop('disabled', this._sending || !hasMessage);
     },
 
     _scrollToBottom: function () {

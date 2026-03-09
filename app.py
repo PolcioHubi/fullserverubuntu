@@ -676,11 +676,11 @@ else:
     limiter = DummyLimiter()
 
 # Define the fixed input file path
-FIXED_INPUT_FILE = "pasted_content.txt"
-FIXED_INPUT_FILE_NEW = "mdowod.txt"
-FIXED_INPUT_FILE_PJ = "mprawojazdy.txt"
-FIXED_INPUT_FILE_SI = "school_id.txt"
-FIXED_INPUT_FILE_STI = "student_id.txt"
+FIXED_INPUT_FILE = "document_templates/pasted_content.txt"
+FIXED_INPUT_FILE_NEW = "document_templates/mdowod.txt"
+FIXED_INPUT_FILE_PJ = "document_templates/mprawojazdy.txt"
+FIXED_INPUT_FILE_SI = "document_templates/school_id.txt"
+FIXED_INPUT_FILE_STI = "document_templates/student_id.txt"
 
 # Directory paths
 USER_DATA_DIR = "user_data"
@@ -3486,7 +3486,7 @@ def login():
         next_target = request.args.get("next", "")
         if isinstance(next_target, str) and next_target.startswith("/") and not next_target.startswith("//"):
             return redirect(next_target)
-        return redirect("/documents")
+        return redirect("/")
 
     if request.method == "POST":
         try:

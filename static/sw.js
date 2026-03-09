@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mobywatel-cache-v6';
+const CACHE_NAME = 'mobywatel-cache-v7';
 const urlsToCache = [
   '/static/logowanie.html',
   '/static/dashboard.html',
@@ -12,6 +12,7 @@ const urlsToCache = [
   '/static/qr.css',
   '/static/qr2.css',
   '/static/jquery-3.6.0.min.js',
+  '/static/js/version_popup.js',
   '/static/manifest.json',
   '/static/apple.png',
   '/static/coi_common_ui_ic_mobywatel_logo.svg'

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mobywatel-v11';
+const CACHE_NAME = 'mobywatel-v14';
 const HTML_ROUTE_PATTERN = /^\/(services|more|qr_code)(\/|$)/;
 
 // Core assets to precache on install — everything needed for instant PWA load
@@ -41,6 +41,13 @@ const PRECACHE_ASSETS = [
     // SVG — documents page
     '/assets/svg/documents/ai.svg',
     '/assets/svg/documents/notifications.svg',
+    '/assets/svg/documents/customize/ab006_chevron_right.svg',
+    '/assets/svg/documents/customize/id001_active_overlap_layout.svg',
+    '/assets/svg/documents/customize/id002_active_grid_layout.svg',
+    '/assets/svg/documents/customize/id003_active_list_layout.svg',
+    '/assets/svg/documents/customize/id004_inactive_overlap_layout.svg',
+    '/assets/svg/documents/customize/id005_inactive_grid_layout.svg',
+    '/assets/svg/documents/customize/id006_inactive_list_layout.svg',
     // SVG — login page
     '/assets/svg/login/kpo.svg',
     '/assets/svg/login/rp.svg',
@@ -54,7 +61,7 @@ const PRECACHE_ASSETS = [
     // Images — core
     '/assets/img/logo.png',
     '/assets/img/apple-180x.png',
-    '/assets/img/card_eagle.png',
+    '/assets/svg/documents/ia001_card_logo_default.svg',
     '/assets/img/card_stars.png',
     '/assets/img/godlo.png',
     '/assets/img/godlo.gif',
@@ -68,6 +75,10 @@ const PRECACHE_ASSETS = [
     '/assets/img/cards/documents/mprawojazdy.png',
     '/assets/img/cards/documents/school_id.png',
     '/assets/img/cards/documents/student_id.png',
+    '/assets/img/cards/small/mdowod_bg_small.png',
+    '/assets/img/cards/small/prawo_jazdy_bg_small.png',
+    '/assets/img/cards/small/leg_szkolna_bg_small.png',
+    '/assets/img/cards/small/leg_studencka_bg_small.png',
     // Fonts (woff2)
     '/assets/css/icons/fonts/fa-regular-400.woff2',
     '/assets/css/icons/fonts/fa-solid-900.woff2',

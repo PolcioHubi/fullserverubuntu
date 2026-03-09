@@ -45,8 +45,9 @@
         if (el && navigator.vibrate) navigator.vibrate(10);
     }, { passive: true });
 
-    // ───── 4. PULL-TO-REFRESH ─────
+    // ───── 4. PULL-TO-REFRESH (DISABLED) ─────
     (function () {
+        return; // wyłączone
         var standalone = document.querySelector("[data-standalone]");
         if (!standalone) return;
         var startY = 0, pulling = false;
@@ -61,12 +62,12 @@
         standalone.addEventListener("touchmove", function (e) {
             if (!pulling) return;
             var dy = e.touches[0].clientY - startY;
-            if (dy > 0 && dy < 150) { indicator.style.height = dy * 0.4 + "px"; indicator.style.opacity = Math.min(1, dy / 80); }
+            if (dy > 0 && dy < 280) { indicator.style.height = dy * 0.2 + "px"; indicator.style.opacity = Math.min(1, dy / 220); }
         }, { passive: true });
         standalone.addEventListener("touchend", function (e) {
             if (!pulling) return; pulling = false;
             var dy = e.changedTouches[0].clientY - startY;
-            if (dy > 80) {
+            if (dy > 220) {
                 indicator.classList.add("ptr-refreshing");
                 indicator.style.height = "36px"; indicator.style.opacity = "1";
                 if (navigator.vibrate) navigator.vibrate(15);
@@ -99,13 +100,6 @@
                 a.classList.remove("nav-active");
             }
         });
-
-        var activeLink = nav.querySelector(".nav-active");
-        if (activeLink) {
-            var dot = document.createElement("div");
-            dot.className = "nav-dot";
-            activeLink.appendChild(dot);
-        }
 
         links.forEach(function (a) {
             a.addEventListener("click", function (e) {

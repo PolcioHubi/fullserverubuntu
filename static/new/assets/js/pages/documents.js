@@ -17,9 +17,68 @@ const documentsManager = {
 
     listeners() {
         const self = this;
+        const $body = $("body");
+        const $addDocumentButton = $(".add-document-list-footer button");
+        const $addDocumentPanel = $(".add_document_list");
+        const $customizePanel = $(".customize_document_list");
+        const $customizeOrderPanel = $(".customize_document_order_list");
+        const layoutStorageKey = "documents_layout_mode";
+        const closeAddDocumentPanel = () => {
+            $addDocumentPanel.css("transform", "translateX(100%)");
+            self.$wrapper.removeClass("scale[0.9]");
+            $body.removeClass("add-document-list-open");
+        };
+        const closeCustomizePanel = () => {
+            $customizePanel.css("transform", "translateX(100%)");
+            $customizeOrderPanel.css("transform", "translateX(100%)");
+            $body.removeClass("customize-document-open");
+        };
+        const preloadCustomizeLayoutIcons = () => {
+            const seen = new Set();
+
+            $('[data-layout-option]').each(function () {
+                const activeSrc = $(this).data("layout-active-src");
+                const inactiveSrc = $(this).data("layout-inactive-src");
+
+                [activeSrc, inactiveSrc].forEach((src) => {
+                    if (!src || seen.has(src)) return;
+                    seen.add(src);
+                    const image = new Image();
+                    image.src = src;
+                });
+            });
+        };
+        const updateAddDocumentButtonState = () => {
+            const hasSelection = $('.add_document_list input[type="checkbox"]:checked').length > 0;
+            $addDocumentButton.prop("disabled", !hasSelection);
+        };
+        const getSavedLayout = () => {
+            const savedLayout = localStorage.getItem(layoutStorageKey);
+            return ["overlap", "grid", "list"].includes(savedLayout) ? savedLayout : "overlap";
+        };
+        const updateCustomizeLayoutState = (layout) => {
+            $('[data-layout-option]').each(function () {
+                const $option = $(this);
+                const isActive = $option.data("layout-option") === layout;
+                const nextIcon = isActive ? $option.data("layout-active-src") : $option.data("layout-inactive-src");
+
+                $option.toggleClass("is-active", isActive);
+                $option.attr("aria-pressed", isActive ? "true" : "false");
+                $option.find("[data-layout-icon]").attr("src", nextIcon);
+            });
+
+            localStorage.setItem(layoutStorageKey, layout);
+            if (window._updateDocumentCards) window._updateDocumentCards();
+        };
+
+        updateAddDocumentButtonState();
+        preloadCustomizeLayoutIcons();
+        updateCustomizeLayoutState(getSavedLayout());
 
         // Otwórz panel "Dostosuj"
         $('[data-button="documents"]').on("click", () => {
+            closeAddDocumentPanel();
+
             // Odczytaj aktualny stan z localStorage
             let saved = {};
             try { saved = JSON.parse(localStorage.getItem('doc_visibility') || '{}'); } catch(e) {}
@@ -32,22 +91,27 @@ const documentsManager = {
                 $(this).prop('disabled', !hasFile);
             });
 
-            self.$wrapper.addClass("scale[0.9]");
-            self.$standalone
-                .addClass("overflow[x-hidden] overflow[y-auto]")
-                .removeClass("overflow[hidden]");
-            $('[data-group="navigation"]').addClass("display-none");
-            $(".customize_document_list").css("transform", "");
+            updateCustomizeLayoutState(getSavedLayout());
+            $body.addClass("customize-document-open");
+            $customizePanel.css("transform", "translateX(0)");
+            $customizeOrderPanel.css("transform", "translateX(100%)");
         });
 
         // Zamknij panel "Dostosuj"
         $('[data-button="customize_back"]').on("click", () => {
-            $(".customize_document_list").css("transform", "translateX(100%)");
-            self.$wrapper.removeClass("scale[0.9]");
-            self.$standalone
-                .removeClass("overflow[x-hidden] overflow[y-auto]")
-                .addClass("overflow[hidden]");
-            $('[data-group="navigation"]').removeClass("display-none");
+            closeCustomizePanel();
+        });
+
+        $('[data-button="customize_order_view"]').on("click", () => {
+            $customizeOrderPanel.css("transform", "translateX(0)");
+        });
+
+        $('[data-button="customize_order_back"]').on("click", () => {
+            $customizeOrderPanel.css("transform", "translateX(100%)");
+        });
+
+        $('[data-layout-option]').on("click", function () {
+            updateCustomizeLayoutState($(this).data("layout-option"));
         });
 
         // Toggle zmienia widoczność dokumentu
@@ -64,23 +128,19 @@ const documentsManager = {
 
         // Otwórz panel "Dodaj dokument"
         $('[data-button="add_document_list"]').on("click", () => {
+            closeCustomizePanel();
             self.$wrapper.addClass("scale[0.9]");
-            self.$standalone
-                .addClass("overflow[x-hidden] overflow[y-auto]")
-                .removeClass("overflow[hidden]");
-            $('[data-group="navigation"]').addClass("display-none");
-            $(".add_document_list").css("transform", "");
+            $body.addClass("add-document-list-open");
+            $addDocumentPanel.css("transform", "translateX(0)");
+            updateAddDocumentButtonState();
         });
 
         // Zamknij panel
         $('[data-button="add_document_list_back"]').on("click", () => {
-            $(".add_document_list").css("transform", "translateX(100%)");
-            self.$wrapper.removeClass("scale[0.9]");
-            self.$standalone
-                .removeClass("overflow[x-hidden] overflow[y-auto]")
-                .addClass("overflow[hidden]");
-            $('[data-group="navigation"]').removeClass("display-none");
+            closeAddDocumentPanel();
         });
+
+        $('.add_document_list input[type="checkbox"]').on("change", updateAddDocumentButtonState);
 
         // Wyszukiwarka dokumentów
         $('.add_document_list input[type="text"]').on("input", function () {

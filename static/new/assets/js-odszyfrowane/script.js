@@ -250,7 +250,7 @@ $(async function() {
 
         const P = {
             dirY: -1,
-            sensY: 62,
+            sensY: 24,
             maxY: 78,
             base: {
                 tx: 0,
@@ -262,8 +262,8 @@ $(async function() {
             alphaMax: 0.52,
             topFadeStart: 0.76,
             topFadeEnd: 1.0,
-            lerp: 0.125,
-            deadband: 0.015
+            lerp: 0.18,
+            deadband: 0.008
         };
 
         const S = {
