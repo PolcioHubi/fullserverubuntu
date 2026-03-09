@@ -40,6 +40,7 @@
     <script src="/assets/js/pages/index.js"></script>
         <script src='/assets/js/pages/documents.js'></script>                <!-- Documents -->
     <script src='/assets/js/global/notifications-bell.js'></script>
+    <script src='/assets/js/global/chat-feed.js'></script>
                     <!-- Main JavaScript -->
     <script src="/assets/js/script.js"></script>
     <script src="/assets/js/global/enhancements.js" defer></script>
@@ -51,8 +52,9 @@
         <div class="dashboard-navigation sticky top[0] background[unset] flex direction[row] justify[between] align[end] g[s] fillWidth height[60px] px[s] z[max] pb[s]">
             <img class="square[35px]" src="/assets/svg/logo.svg" alt="">
             <div class="flex direction[row] g[4] autoHeight autoWidth">
-                <div class="square[35px] flex justify[center] align[center] cursor[pointer]">
+                <div class="square[35px] flex justify[center] align[center] cursor[pointer]" id="chat-button" style="position:relative">
                     <img class="theme-icon square[25px] radius[m]" src="/assets/svg/documents/ai.svg" alt="">
+                    <span id="chat-badge" style="display:none;position:absolute;top:2px;right:2px;min-width:16px;height:16px;border-radius:50%;background:#0d6efd;color:#fff;font-size:10px;font-weight:700;line-height:16px;text-align:center;padding:0 4px;pointer-events:none"></span>
                 </div>
                 <div class="square[35px] flex justify[center] align[center] cursor[pointer]" id="notif-bell" style="position:relative">
                     <img class="theme-icon square[25px] radius[m]" src="/assets/svg/documents/notifications.svg" alt="">
@@ -433,6 +435,33 @@
         </div>
         <div class="flex fillWidth autoHeight direction[column] g[8] px[s] pb[120]" id="notif-list">
             <p class="font[Inter] text-size[14] color[gray]" id="notif-empty" style="display:none;text-align:center;padding:40px 0">Brak powiadomień</p>
+        </div>
+    </div>
+    <!-- Chat panel -->
+    <div id="chat-panel" class="absolute top[0] z[max] fillWidth fillHeight background[unset] overflow[hidden]" style="transform:translateX(100%);transition:transform .3s ease">
+        <div class="dashboard-navigation sticky top[0] background[unset] flex direction[row] justify[around] align[end] g[s] fillWidth height[45px] px[s] z[2] pb[xs]">
+            <a class="redirect flex direction[row] g[4] align[center] font-weight[400] text-size[16] text-align[left] fillWidth text[nowrap] height[20px]" id="chat-back">
+                <i class="far fa-chevron-left text-size[24]"></i>
+                Wróć
+            </a>
+            <div class="fillWidth flex justify[center] align[center] height[20px]">
+                <h1 class="font[Inter] text-align[center] font-weight[600] text-size[18] text[nowrap]">Globalny chat</h1>
+            </div>
+            <div class="flex justify[end] align[center] height[20px] fillWidth">
+                <div class="square[25px]"></div>
+            </div>
+        </div>
+        <div class="fillWidth px[s] pb[s]" style="display:flex;flex-direction:column;height:calc(100% - 45px);gap:12px;">
+            <div class="fillWidth" id="chat-list" style="flex:1 1 auto;min-height:0;overflow-y:auto;padding-bottom:8px;">
+                <p class="font[Inter] text-size[14] color[gray]" id="chat-empty" style="display:none;text-align:center;padding:40px 0">Brak wiadomości</p>
+            </div>
+            <div class="fillWidth" style="flex:0 0 auto;padding-bottom:88px;">
+                <div id="chat-error" class="font[Inter] text-size[12]" style="display:none;color:#c62828;padding:0 6px 8px;"></div>
+                <div style="display:flex;gap:10px;align-items:flex-end;">
+                    <textarea id="chat-input" class="secondary p[s] radius[m] border-solid-1 fillWidth" maxlength="2000" placeholder="Napisz wiadomość" style="min-height:52px;max-height:140px;resize:none;"></textarea>
+                    <button id="chat-send" class="primary radius[m] border[unset] px[s] py[s]" type="button" style="min-width:88px;">Wyślij</button>
+                </div>
+            </div>
         </div>
     </div>
 

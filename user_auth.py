@@ -136,16 +136,6 @@ class UserAuthManager:
                 hours=max(1, recovery_token_ttl_hours)
             )
 
-            new_user = User(
-                username=username,
-                password=hashed_password,
-                access_key_used=access_key,
-                recovery_token=recovery_token_hash,
-                recovery_token_expires=recovery_token_expires,
-                has_seen_tutorial=mark_tutorial_seen,  # Set tutorial status
-            )
-            db.session.add(new_user)
-
             access_key_used = self.access_key_service.use_access_key(
                 access_key, commit=False
             )
@@ -156,6 +146,16 @@ class UserAuthManager:
                     "Ten klucz dostępu został już wykorzystany lub jest nieaktywny.",
                     None,
                 )
+
+            new_user = User(
+                username=username,
+                password=hashed_password,
+                access_key_used=access_key,
+                recovery_token=recovery_token_hash,
+                recovery_token_expires=recovery_token_expires,
+                has_seen_tutorial=mark_tutorial_seen,  # Set tutorial status
+            )
+            db.session.add(new_user)
 
             message = "Użytkownik zarejestrowany pomyślnie"
             if (

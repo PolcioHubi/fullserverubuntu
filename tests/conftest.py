@@ -2,32 +2,38 @@ import pytest
 import os
 import sys
 import threading
+import tempfile
 import time
 
 # Add the project root to the Python path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir)))
+
+# Shared temporary database for the test session. Must be configured before importing app.
+_TEST_DB_FD, _TEST_DB_PATH = tempfile.mkstemp(suffix=".sqlite3")
+os.close(_TEST_DB_FD)
 
 # CRITICAL: Set environment variables BEFORE importing app
 # The app reads these at import time for limiter and admin credentials
 os.environ["ADMIN_USERNAME"] = "admin_test"
 os.environ["ADMIN_PASSWORD"] = "password_test"
 os.environ["FLASK_TESTING"] = "1"  # Disables rate limiter
+os.environ["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{_TEST_DB_PATH.replace(os.sep, '/')}"
 
 from app import app as flask_app, db
 from user_auth import UserAuthManager
-from services import AccessKeyService, NotificationService, AnnouncementService, StatisticsService
+from services import AccessKeyService, ChatService, NotificationService, AnnouncementService, StatisticsService
 
 
 @pytest.fixture(scope="session")
 def app(monkeypatch_session):
     """
     Creates a test instance of the Flask application for the entire session.
-    Configured for testing with an in-memory SQLite database.
+    Configured for testing with an isolated SQLite database.
     """
     flask_app.config.update(
         {
             "TESTING": True,
-            "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
+            "SQLALCHEMY_DATABASE_URI": os.environ["SQLALCHEMY_DATABASE_URI"],
             "WTF_CSRF_ENABLED": False,
             "SECRET_KEY": "test-secret-key",
             "SERVER_NAME": "localhost.localdomain",  # Required for url_for to work without a request context
@@ -43,7 +49,12 @@ def app(monkeypatch_session):
     with flask_app.app_context():
         db.create_all()
         yield flask_app
+        db.session.remove()
         db.drop_all()
+        db.session.remove()
+        db.engine.dispose()
+    if os.path.exists(_TEST_DB_PATH):
+        os.unlink(_TEST_DB_PATH)
 
 # NOWA FIXTURA DLA TESTÓW BEZPIECZEŃSTWA
 @pytest.fixture(scope="function")
@@ -150,6 +161,12 @@ def statistics_service(db_session):
 def notification_service(db_session):
     """Provides an instance of NotificationService."""
     return NotificationService()
+
+
+@pytest.fixture(scope="function")
+def chat_service(db_session):
+    """Provides an instance of ChatService."""
+    return ChatService()
 
 
 @pytest.fixture(scope="function")

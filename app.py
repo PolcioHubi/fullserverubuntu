@@ -24,10 +24,11 @@ import zipfile
 import redis
 from pathlib import PurePosixPath
 from copy import deepcopy
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from functools import wraps
 from logging.handlers import RotatingFileHandler
 from sqlalchemy import create_engine, inspect
+from sqlalchemy.engine import make_url
 from sqlalchemy.exc import OperationalError
 
 
@@ -63,12 +64,13 @@ from flask_login import (
 from flask_migrate import Migrate
 from flask_wtf.csrf import CSRFProtect, generate_csrf
 
-from models import User, db
+from models import ChatMessage, User, db
 from pesel_generator import generate_pesel
 from production_config import config
 from services import (
     AccessKeyService,
     AnnouncementService,
+    ChatService,
     NotificationService,
     StatisticsService,
 )
@@ -177,11 +179,28 @@ if env == "production":
         sys.exit(1)
 
 # ============== Database and Migrations Setup ===============
-# Construct the absolute path for the database file
-db_file = os.path.join(os.path.dirname(__file__), "auth_data", "database.db")
-app.logger.info(f"Database file path: {os.path.abspath(db_file)}")
-os.makedirs(os.path.dirname(db_file), exist_ok=True)
-app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_file}"
+# Construct the database configuration, allowing tests to override the URI
+default_db_file = os.path.join(os.path.dirname(__file__), "auth_data", "database.db")
+configured_db_uri = os.environ.get("SQLALCHEMY_DATABASE_URI")
+database_uri = configured_db_uri or f"sqlite:///{default_db_file}"
+app.config["SQLALCHEMY_DATABASE_URI"] = database_uri
+
+db_file = default_db_file
+try:
+    parsed_db_url = make_url(database_uri)
+    if parsed_db_url.get_backend_name() == "sqlite" and parsed_db_url.database:
+        db_file = parsed_db_url.database
+except Exception:
+    db_file = default_db_file
+
+if db_file and db_file != ":memory:":
+    db_dir = os.path.dirname(os.path.abspath(db_file))
+    if db_dir:
+        os.makedirs(db_dir, exist_ok=True)
+
+app.logger.info(
+    f"Database file path: {os.path.abspath(db_file) if db_file and db_file != ':memory:' else db_file}"
+)
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db.init_app(app)
@@ -214,10 +233,6 @@ def ensure_runtime_database_tables() -> None:
             app.logger.info("Database tables recovered successfully.")
     except Exception as e:
         app.logger.warning(f"Database startup schema check failed: {e}")
-
-
-with app.app_context():
-    ensure_runtime_database_tables()
 
 
 # ============================================================
@@ -295,6 +310,12 @@ def _disable_sensitive_cache_headers(response):
     response.headers["Pragma"] = "no-cache"
     response.headers["Expires"] = "0"
     return response
+
+
+def _json_no_store(payload, status_code: int = 200):
+    response = jsonify(payload)
+    response.status_code = status_code
+    return _disable_sensitive_cache_headers(response)
 
 
 def _regenerate_server_session() -> None:
@@ -509,6 +530,7 @@ access_key_service = AccessKeyService()
 announcement_service = AnnouncementService()
 statistics_service = StatisticsService()
 notification_service = NotificationService()
+chat_service = ChatService()
 auth_manager = UserAuthManager(access_key_service, notification_service)
 # =====================================================
 
@@ -1049,6 +1071,7 @@ def _schema_update_spec() -> tuple[dict[str, list[tuple[str, str]]], list[str]]:
             ("recovery_token", "ALTER TABLE users ADD COLUMN recovery_token TEXT"),
             ("recovery_token_expires", "ALTER TABLE users ADD COLUMN recovery_token_expires DATETIME"),
             ("has_seen_tutorial", "ALTER TABLE users ADD COLUMN has_seen_tutorial BOOLEAN NOT NULL DEFAULT 0"),
+            ("last_global_chat_seen_id", "ALTER TABLE users ADD COLUMN last_global_chat_seen_id INTEGER"),
         ],
         "access_keys": [
             ("description", "ALTER TABLE access_keys ADD COLUMN description TEXT"),
@@ -1080,6 +1103,8 @@ def _schema_update_spec() -> tuple[dict[str, list[tuple[str, str]]], list[str]]:
         "CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON notifications(user_id)",
         "CREATE INDEX IF NOT EXISTS idx_announcements_is_active ON announcements(is_active)",
         "CREATE INDEX IF NOT EXISTS idx_files_user_username ON files(user_username)",
+        "CREATE INDEX IF NOT EXISTS idx_chat_messages_created_at ON chat_messages(created_at)",
+        "CREATE INDEX IF NOT EXISTS idx_chat_messages_user_id ON chat_messages(user_id)",
     ]
     return schema_updates, index_updates
 
@@ -1177,6 +1202,22 @@ def ensure_sqlite_schema_compatibility(db_path: str) -> tuple[bool, list[str], l
         )
 
     return True, applied_updates, []
+
+
+with app.app_context():
+    ensure_runtime_database_tables()
+    try:
+        schema_ok, schema_updates_applied, schema_errors = ensure_sqlite_schema_compatibility(db_file)
+        if schema_ok and schema_updates_applied:
+            app.logger.info(
+                f"Runtime schema compatibility updates applied: {', '.join(schema_updates_applied)}"
+            )
+        elif not schema_ok and schema_errors:
+            app.logger.warning(
+                f"Runtime schema compatibility failed: {'; '.join(schema_errors)}"
+            )
+    except Exception as schema_error:
+        app.logger.warning(f"Runtime schema compatibility check failed: {schema_error}")
 
 
 def validate_imported_database(db_path: str) -> tuple[bool, list[str]]:
@@ -3627,7 +3668,15 @@ def serve_js_from_static(filename):
 @limiter.exempt
 def serve_new_assets(filename):
     assets_dir = os.path.join(app.static_folder, "new", "assets")
-    return send_from_directory(assets_dir, filename, max_age=86400)
+    no_store_assets = {
+        "js/global/notifications-bell.js",
+        "js/global/chat-feed.js",
+    }
+    max_age = 0 if filename in no_store_assets else 86400
+    response = send_from_directory(assets_dir, filename, max_age=max_age)
+    if filename in no_store_assets:
+        return _disable_sensitive_cache_headers(response)
+    return response
 
 
 # Serve /documents → static/new/documents.html
@@ -4154,6 +4203,121 @@ def get_announcements():
 def get_notifications():
     notifications = notification_service.get_notifications(current_user.username)
     return jsonify(notifications)
+
+
+def _serialize_chat_message(chat_message: ChatMessage) -> dict[str, object]:
+    created_at = chat_message.created_at
+    if created_at is not None and created_at.tzinfo is None:
+        created_at = created_at.replace(tzinfo=timezone.utc)
+
+    return {
+        "id": chat_message.id,
+        "user_id": chat_message.user_id,
+        "message": chat_message.message,
+        "created_at": created_at.isoformat() if created_at else None,
+        "is_own": chat_message.user_id == current_user.username,
+    }
+
+
+def _parse_optional_nonnegative_int(value, field_name: str):
+    if value is None or value == "":
+        return None
+    try:
+        parsed = int(value)
+    except (TypeError, ValueError):
+        raise ValueError(f"Nieprawidłowa wartość pola {field_name}.")
+    if parsed < 0:
+        raise ValueError(f"Pole {field_name} nie może być ujemne.")
+    return parsed
+
+
+@app.route("/api/chat/unread", methods=["GET"])
+@login_required
+def get_chat_unread():
+    unread_count = chat_service.get_unread_count(current_user.username)
+    last_message_id = chat_service.get_last_message_id()
+    return _json_no_store(
+        {
+            "success": True,
+            "unread_count": unread_count,
+            "last_message_id": last_message_id,
+        }
+    )
+
+
+@app.route("/api/chat/messages", methods=["GET"])
+@login_required
+def get_chat_messages():
+    try:
+        after_id = _parse_optional_nonnegative_int(request.args.get("after_id"), "after_id")
+        limit = _parse_optional_nonnegative_int(request.args.get("limit"), "limit")
+    except ValueError as exc:
+        return _json_no_store({"success": False, "error": str(exc)}, 400)
+
+    effective_limit = limit or ChatService.MAX_HISTORY_LIMIT
+    if after_id is None:
+        messages = chat_service.get_recent_messages(effective_limit)
+    else:
+        messages = chat_service.get_messages_after(after_id, effective_limit)
+
+    unread_count = chat_service.get_unread_count(current_user.username)
+    last_message_id = chat_service.get_last_message_id()
+    return _json_no_store(
+        {
+            "success": True,
+            "items": [_serialize_chat_message(message) for message in messages],
+            "unread_count": unread_count,
+            "last_message_id": last_message_id,
+        }
+    )
+
+
+@app.route("/api/chat/messages", methods=["POST"])
+@csrf.exempt
+@login_required
+def post_chat_message():
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return _json_no_store({"success": False, "error": "Nieprawidłowy format danych"}, 400)
+
+    message_raw = data.get("message", "")
+    if not isinstance(message_raw, str):
+        return _json_no_store({"success": False, "error": "Nieprawidłowy format wiadomości"}, 400)
+
+    message = message_raw.strip()
+    if not message:
+        return _json_no_store({"success": False, "error": "Wiadomość nie może być pusta"}, 400)
+    if len(message) > 2000:
+        return _json_no_store({"success": False, "error": "Wiadomość może mieć maksymalnie 2000 znaków"}, 400)
+
+    chat_message = chat_service.create_message(current_user.username, message)
+    return _json_no_store(
+        {
+            "success": True,
+            "item": _serialize_chat_message(chat_message),
+        },
+        201,
+    )
+
+
+@app.route("/api/chat/read", methods=["POST"])
+@csrf.exempt
+@login_required
+def mark_chat_as_read():
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return _json_no_store({"success": False, "error": "Nieprawidłowy format danych"}, 400)
+
+    try:
+        last_seen_id = _parse_optional_nonnegative_int(data.get("last_seen_id"), "last_seen_id")
+    except ValueError as exc:
+        return _json_no_store({"success": False, "error": str(exc)}, 400)
+
+    if last_seen_id is None:
+        return _json_no_store({"success": False, "error": "Brak last_seen_id"}, 400)
+
+    unread_count = chat_service.mark_read(current_user.username, last_seen_id)
+    return _json_no_store({"success": True, "unread_count": unread_count})
 
 
 @app.route("/api/notifications/read", methods=["POST"])

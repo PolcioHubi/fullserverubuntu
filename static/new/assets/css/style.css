@@ -140,12 +140,38 @@ img { pointer-events: none; }
     outline: 2px solid rgba(var(--blue-active), 1);
 }
 
+[data-custom] textarea {
+    transition: none;
+    user-select: text;
+}
+
+[data-custom] textarea:focus {
+    transition: none;
+    outline: 2px solid rgba(var(--blue-active), 1);
+}
+
 [data-custom] input.secondary {
     background-color: rgba(var(--custom-input), 1);
     color: rgba(var(--custom-input-color), 1) !important;
 }
 
+[data-custom] textarea.secondary {
+    background-color: rgba(var(--custom-input), 1);
+    color: rgba(var(--primary), 1) !important;
+    -webkit-text-fill-color: rgba(var(--primary), 1);
+    caret-color: rgba(var(--blue-active), 1);
+    border: 1px solid rgba(var(--ring), 0.18);
+}
+
+[data-custom] textarea.secondary::placeholder {
+    color: rgba(var(--custom-input-color), 0.92);
+}
+
 input.secondary:focus {
+    outline: none;
+}
+
+textarea.secondary:focus {
     outline: none;
 }
 

@@ -20,6 +20,7 @@ class User(db.Model):
     recovery_token = db.Column(db.String, nullable=True, index=True)
     recovery_token_expires = db.Column(db.DateTime, nullable=True, index=True)
     has_seen_tutorial = db.Column(db.Boolean, nullable=False, default=False)
+    last_global_chat_seen_id = db.Column(db.Integer, nullable=True)
 
     # Relationships
     files = db.relationship(
@@ -27,6 +28,9 @@ class User(db.Model):
     )
     notifications = db.relationship(
         "Notification", backref="user", lazy=True, cascade="all, delete-orphan"
+    )
+    chat_messages = db.relationship(
+        "ChatMessage", backref="chat_user", lazy=True, cascade="all, delete-orphan"
     )
 
     def __init__(
@@ -37,6 +41,7 @@ class User(db.Model):
         recovery_token: Optional[str] = None,
         recovery_token_expires: Optional[datetime] = None,
         has_seen_tutorial: bool = False,
+        last_global_chat_seen_id: Optional[int] = None,
         **kwargs
     ):
         super().__init__(**kwargs)
@@ -46,6 +51,7 @@ class User(db.Model):
         self.recovery_token = recovery_token
         self.recovery_token_expires = recovery_token_expires
         self.has_seen_tutorial = has_seen_tutorial
+        self.last_global_chat_seen_id = last_global_chat_seen_id
 
 
 class AccessKey(db.Model):
@@ -113,6 +119,24 @@ class Announcement(db.Model):
         self.message = message
         self.type = type
         self.expires_at = expires_at
+
+
+class ChatMessage(db.Model):
+    __tablename__ = "chat_messages"
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(
+        db.String,
+        db.ForeignKey("users.username", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    message = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, server_default=func.now(), index=True)
+
+    def __init__(self, user_id: str, message: str, **kwargs):
+        super().__init__(**kwargs)
+        self.user_id = user_id
+        self.message = message
 
 
 class File(db.Model):

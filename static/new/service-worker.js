@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mobywatel-v6';
+const CACHE_NAME = 'mobywatel-v7';
 const APP_LOGIN_URL = '/login?pwa=1&next=%2Fdocuments';
 const HTML_ROUTE_PATTERN = /^\/(documents|services|more|qr_code|login)(\/|$)/;
 
@@ -124,9 +124,18 @@ self.addEventListener('fetch', (e) => {
 
     const path = url.pathname;
 
-    // Always fetch notifications-bell.js from network (never cache)
-    if (path === '/assets/js/global/notifications-bell.js') {
-        e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+    // Always fetch live UI scripts from network (never cache)
+    if (
+        path === '/assets/js/global/notifications-bell.js' ||
+        path === '/assets/js/global/chat-feed.js'
+    ) {
+        e.respondWith(fetch(e.request));
+        return;
+    }
+
+    // Chat API must never return stale data from cache
+    if (/^\/api\/chat\//.test(path)) {
+        e.respondWith(fetch(e.request));
         return;
     }
 

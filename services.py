@@ -2,7 +2,7 @@ import logging
 import secrets
 import datetime
 from typing import Dict, List, Optional, Tuple, Any
-from models import db, AccessKey, Announcement, File, Notification, User
+from models import db, AccessKey, Announcement, ChatMessage, File, Notification, User
 from sqlalchemy import func, desc
 
 
@@ -72,13 +72,18 @@ class AccessKeyService:
         Returns True if key was successfully used, False otherwise.
         """
         try:
-            # Use SELECT FOR UPDATE to lock the row and prevent race conditions
-            key_data = (
-                AccessKey.query
-                .filter_by(key=key_val)
-                .with_for_update()
-                .first()
-            )
+            bind = db.session.get_bind()
+            dialect_name = bind.dialect.name if bind is not None else ""
+            if dialect_name == "sqlite":
+                key_data = db.session.get(AccessKey, key_val)
+            else:
+                # Use SELECT FOR UPDATE to lock the row and prevent race conditions
+                key_data = (
+                    AccessKey.query
+                    .filter_by(key=key_val)
+                    .with_for_update()
+                    .first()
+                )
             
             if key_data and key_data.is_active:
                 key_data.used_count += 1
@@ -371,3 +376,86 @@ class NotificationService:
                 exc_info=True,
             )
             raise
+
+
+class ChatService:
+    """Manages the global live chat."""
+
+    MAX_HISTORY_LIMIT = 150
+
+    def _normalize_limit(self, limit: int) -> int:
+        return max(1, min(int(limit), self.MAX_HISTORY_LIMIT))
+
+    def create_message(self, user_id: str, message: str, commit: bool = True) -> ChatMessage:
+        try:
+            chat_message = ChatMessage(user_id=user_id, message=message)
+            db.session.add(chat_message)
+            if commit:
+                db.session.commit()
+                db.session.refresh(chat_message)
+            return chat_message
+        except Exception as e:
+            if commit:
+                db.session.rollback()
+            logging.error(
+                f"Error creating chat message for user {user_id}: {e}",
+                exc_info=True,
+            )
+            raise
+
+    def get_recent_messages(self, limit: int = MAX_HISTORY_LIMIT) -> List[ChatMessage]:
+        normalized_limit = self._normalize_limit(limit)
+        messages = (
+            ChatMessage.query.order_by(desc(ChatMessage.id))
+            .limit(normalized_limit)
+            .all()
+        )
+        return list(reversed(messages))
+
+    def get_messages_after(self, after_id: int, limit: int = MAX_HISTORY_LIMIT) -> List[ChatMessage]:
+        normalized_limit = self._normalize_limit(limit)
+        return (
+            ChatMessage.query.filter(ChatMessage.id > after_id)
+            .order_by(ChatMessage.id.asc())
+            .limit(normalized_limit)
+            .all()
+        )
+
+    def get_last_message_id(self) -> int:
+        last_id = db.session.query(func.max(ChatMessage.id)).scalar()
+        return int(last_id or 0)
+
+    def get_unread_count(self, user_id: str) -> int:
+        user = db.session.get(User, user_id)
+        if user is None:
+            return 0
+
+        seen_id = int(user.last_global_chat_seen_id or 0)
+        return (
+            ChatMessage.query.filter(
+                ChatMessage.id > seen_id,
+                ChatMessage.user_id != user_id,
+            ).count()
+        )
+
+    def mark_read(self, user_id: str, last_seen_id: int, commit: bool = True) -> int:
+        user = db.session.get(User, user_id)
+        if user is None:
+            return 0
+
+        target_seen_id = max(int(user.last_global_chat_seen_id or 0), max(0, int(last_seen_id)))
+        user.last_global_chat_seen_id = target_seen_id or None
+
+        try:
+            if commit:
+                db.session.commit()
+        except Exception as e:
+            if commit:
+                db.session.rollback()
+            logging.error(
+                f"Error marking global chat as read for user {user_id}: {e}",
+                exc_info=True,
+            )
+            raise
+
+        return self.get_unread_count(user_id)

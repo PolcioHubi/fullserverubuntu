@@ -1,9 +1,10 @@
 import pytest
 from datetime import datetime, timedelta
-from models import db, AccessKey, Announcement, Notification, User, File
+from models import db, AccessKey, Announcement, ChatMessage, Notification, User, File
 from services import (
     AccessKeyService,
     AnnouncementService,
+    ChatService,
     StatisticsService,
     NotificationService,
 )
@@ -241,6 +242,58 @@ def test_mark_notification_as_read(notification_service, registered_user, db_ses
 def test_mark_notification_as_read_nonexistent(notification_service):
     # Should not raise an error
     notification_service.mark_notification_as_read(99999) # Non-existent ID
+
+
+# Tests for ChatService
+def test_create_chat_message(chat_service, registered_user, db_session):
+    message = chat_service.create_message(registered_user["username"], "Hello global chat")
+    assert message.id is not None
+    assert message.user_id == registered_user["username"]
+    assert message.message == "Hello global chat"
+
+
+def test_get_recent_chat_messages_returns_oldest_first(chat_service, registered_user, db_session):
+    chat_service.create_message(registered_user["username"], "Pierwsza")
+    chat_service.create_message(registered_user["username"], "Druga")
+    messages = chat_service.get_recent_messages()
+    relevant = [m.message for m in messages if m.message in {"Pierwsza", "Druga"}]
+    assert relevant[-2:] == ["Pierwsza", "Druga"]
+
+
+def test_get_chat_messages_after(chat_service, registered_user, db_session):
+    first = chat_service.create_message(registered_user["username"], "M1")
+    chat_service.create_message(registered_user["username"], "M2")
+    chat_service.create_message(registered_user["username"], "M3")
+    messages = chat_service.get_messages_after(first.id)
+    assert [message.message for message in messages] == ["M2", "M3"]
+
+
+def test_chat_unread_excludes_own_messages(chat_service, registered_user, auth_manager, access_key_service, db_session):
+    key = access_key_service.generate_access_key("chat_user_key")
+    success, _, _ = auth_manager.register_user("chat_user_b", "password123", key, mark_tutorial_seen=True)
+    assert success is True
+
+    chat_service.create_message(registered_user["username"], "Własna wiadomość")
+    chat_service.create_message("chat_user_b", "Cudza wiadomość")
+
+    assert chat_service.get_unread_count(registered_user["username"]) == 1
+    assert chat_service.get_unread_count("chat_user_b") == 1
+
+
+def test_mark_chat_as_read_updates_last_seen(chat_service, registered_user, auth_manager, access_key_service, db_session):
+    key = access_key_service.generate_access_key("chat_user_key_2")
+    success, _, _ = auth_manager.register_user("chat_user_c", "password123", key, mark_tutorial_seen=True)
+    assert success is True
+
+    chat_service.create_message("chat_user_c", "Nowa wiadomość")
+    last_message = chat_service.create_message("chat_user_c", "Jeszcze nowsza wiadomość")
+
+    unread_count = chat_service.mark_read(registered_user["username"], last_message.id)
+    user = User.query.filter_by(username=registered_user["username"]).first()
+
+    assert user is not None
+    assert user.last_global_chat_seen_id == last_message.id
+    assert unread_count == 0
 
 
 # Tests for StatisticsService

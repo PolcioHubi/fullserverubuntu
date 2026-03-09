@@ -165,6 +165,9 @@ var notifBell = {
     openPanel: function () {
         var $standalone = $('[data-standalone]');
         var $wrapper = $('[data-wrapper]');
+        if (window.chatFeed && typeof window.chatFeed.closePanel === 'function') {
+            window.chatFeed.closePanel();
+        }
         $wrapper.addClass('scale[0.9]');
         $standalone.addClass('overflow[x-hidden] overflow[y-auto]').removeClass('overflow[hidden]');
         $('[data-group="navigation"]').addClass('display-none');

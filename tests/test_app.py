@@ -10,6 +10,22 @@ from app import manage_log_directory_size, load_data_from_file
 from bs4 import BeautifulSoup
 
 
+def _login_json_client(client, username, password):
+    login_page = client.get("/login")
+    soup = BeautifulSoup(login_page.data, "html.parser")
+    csrf_meta = soup.find("meta", {"name": "csrf-token"})
+    assert csrf_meta is not None
+    csrf_token = csrf_meta.get("content")
+    response = client.post(
+        "/login",
+        json={"username": username, "password": password},
+        headers={"X-CSRFToken": csrf_token},
+    )
+    assert response.status_code == 200
+    assert response.get_json()["success"] is True
+    return response
+
+
 def test_index_page(client):
     """
     Testuje, czy strona główna ładuje się poprawnie dla niezalogowanego
@@ -116,6 +132,101 @@ def test_notifications_api_flow(logged_in_client):
     notifications = response.get_json()
     assert len(notifications) == 1
     assert notifications[0]["is_read"] is True
+
+
+def test_chat_messages_api_flow(logged_in_client):
+    response = logged_in_client.get("/api/chat/messages")
+    assert response.status_code == 200
+    assert response.headers["Cache-Control"] == "private, no-cache, no-store, must-revalidate"
+
+    data = response.get_json()
+    assert data["success"] is True
+    assert data["items"] == []
+    assert data["unread_count"] == 0
+    assert data["last_message_id"] == 0
+
+    response = logged_in_client.post("/api/chat/messages", json={"message": "Witaj globalny chacie"})
+    assert response.status_code == 201
+    assert response.headers["Cache-Control"] == "private, no-cache, no-store, must-revalidate"
+
+    posted = response.get_json()
+    assert posted["success"] is True
+    assert posted["item"]["message"] == "Witaj globalny chacie"
+    assert posted["item"]["is_own"] is True
+    assert posted["item"]["created_at"].endswith("+00:00")
+
+    response = logged_in_client.get("/api/chat/messages")
+    data = response.get_json()
+    assert len(data["items"]) == 1
+    assert data["items"][0]["message"] == "Witaj globalny chacie"
+    assert data["last_message_id"] == data["items"][0]["id"]
+
+
+def test_chat_messages_after_returns_only_newer_entries(logged_in_client):
+    first_response = logged_in_client.post("/api/chat/messages", json={"message": "Pierwsza"})
+    second_response = logged_in_client.post("/api/chat/messages", json={"message": "Druga"})
+
+    first_id = first_response.get_json()["item"]["id"]
+    second_id = second_response.get_json()["item"]["id"]
+
+    response = logged_in_client.get(f"/api/chat/messages?after_id={first_id}")
+    data = response.get_json()
+
+    assert response.status_code == 200
+    assert [item["id"] for item in data["items"]] == [second_id]
+    assert [item["message"] for item in data["items"]] == ["Druga"]
+
+
+def test_chat_flow_between_two_logged_in_users(app, auth_manager, access_key_service, registered_user):
+    key = access_key_service.generate_access_key("chat_second_user")
+    success, _, _ = auth_manager.register_user("chat_user_b", "password123", key, mark_tutorial_seen=True)
+    assert success is True
+
+    client_a = app.test_client()
+    client_b = app.test_client()
+
+    _login_json_client(client_a, registered_user["username"], registered_user["password"])
+
+    response = client_a.post("/api/chat/messages", json={"message": "Hej od A"})
+    assert response.status_code == 201
+    assert response.get_json()["item"]["user_id"] == registered_user["username"]
+
+    unread_a = client_a.get("/api/chat/unread").get_json()
+    assert unread_a["unread_count"] == 0
+
+    _login_json_client(client_b, "chat_user_b", "password123")
+    unread_b = client_b.get("/api/chat/unread").get_json()
+    assert unread_b["unread_count"] == 1
+
+    messages_b = client_b.get("/api/chat/messages").get_json()
+    assert messages_b["items"][-1]["message"] == "Hej od A"
+    assert messages_b["items"][-1]["is_own"] is False
+
+    read_response = client_b.post(
+        "/api/chat/read",
+        json={"last_seen_id": messages_b["last_message_id"]},
+    )
+    assert read_response.status_code == 200
+    assert read_response.get_json()["unread_count"] == 0
+
+    unread_b_after = client_b.get("/api/chat/unread").get_json()
+    assert unread_b_after["unread_count"] == 0
+
+
+def test_chat_api_rejects_invalid_messages(logged_in_client):
+    empty_response = logged_in_client.post("/api/chat/messages", json={"message": "   "})
+    assert empty_response.status_code == 400
+    assert "Wiadomość nie może być pusta" in empty_response.get_json()["error"]
+
+    too_long_response = logged_in_client.post("/api/chat/messages", json={"message": "a" * 2001})
+    assert too_long_response.status_code == 400
+    assert "maksymalnie 2000 znaków" in too_long_response.get_json()["error"]
+
+
+def test_chat_asset_is_served_without_cache(client):
+    response = client.get("/assets/js/global/chat-feed.js")
+    assert response.status_code == 200
+    assert response.headers["Cache-Control"] == "private, no-cache, no-store, must-revalidate"
 
 
 def test_main_form_image_upload(logged_in_client):
@@ -484,25 +595,19 @@ def test_main_form_modifies_existing_file(logged_in_client, registered_user):
     import os
     from bs4 import BeautifulSoup
 
-    output_file_path = os.path.join("user_data", username, "files", "dowodnowy.html")
+    output_file_path = os.path.join("user_data", username, "files", "dowodnowy_new.html")
     assert os.path.exists(output_file_path)
 
     with open(output_file_path, "r", encoding="utf-8") as f:
         soup = BeautifulSoup(f, "html.parser")
 
-    # Sprawdź, czy imię zostało zaktualizowane
-    name_label = soup.find("p", class_="sub", string="Imię (Imiona)")
-    assert name_label is not None, "Name label should exist"
-    name_value = name_label.find_previous_sibling("p")
-    assert name_value is not None, "Name value should exist"
-    assert name_value.string == "ADAM"  # type: ignore[union-attr]
+    first_name_value = soup.find(attrs={"data-placeholder": "mdowod_first_name"})
+    assert first_name_value is not None, "First name placeholder should exist"
+    assert first_name_value.get_text(strip=True) == "ADAM"
 
-    # Sprawdź, czy nazwisko zostało zaktualizowane
-    surname_label = soup.find("p", class_="sub", string="Nazwiskо")
-    assert surname_label is not None, "Surname label should exist"
-    surname_value = surname_label.find_previous_sibling("p")
-    assert surname_value is not None, "Surname value should exist"
-    assert surname_value.string == "DRUGI"  # type: ignore[union-attr]
+    last_name_value = soup.find(attrs={"data-placeholder": "mdowod_last_name"})
+    assert last_name_value is not None, "Last name placeholder should exist"
+    assert last_name_value.get_text(strip=True) == "DRUGI"
 
 
 # New tests for app.py functions

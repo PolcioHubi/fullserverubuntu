@@ -289,10 +289,10 @@ class TestManifestJson:
         assert "start_url" in data
 
     def test_manifest_start_url(self, client):
-        """start_url w manifeście wskazuje na /documents."""
+        """start_url w manifeście wskazuje na ekran logowania PWA."""
         resp = client.get("/manifest.json")
         data = json.loads(resp.data)
-        assert data["start_url"] == "/documents"
+        assert data["start_url"] == "/login?pwa=1&next=%2Fdocuments"
 
     def test_manifest_display_standalone(self, client):
         """display jest ustawiony na standalone (tryb PWA)."""
