@@ -1,8 +1,11 @@
-const CACHE_NAME = 'mobywatel-v5';
+const CACHE_NAME = 'mobywatel-v6';
+const APP_LOGIN_URL = '/login?pwa=1&next=%2Fdocuments';
+const HTML_ROUTE_PATTERN = /^\/(documents|services|more|qr_code|login)(\/|$)/;
 
 // Core assets to precache on install — everything needed for instant PWA load
 const PRECACHE_ASSETS = [
     // HTML pages (shell)
+    APP_LOGIN_URL,
     '/login',
     '/documents',
     '/services',
@@ -77,6 +80,10 @@ const PRECACHE_ASSETS = [
     '/manifest.json'
 ];
 
+function getHtmlCacheKey(pathname) {
+    return new Request(pathname, { credentials: 'same-origin' });
+}
+
 self.addEventListener('install', (e) => {
     e.waitUntil(
         caches.open(CACHE_NAME).then(cache => {
@@ -141,13 +148,14 @@ self.addEventListener('fetch', (e) => {
     }
 
     // Stale-while-revalidate for HTML pages — instant from cache, update in background
-    if (/^\/(documents|services|more|qr_code|login)(\/|$)/.test(path)) {
+    if (HTML_ROUTE_PATTERN.test(path)) {
+        const cacheKey = getHtmlCacheKey(path);
         e.respondWith(
-            caches.match(e.request).then(cached => {
+            caches.match(cacheKey).then(cached => {
                 const fetchPromise = fetch(e.request).then(response => {
                     if (response.ok) {
                         const clone = response.clone();
-                        caches.open(CACHE_NAME).then(c => c.put(e.request, clone));
+                        caches.open(CACHE_NAME).then(c => c.put(cacheKey, clone));
                     }
                     return response;
                 }).catch(() => cached);

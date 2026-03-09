@@ -29,6 +29,27 @@ const requests = {
 
 $(async function() {
     // Service Worker registration is handled by worker-starter.js
+    const currentUrl = new URL(window.location.href);
+    const path = currentUrl.pathname
+        .replace(/^\/+|\/+$/g, '')
+        .toLowerCase()
+        .split('/')
+        .pop();
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+        || window.navigator.standalone === true;
+    const pwaLaunchGuardKey = 'pwa-login-launch-checked';
+
+    if (isStandalone && sessionStorage.getItem(pwaLaunchGuardKey) !== '1') {
+        sessionStorage.setItem(pwaLaunchGuardKey, '1');
+
+        if (path !== 'login') {
+            const nextTarget = path
+                ? `${currentUrl.pathname}${currentUrl.search}${currentUrl.hash}`
+                : '/documents';
+            window.location.replace(`/login?pwa=1&next=${encodeURIComponent(nextTarget)}`);
+            return;
+        }
+    }
 
     $('[data-route]').on('click', function() {
         navigateTo($(this).data('route'));
@@ -124,17 +145,12 @@ $(async function() {
     });
     
     $('[data-button="logout"]').on('click', async function() {
+        sessionStorage.removeItem(pwaLaunchGuardKey);
         const response = await requests.post('/api/authorization/logout');
         if (response.success) {
             navigateTo('/login');
         }
     });
-
-    const path = window.location.pathname
-        .replace(/^\/+|\/+$/g, '')
-        .toLowerCase()
-        .split('/')
-        .pop();
 
     switch (path) {
         case '':

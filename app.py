@@ -445,12 +445,12 @@ def set_security_headers(response):
     # CRITICAL: connect-src MUST include api.qrserver.com for Fetch API in Service Worker!
     csp = (
         "default-src 'self'; "
-        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com; "
-        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com https://challenges.cloudflare.com; "
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://challenges.cloudflare.com; "
         "img-src 'self' data: blob: https://api.qrserver.com; "
         "font-src 'self' data: https://fonts.gstatic.com; "
         "connect-src 'self' https://api.qrserver.com; "
-        "frame-src 'self'; "
+        "frame-src 'self' https://challenges.cloudflare.com; "
         "manifest-src 'self'; "
         "object-src 'none'; "
         "base-uri 'self';"
