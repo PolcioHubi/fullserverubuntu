@@ -20,7 +20,7 @@ GUNICORN_WORKERS=$((2 * $(nproc) + 1))
 # POPRAWKA: Polityka CSP dopasowana do potrzeb aplikacji (QR codes, fonty zewnętrzne, Service Worker)
 # WAŻNE: connect-src musi zawierać api.qrserver.com dla Fetch API w Service Worker!
 # WAŻNE: worker-src 'self' jest wymagany dla Service Workera!
-CSP_HEADER="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://185-167-99-62.cloud-xip.com/cdn-cgi/; style-src 'self' 'unsafe-inline' https://challenges.cloudflare.com; img-src 'self' data: blob: https://api.qrserver.com; font-src 'self' data:; connect-src 'self' https://api.qrserver.com https://challenges.cloudflare.com; frame-src 'self' https://challenges.cloudflare.com; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self';"
+CSP_HEADER="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://185-167-99-62.cloud-xip.com/cdn-cgi/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://challenges.cloudflare.com; img-src 'self' data: blob: https://api.qrserver.com; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://api.qrserver.com https://challenges.cloudflare.com https://fonts.googleapis.com https://fonts.gstatic.com; frame-src 'self' https://challenges.cloudflare.com; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self';"
 
 
 echo ">>> START: Rozpoczynanie wdrożenia aplikacji $SERVICE_NAME..."

@@ -470,7 +470,7 @@ def set_security_headers(response):
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://challenges.cloudflare.com; "
         "img-src 'self' data: blob: https://api.qrserver.com; "
         "font-src 'self' data: https://fonts.gstatic.com; "
-        "connect-src 'self' https://api.qrserver.com; "
+        "connect-src 'self' https://api.qrserver.com https://fonts.googleapis.com https://fonts.gstatic.com; "
         "frame-src 'self' https://challenges.cloudflare.com; "
         "manifest-src 'self'; "
         "object-src 'none'; "
