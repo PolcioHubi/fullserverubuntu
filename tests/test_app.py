@@ -105,6 +105,21 @@ def test_login_and_logout(client, registered_user):
     assert title_tag.text.strip() == "Logowanie"
 
 
+def test_login_page_still_renders_for_authenticated_user(client, registered_user):
+    """
+    Testuje, czy ekran logowania nadal renderuje się nawet dla zalogowanego
+    użytkownika, aby PWA zawsze mogło startować od logowania.
+    """
+    _login_json_client(client, registered_user["username"], registered_user["password"])
+
+    response = client.get("/login?next=%2Fdocuments", follow_redirects=False)
+    assert response.status_code == 200
+    soup = BeautifulSoup(response.data, "html.parser")
+    title_tag = soup.find("title")
+    assert title_tag is not None
+    assert title_tag.text.strip() == "Logowanie"
+
+
 def test_notifications_api_flow(logged_in_client):
     """
     Testuje API powiadomień: pobieranie powiadomień i oznaczanie ich

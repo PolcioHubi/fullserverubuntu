@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mobywatel-v7';
+const CACHE_NAME = 'mobywatel-v8';
 const APP_LOGIN_URL = '/login?pwa=1&next=%2Fdocuments';
 const HTML_ROUTE_PATTERN = /^\/(documents|services|more|qr_code|login)(\/|$)/;
 
