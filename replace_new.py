@@ -22,8 +22,7 @@ def replace_html_data_new(soup, new_data):
         )
 
     def set_placeholder(name, value):
-        el = soup.find(attrs={"data-placeholder": name})
-        if el:
+        for el in soup.find_all(attrs={"data-placeholder": name}):
             el.string = value
 
     # Main card fields
@@ -59,6 +58,9 @@ def replace_html_data_new(soup, new_data):
 
     # Identity card panel
     set_placeholder("personal_id_series", safe_get("seria_numer_dowodu"))
+    set_placeholder("dowod_issuer", "Ważny")
+    issuer = safe_get("organ_wydajacy_dowodu")
+    set_placeholder("personal_id_issuer", issuer if issuer else "PREZYDENT M.ST. WARSZAWY")
     set_placeholder("personal_id_expiration", safe_get("termin_waznosci_dowodu"))
     set_placeholder("personal_id_issue", safe_get("data_wydania_dowodu"))
 

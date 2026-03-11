@@ -1,5 +1,6 @@
 const MDOWOD_IMAGE_URL = "/assets/img/extracted-images/mdowod.png";
 const MDOWOD_FACE_PATH = "/assets/img/photos/mdowod_face.jpg";
+const MDOWOD_ISSUER_FALLBACK = "PREZYDENT M.ST. WARSZAWY";
 
 // Canvas Background Plugin
 (function($) {
@@ -87,13 +88,16 @@ const mdowodManager = {
             const item = await requests.get("/api/data/get/details");
             if (item.success) {
                 const d = item.data;
+                const issuer = typeof d.mdowod?.personal?.issuer === "string" && d.mdowod.personal.issuer.trim()
+                    ? d.mdowod.personal.issuer
+                    : MDOWOD_ISSUER_FALLBACK;
                 this.placeholders.$first_name.html(d.mdowod.main.first_name);
                 this.placeholders.$last_name.html(d.mdowod.main.last_name);
                 this.placeholders.$birthday.html(d.mdowod.main.birthday);
                 this.placeholders.$pesel.html(d.mdowod.main.pesel);
                 this.placeholders.$picture.attr("src", MDOWOD_FACE_PATH);
                 this.placeholders.$id_series.html(d.mdowod.personal.series);
-                this.placeholders.$id_issuer.html(d.mdowod.personal.issuer);
+                this.placeholders.$id_issuer.html(issuer);
                 this.placeholders.$id_expiration.html(d.mdowod.personal.expiration);
                 this.placeholders.$id_issue.html(d.mdowod.personal.issue);
                 this.placeholders.$mdowod_series.html(d.mdowod.other.series);

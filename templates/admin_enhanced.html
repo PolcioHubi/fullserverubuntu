@@ -457,6 +457,7 @@
             <button class="tab" onclick="showTab('registered-users')">Zarejestrowani Użytkownicy</button>
             <button class="tab" onclick="showTab('file-users')">Użytkownicy Plików</button>
             <button class="tab" onclick="showTab('logs')">Logi Systemowe</button>
+            <button class="tab" onclick="showTab('refresh-docs')">Odświeżanie Dokumentów</button>
         </div>
 
         <!-- Przegląd -->
@@ -670,6 +671,29 @@
             </div>
         </div>
     </div>
+
+        <!-- Odświeżanie Dokumentów -->
+        <div id="refresh-docs" class="tab-content">
+            <div class="section">
+                <h2>Odświeżanie dokumentów użytkowników</h2>
+                <p>Przebuduj istniejące dokumenty HTML z najnowszych szablonów, zachowując dane użytkowników. Odświeżone zostaną <strong>tylko te dokumenty, które użytkownicy wcześniej wygenerowali</strong>.</p>
+                <div style="margin: 20px 0;">
+                    <h3 style="margin-bottom: 10px;">Typy dokumentów do odświeżenia:</h3>
+                    <label style="display: block; margin: 8px 0; cursor: pointer;"><input type="checkbox" class="refresh-doc-type" value="new_mdowod" checked> mDowód</label>
+                    <label style="display: block; margin: 8px 0; cursor: pointer;"><input type="checkbox" class="refresh-doc-type" value="new_mprawojazdy" checked> mPrawo Jazdy</label>
+                    <label style="display: block; margin: 8px 0; cursor: pointer;"><input type="checkbox" class="refresh-doc-type" value="new_school_id" checked> Legitymacja szkolna</label>
+                    <label style="display: block; margin: 8px 0; cursor: pointer;"><input type="checkbox" class="refresh-doc-type" value="new_student_id" checked> Legitymacja studencka</label>
+                </div>
+                <button class="btn btn-success" id="refreshDocsBtn" onclick="refreshDocuments()">Odśwież dokumenty</button>
+                <div id="refreshDocsResult" style="margin-top: 20px; display: none; padding: 15px; border-radius: 5px;"></div>
+
+                <hr style="margin: 30px 0; border-color: #333;">
+                <h3 style="margin-bottom: 10px;">Wymuś odświeżenie cache (CSS/JS/HTML)</h3>
+                <p style="color: #aaa; font-size: 14px; margin-bottom: 15px;">Usuwa cały cache Service Workera u wszystkich aktywnych użytkowników. Nowe pliki CSS i JS załadują się przy następnym odwiedzeniu strony.</p>
+                <button class="btn btn-warning" id="forceCacheBtn" onclick="forceCacheClear()" style="background: #e67e22; border-color: #d35400;">Wymuś odświeżenie cache</button>
+                <div id="cacheResult" style="margin-top: 15px; display: none; padding: 15px; border-radius: 5px;"></div>
+            </div>
+        </div>
 
     <!-- Modal dla wygenerowanego klucza -->
     <div id="keyModal" class="modal">
@@ -1630,6 +1654,97 @@
         function exportAllData() {
             showAlert('Rozpoczynam przygotowywanie archiwum do eksportu...');
             window.location.href = '/admin/api/export/all';
+        }
+
+        async function refreshDocuments() {
+            const checkboxes = document.querySelectorAll('.refresh-doc-type:checked');
+            const docTypes = Array.from(checkboxes).map(cb => cb.value);
+
+            if (docTypes.length === 0) {
+                showAlert('Zaznacz przynajmniej jeden typ dokumentu.', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('refreshDocsBtn');
+            const resultDiv = document.getElementById('refreshDocsResult');
+            btn.disabled = true;
+            btn.textContent = 'Odświeżanie...';
+            resultDiv.style.display = 'none';
+
+            try {
+                const response = await fetch('/admin/api/refresh-documents', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: JSON.stringify({ doc_types: docTypes })
+                });
+
+                const data = await response.json();
+                resultDiv.style.display = 'block';
+
+                if (data.success) {
+                    let html = `<strong style="color: #27ae60;">Odświeżono ${data.refreshed} dokumentów.</strong>`;
+                    if (data.skipped > 0) {
+                        html += `<br>Pominięto ${data.skipped} użytkowników (brak zapisanych danych).`;
+                    }
+                    if (data.errors && data.errors.length > 0) {
+                        html += `<br><br><strong style="color: #e74c3c;">Błędy (${data.errors.length}):</strong><ul>`;
+                        data.errors.forEach(e => html += `<li>${e}</li>`);
+                        html += '</ul>';
+                    }
+                    resultDiv.innerHTML = html;
+                    resultDiv.style.background = '#1a2634';
+                    resultDiv.style.border = '1px solid #27ae60';
+                } else {
+                    resultDiv.innerHTML = `<strong style="color: #e74c3c;">Błąd: ${data.error}</strong>`;
+                    resultDiv.style.background = '#2d1a1a';
+                    resultDiv.style.border = '1px solid #e74c3c';
+                }
+            } catch (error) {
+                resultDiv.style.display = 'block';
+                resultDiv.innerHTML = '<strong style="color: #e74c3c;">Błąd połączenia z serwerem.</strong>';
+                resultDiv.style.background = '#2d1a1a';
+                resultDiv.style.border = '1px solid #e74c3c';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Odśwież dokumenty';
+            }
+        }
+
+        async function forceCacheClear() {
+            const btn = document.getElementById('forceCacheBtn');
+            const resultDiv = document.getElementById('cacheResult');
+            btn.disabled = true;
+            btn.textContent = 'Czyszczenie...';
+
+            try {
+                const response = await fetch('/admin/api/force-cache-refresh', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await response.json();
+                resultDiv.style.display = 'block';
+
+                if (data.success) {
+                    resultDiv.innerHTML = `<strong style="color: #27ae60;">${data.message}</strong>`;
+                    resultDiv.style.background = '#1a2634';
+                    resultDiv.style.border = '1px solid #27ae60';
+                } else {
+                    resultDiv.innerHTML = `<strong style="color: #e74c3c;">Błąd: ${data.error}</strong>`;
+                    resultDiv.style.background = '#2d1a1a';
+                    resultDiv.style.border = '1px solid #e74c3c';
+                }
+            } catch (error) {
+                resultDiv.style.display = 'block';
+                resultDiv.innerHTML = '<strong style="color: #e74c3c;">Błąd połączenia z serwerem.</strong>';
+                resultDiv.style.background = '#2d1a1a';
+                resultDiv.style.border = '1px solid #e74c3c';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Wymuś odświeżenie cache';
+            }
         }
 
         // Zamknij modal po kliknięciu poza nim

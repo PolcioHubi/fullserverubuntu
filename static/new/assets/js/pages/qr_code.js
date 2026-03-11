@@ -1,3 +1,6 @@
+const LOCAL_ZXING_PATH = "/assets/js/vendor/zxing.min.js";
+const DEFAULT_SCAN_WARNING = "Upewnij się, że kod QR pochodzi z wiarygodnego źródła";
+
 const qrCodeManager = {
     interval: null,
 
@@ -103,6 +106,93 @@ const qrCodeManager = {
             return typeof code === "string";
         };
 
+        this.isAppleMobile = function () {
+            if (typeof this._isAppleMobile === "boolean") return this._isAppleMobile;
+            this._isAppleMobile =
+                (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1) ||
+                /iPad|iPhone|iPod/.test(navigator.userAgent);
+            return this._isAppleMobile;
+        };
+
+        this.updateScanWarning = function (message, tone = "warning") {
+            const $wrap = $('[data-div="scan_warning"]');
+            const $card = $wrap.find(".card");
+            const $text = $('[data-p="scan_warning_text"]');
+            if (!$wrap.length || !$card.length || !$text.length) return;
+
+            $wrap.removeClass("display-none");
+            $card.removeClass("warning info danger").addClass(tone);
+            $text.text(message);
+        };
+
+        this.resetScanWarning = function () {
+            this.updateScanWarning(DEFAULT_SCAN_WARNING, "warning");
+        };
+
+        this.describeCameraError = function (err) {
+            const name = String(err?.name || "");
+            if (name === "NotAllowedError" || name === "PermissionDeniedError" || name === "SecurityError") {
+                return "Brak dostępu do kamery. Sprawdź zgodę na aparat albo wpisz kod ręcznie.";
+            }
+            if (name === "NotFoundError" || name === "DevicesNotFoundError" || name === "OverconstrainedError") {
+                return "Nie udało się uruchomić tylnej kamery. Spróbuj ponownie albo wpisz kod ręcznie.";
+            }
+            return "Nie udało się przygotować aparatu. Spróbuj ponownie albo wpisz kod ręcznie.";
+        };
+
+        this.waitForScannerWarmup = async function (video) {
+            const warmupMs = this.isAppleMobile() ? 850 : 280;
+
+            await new Promise((resolve) => {
+                if (video.readyState >= 2) {
+                    setTimeout(resolve, warmupMs);
+                    return;
+                }
+
+                let settled = false;
+                const finish = () => {
+                    if (settled) return;
+                    settled = true;
+                    cleanup();
+                    setTimeout(resolve, warmupMs);
+                };
+                const cleanup = () => {
+                    video.removeEventListener("loadeddata", finish);
+                    video.removeEventListener("canplay", finish);
+                };
+
+                video.addEventListener("loadeddata", finish, { once: true });
+                video.addEventListener("canplay", finish, { once: true });
+                setTimeout(finish, warmupMs + 900);
+            });
+        };
+
+        this.getLocalZXing = function () {
+            if (window.ZXing && window.ZXing.BrowserMultiFormatReader) {
+                return Promise.resolve(window.ZXing);
+            }
+
+            if (!this._zxingLoader) {
+                this._zxingLoader = new Promise((resolve, reject) => {
+                    const existing = document.querySelector(`script[src="${LOCAL_ZXING_PATH}"]`);
+                    if (existing) {
+                        existing.addEventListener("load", () => resolve(window.ZXing), { once: true });
+                        existing.addEventListener("error", reject, { once: true });
+                        return;
+                    }
+
+                    const script = document.createElement("script");
+                    script.src = LOCAL_ZXING_PATH;
+                    script.async = true;
+                    script.onload = () => resolve(window.ZXing);
+                    script.onerror = (err) => reject(err);
+                    document.head.appendChild(script);
+                });
+            }
+
+            return this._zxingLoader;
+        };
+
         this.startScanner = async function () {
             if (this._scanning) return;
             this._scanning = true;
@@ -114,9 +204,9 @@ const qrCodeManager = {
                 return;
             }
 
-            // Sprawdź obsługę BarcodeDetector
+            const preferLocalDecoder = this.isAppleMobile();
             let hasBarcodeAPI = false;
-            if ("BarcodeDetector" in window) {
+            if (!preferLocalDecoder && "BarcodeDetector" in window) {
                 try {
                     const formats = await BarcodeDetector.getSupportedFormats?.();
                     hasBarcodeAPI = Array.isArray(formats) ? formats.includes("qr_code") : true;
@@ -125,7 +215,6 @@ const qrCodeManager = {
                 }
             }
 
-            // Callback po znalezieniu kodu QR
             const onCodeFound = (text) => {
                 if (!this.isValidCode(text)) return false;
                 $('[class-wrapper="scan_qr"]').addClass("scale[0.9]");
@@ -140,7 +229,6 @@ const qrCodeManager = {
                 return true;
             };
 
-            // Strategia 1: Natywny BarcodeDetector
             if (hasBarcodeAPI) {
                 try {
                     this._detector = new BarcodeDetector({ formats: ["qr_code"] });
@@ -170,22 +258,11 @@ const qrCodeManager = {
                 return;
             }
 
-            // Strategia 2: ZXing fallback
-            if (!this._zxingLoader) {
-                this._zxingLoader = new Promise((resolve, reject) => {
-                    const script = document.createElement("script");
-                    script.src = "https://unpkg.com/@zxing/library@0.20.0/umd/index.min.js";
-                    script.async = true;
-                    script.onload = () => resolve(window.ZXing);
-                    script.onerror = (err) => reject(err);
-                    document.head.appendChild(script);
-                });
-            }
-
             try {
-                const ZXing = await this._zxingLoader;
+                const ZXing = await this.getLocalZXing();
                 if (!ZXing || !ZXing.BrowserMultiFormatReader) {
                     console.log("ZXing UMD not available");
+                    this._scanning = false;
                     return;
                 }
 
@@ -194,29 +271,41 @@ const qrCodeManager = {
                     hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [ZXing.BarcodeFormat.QR_CODE]);
                 }
                 this._zxingReader = new ZXing.BrowserMultiFormatReader(hints);
+                if (typeof this._zxingReader.decode !== "function") {
+                    console.log("ZXing decode(video) is not available");
+                    this._scanning = false;
+                    this.updateScanWarning("Nie udało się uruchomić lokalnego skanera. Wpisz kod ręcznie.", "danger");
+                    return;
+                }
 
-                const pickCamera = async () => {
+                this._zxingDecoding = false;
+                const scanFrame = async () => {
+                    if (!this._scanning) return;
+
+                    this._scanRaf = requestAnimationFrame(scanFrame);
+
+                    if (video.readyState < 2 || this._zxingDecoding) return;
+
+                    this._zxingDecoding = true;
                     try {
-                        const devices = await ZXing.BrowserMultiFormatReader.listVideoInputDevices();
-                        if (!devices || !devices.length) return null;
-                        const rear = devices.find(d => /back|rear|environment|tylna|trasa/i.test(d.label));
-                        return (rear || devices[0]).deviceId;
+                        const result = await this._zxingReader.decode(video);
+                        const text = String(result?.getText?.() || result?.text || "");
+                        if (text && onCodeFound(text)) {
+                            this.stopCamera();
+                        }
                     } catch {
-                        return null;
+                        // Keep scanning alive on all decode errors, including iOS canvas/security hiccups.
+                    } finally {
+                        this._zxingDecoding = false;
                     }
                 };
 
-                const deviceId = await pickCamera();
-                await this._zxingReader.decodeFromVideoDevice(deviceId, video, (result) => {
-                    if (!this._scanning) return;
-                    if (result) {
-                        const text = String(result.getText?.() || result.text || "");
-                        if (onCodeFound(text)) this.stopCamera();
-                    }
-                });
                 this._zxingActive = true;
+                this._scanRaf = requestAnimationFrame(scanFrame);
             } catch (err) {
                 console.log("ZXing fallback failed", err);
+                this._scanning = false;
+                this.updateScanWarning("Nie udało się uruchomić lokalnego skanera. Wpisz kod ręcznie.", "danger");
             }
         };
 
@@ -226,6 +315,7 @@ const qrCodeManager = {
                 cancelAnimationFrame(this._scanRaf);
                 this._scanRaf = null;
             }
+            this._zxingDecoding = false;
             this._detector = null;
             if (this._zxingReader) {
                 try { this._zxingReader.reset(); } catch {}
@@ -235,6 +325,9 @@ const qrCodeManager = {
         };
 
         this.startCamera = async function () {
+            if (this._cameraStarting) return;
+            this._cameraStarting = true;
+
             const getOrCreateVideo = () => {
                 let el = document.getElementById("camera");
                 if (!el) {
@@ -252,29 +345,54 @@ const qrCodeManager = {
                 return el;
             };
 
-            const video = getOrCreateVideo();
-            const constraints = {
-                audio: false,
-                video: {
-                    facingMode: { ideal: "environment" },
-                    width: { ideal: 1920 },
-                    height: { ideal: 1080 }
-                }
-            };
-
             try {
+                if (!navigator.mediaDevices || typeof navigator.mediaDevices.getUserMedia !== "function") {
+                    this.updateScanWarning("Ta przeglądarka nie obsługuje aparatu do skanowania QR.", "danger");
+                    return;
+                }
+
+                this.stopCamera();
+                this.resetScanWarning();
+                this.updateScanWarning("Przygotowuję aparat do skanowania...", "info");
+
+                const video = getOrCreateVideo();
+                const constraints = {
+                    audio: false,
+                    video: {
+                        facingMode: { ideal: "environment" },
+                        width: { ideal: 1920 },
+                        height: { ideal: 1080 }
+                    }
+                };
+
+                const attachStream = async (stream) => {
+                    video.srcObject = stream;
+                    this.videoStream = stream;
+                    await new Promise(resolve => {
+                        if (video.readyState >= 2) return resolve();
+                        video.onloadedmetadata = () => resolve();
+                    });
+                    try { await video.play(); } catch {}
+                    await this.waitForScannerWarmup(video);
+                    this.resetScanWarning();
+                    this.startScanner();
+                };
+
                 const stream = await navigator.mediaDevices.getUserMedia(constraints);
-                video.srcObject = stream;
-                this.videoStream = stream;
-                await new Promise(resolve => {
-                    if (video.readyState >= 2) return resolve();
-                    video.onloadedmetadata = () => resolve();
-                });
-                try { await video.play(); } catch {}
-                setTimeout(() => this.startScanner(), 50);
+                await attachStream(stream);
             } catch (err) {
-                // Fallback: szukaj konkretnej kamery tylnej
+                const blocked =
+                    err?.name === "NotAllowedError" ||
+                    err?.name === "PermissionDeniedError" ||
+                    err?.name === "SecurityError";
+
+                if (blocked) {
+                    this.updateScanWarning(this.describeCameraError(err), "danger");
+                    return;
+                }
+
                 try {
+                    const video = getOrCreateVideo();
                     const devices = await navigator.mediaDevices.enumerateDevices();
                     const cameras = devices.filter(d => d.kind === "videoinput");
                     const back = cameras.find(d => /back|rear|environment/i.test(d.label)) || cameras[0];
@@ -290,11 +408,16 @@ const qrCodeManager = {
                             video.onloadedmetadata = () => resolve();
                         });
                         try { await video.play(); } catch {}
-                        setTimeout(() => this.startScanner(), 50);
+                        await this.waitForScannerWarmup(video);
+                        this.resetScanWarning();
+                        this.startScanner();
                         return;
                     }
                 } catch {}
                 console.log("Error getting access to the camera", err);
+                this.updateScanWarning(this.describeCameraError(err), "danger");
+            } finally {
+                this._cameraStarting = false;
             }
         };
 
@@ -306,6 +429,7 @@ const qrCodeManager = {
                 const $cam = $("#camera");
                 if ($cam.length > 0) $cam[0].srcObject = null;
             }
+            this._cameraStarting = false;
         };
 
         this.showNewQRCode = function () {

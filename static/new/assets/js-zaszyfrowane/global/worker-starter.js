@@ -1,47 +1,44 @@
 (function () {
     if (!('serviceWorker' in navigator)) return;
     const SW_URL = '/service-worker.js';
+    var reloading = false;
     function registerSW() {
-        navigator.serviceWorker.register(SW_URL, { scope: '/' }).then(reg => {
+        navigator.serviceWorker.register(SW_URL, { scope: '/', updateViaCache: 'none' }).then(reg => {
             console.log('[SW] registered:', reg.scope);
-            if (reg.installing) trackInstalling(reg.installing, reg);
+            if (reg.installing) trackInstalling(reg.installing);
             reg.addEventListener('updatefound', () => {
-                if (reg.installing) trackInstalling(reg.installing, reg);
+                if (reg.installing) trackInstalling(reg.installing);
             });
+            // Force update check on every page load
+            reg.update().catch(() => {});
         }).catch(err => {
             console.warn('[SW] register error:', err);
         });
 
         navigator.serviceWorker.addEventListener('controllerchange', () => {
+            if (reloading) return;
+            reloading = true;
             console.log('[SW] controller changed → reload');
             window.location.reload();
         });
 
         navigator.serviceWorker.addEventListener('message', (e) => {
-            const d = e.data || {};
+            var d = e.data || {};
             if (d.type === 'REQUEST_SOURCE') {
-                console.log(`[SW] ${d.source}: ${d.url}`);
+                console.log('[SW] ' + d.source + ': ' + d.url);
             }
-            if (d.type === 'NEW_VERSION_AVAILABLE') {
-                const ok = confirm('Dostępna jest nowa wersja aplikacji. Zainstalować teraz?');
-                if (ok && navigator.serviceWorker.controller) {
-                    navigator.serviceWorker.controller.postMessage({ type: 'SKIP_WAITING' });
-                }
+            if (d.type === 'CACHE_CLEARED') {
+                console.log('[SW] cache cleared by admin');
+                window.location.reload();
             }
         });
     }
 
-    function trackInstalling(worker, reg) {
+    function trackInstalling(worker) {
         worker.addEventListener('statechange', () => {
-            if (worker.state === 'installed') {
-                if (navigator.serviceWorker.controller) {
-                    navigator.serviceWorker.ready.then(() => {
-                        window.postMessage({ type: 'sw-update-ready' }, window.location.origin);
-                        navigator.serviceWorker.controller.postMessage({ type: 'UPDATE_READY' });
-                    });
-                } else {
-                    console.log('[SW] first install complete');
-                }
+            if (worker.state === 'installed' && navigator.serviceWorker.controller) {
+                // Auto-activate new SW without asking user
+                worker.postMessage({ type: 'SKIP_WAITING' });
             }
         });
     }

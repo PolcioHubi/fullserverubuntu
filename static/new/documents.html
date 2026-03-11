@@ -42,7 +42,7 @@
     <script src='/assets/js/global/notifications-bell.js'></script>
     <script src='/assets/js/global/chat-feed.js?v=20260309-chat-input'></script>
                     <!-- Main JavaScript -->
-    <script src="/assets/js/script.js?v=20260309-documents-layout"></script>
+    <script src="/assets/js/script.js?v=20260310-documents-hydration"></script>
     <script src="/assets/js/global/enhancements.js" defer></script>
     <!-- Title -->
     <title>mObywatel</title>
@@ -76,7 +76,7 @@
                     </div>
                 </div>
             </div>
-            <div class="documents-layout-root pagePop" data-documents-layout-root>
+            <div class="documents-layout-root pagePop" data-documents-layout-root data-documents-ready="0">
                 <div class="documents-layout-view documents-layout-overlap relative fillWidth max-height[810px]" data-layout-view="overlap">
                     <div class="absolute z[1] flex top[0px] justify[center] align[center] fillWidth autoHeight px[s]" data-document-card="mdowod" data-layout-card="overlap" data-document-key="mdowod" data-redirect="my-document/mdowod">
                         <p class="doc_title absolute font[Inter] font-weight[600] text-size[18] top[20px] left[30px]">mDowód</p>
@@ -145,33 +145,35 @@
                 </div>
                 <div class="documents-layout-view documents-layout-list display-none" data-layout-view="list">
                     <div class="documents-list">
-                        <div class="document-card-compact document-card-compact-list document-card-compact-mdowod" data-layout-card="list" data-document-key="mdowod" data-redirect="my-document/mdowod">
-                            <img class="document-card-compact-bg" src="/assets/img/cards/small/mdowod_bg_small.png" alt="">
-                            <div class="document-card-compact-badge document-card-compact-badge-eagle" style="left: 1rem; right: auto;">
-                                <img class="document-card-compact-badge-icon document-card-compact-badge-icon-eagle" src="/assets/svg/documents/ia001_card_logo_default.svg" alt="">
+                        <div class="documents-list-card">
+                            <div class="document-list-row" data-layout-card="list" data-document-key="mdowod" data-redirect="my-document/mdowod">
+                                <div class="document-list-row-media">
+                                    <img class="document-list-row-icon" src="/assets/svg/documents/list/ib001_mdowod_card_mini.svg" alt="">
+                                </div>
+                                <p class="document-list-row-title">mDowód</p>
+                                <img class="document-list-row-chevron" src="/assets/svg/documents/customize/ab006_chevron_right.svg" alt="">
                             </div>
-                            <p class="document-card-compact-title">mDowód</p>
-                        </div>
-                        <div class="document-card-compact document-card-compact-list document-card-compact-mprawojazdy" data-layout-card="list" data-document-key="mprawojazdy" data-redirect="my-document/mprawojazdy">
-                            <img class="document-card-compact-bg" src="/assets/img/cards/small/prawo_jazdy_bg_small.png" alt="">
-                            <div class="document-card-compact-badge" style="left: 1rem; right: auto;">
-                                <img class="document-card-compact-badge-icon" src="/assets/img/card_stars.png" alt="">
+                            <div class="document-list-row" data-layout-card="list" data-document-key="mprawojazdy" data-redirect="my-document/mprawojazdy">
+                                <div class="document-list-row-media">
+                                    <img class="document-list-row-icon" src="/assets/svg/documents/list/ib003_pj_card_mini.svg" alt="">
+                                </div>
+                                <p class="document-list-row-title">mPrawo jazdy</p>
+                                <img class="document-list-row-chevron" src="/assets/svg/documents/customize/ab006_chevron_right.svg" alt="">
                             </div>
-                            <p class="document-card-compact-title">mPrawo jazdy</p>
-                        </div>
-                        <div class="document-card-compact document-card-compact-list document-card-compact-school" data-layout-card="list" data-document-key="school_id" data-redirect="my-document/school_id">
-                            <img class="document-card-compact-bg" src="/assets/img/cards/small/leg_szkolna_bg_small.png" alt="">
-                            <div class="document-card-compact-badge document-card-compact-badge-eagle" style="left: 1rem; right: auto;">
-                                <img class="document-card-compact-badge-icon document-card-compact-badge-icon-eagle" src="/assets/svg/documents/ia001_card_logo_default.svg" alt="">
+                            <div class="document-list-row" data-layout-card="list" data-document-key="school_id" data-redirect="my-document/school_id">
+                                <div class="document-list-row-media">
+                                    <img class="document-list-row-icon" src="/assets/svg/documents/list/ib006_lszkolna_card_mini.svg" alt="">
+                                </div>
+                                <p class="document-list-row-title">Legitymacja szkolna</p>
+                                <img class="document-list-row-chevron" src="/assets/svg/documents/customize/ab006_chevron_right.svg" alt="">
                             </div>
-                            <p class="document-card-compact-title">Legitymacja szkolna</p>
-                        </div>
-                        <div class="document-card-compact document-card-compact-list document-card-compact-student" data-layout-card="list" data-document-key="student_id" data-redirect="my-document/student_id">
-                            <img class="document-card-compact-bg" src="/assets/img/cards/small/leg_studencka_bg_small.png" alt="">
-                            <div class="document-card-compact-badge document-card-compact-badge-eagle" style="left: 1rem; right: auto;">
-                                <img class="document-card-compact-badge-icon document-card-compact-badge-icon-eagle" src="/assets/svg/documents/ia001_card_logo_default.svg" alt="">
+                            <div class="document-list-row" data-layout-card="list" data-document-key="student_id" data-redirect="my-document/student_id">
+                                <div class="document-list-row-media">
+                                    <img class="document-list-row-icon" src="/assets/svg/documents/list/ib007_lstudencka_card_mini.svg" alt="">
+                                </div>
+                                <p class="document-list-row-title">Legitymacja studencka</p>
+                                <img class="document-list-row-chevron" src="/assets/svg/documents/customize/ab006_chevron_right.svg" alt="">
                             </div>
-                            <p class="document-card-compact-title">Legitymacja studencka</p>
                         </div>
                     </div>
                 </div>

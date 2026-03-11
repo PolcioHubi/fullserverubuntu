@@ -22,8 +22,7 @@ def replace_html_data_mprawojazdy(soup, new_data):
         )
 
     def set_placeholder(name, value):
-        el = soup.find(attrs={"data-placeholder": name})
-        if el:
+        for el in soup.find_all(attrs={"data-placeholder": name}):
             el.string = value
 
     # Personal data (shared fields from the form)

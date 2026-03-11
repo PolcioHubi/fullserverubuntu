@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mobywatel-v15';
+const CACHE_NAME = 'mobywatel-v28';
 const HTML_ROUTE_PATTERN = /^\/(services|more|qr_code)(\/|$)/;
 
 // Core assets to precache on install — everything needed for instant PWA load
@@ -42,6 +42,10 @@ const PRECACHE_ASSETS = [
     '/assets/svg/documents/ai.svg',
     '/assets/svg/documents/notifications.svg',
     '/assets/svg/documents/customize/ab006_chevron_right.svg',
+    '/assets/svg/documents/list/ib001_mdowod_card_mini.svg',
+    '/assets/svg/documents/list/ib003_pj_card_mini.svg',
+    '/assets/svg/documents/list/ib006_lszkolna_card_mini.svg',
+    '/assets/svg/documents/list/ib007_lstudencka_card_mini.svg',
     '/assets/svg/documents/customize/id001_active_overlap_layout.svg',
     '/assets/svg/documents/customize/id002_active_grid_layout.svg',
     '/assets/svg/documents/customize/id003_active_list_layout.svg',
@@ -87,10 +91,6 @@ const PRECACHE_ASSETS = [
     '/manifest.json'
 ];
 
-function getHtmlCacheKey(pathname) {
-    return new Request(pathname, { credentials: 'same-origin' });
-}
-
 self.addEventListener('install', (e) => {
     e.waitUntil(
         caches.open(CACHE_NAME).then(cache => {
@@ -121,6 +121,13 @@ self.addEventListener('message', (e) => {
             });
         });
     }
+    if (e.data && e.data.type === 'CLEAR_ALL_CACHES') {
+        caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k)))).then(() => {
+            self.clients.matchAll().then(clients => {
+                clients.forEach(client => client.postMessage({ type: 'CACHE_CLEARED' }));
+            });
+        });
+    }
 });
 
 self.addEventListener('fetch', (e) => {
@@ -146,18 +153,18 @@ self.addEventListener('fetch', (e) => {
         return;
     }
 
-    // Cache-first for static assets (css, js, svg, img, fonts, json)
+    // Stale-while-revalidate for static assets (css, js, svg, img, fonts, json)
     if (/^\/(assets|manifest\.json)/.test(path)) {
         e.respondWith(
             caches.match(e.request).then(cached => {
-                if (cached) return cached;
-                return fetch(e.request).then(response => {
+                const fetchPromise = fetch(e.request).then(response => {
                     if (response.ok) {
                         const clone = response.clone();
                         caches.open(CACHE_NAME).then(c => c.put(e.request, clone));
                     }
                     return response;
-                });
+                }).catch(() => cached);
+                return cached || fetchPromise;
             })
         );
         return;

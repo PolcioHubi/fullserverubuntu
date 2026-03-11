@@ -2256,13 +2256,14 @@ def index():
                 modified_soup = replace_html_data(soup, new_data)
 
             # Update the image source in the HTML (must happen before serialization)
-            img_tag = modified_soup.find("img", id="user_photo")
-            if img_tag and new_data.get("image_filename"):
-                img_tag["src"] = url_for(
-                    "serve_user_file",
-                    username=user_name,
-                    filename=new_data["image_filename"],
-                )
+            img_tags = modified_soup.find_all("img", id="user_photo")
+            for img_tag in img_tags:
+                if new_data.get("image_filename"):
+                    img_tag["src"] = url_for(
+                        "serve_user_file",
+                        username=user_name,
+                        filename=new_data["image_filename"],
+                    )
 
             # Check if HTML content has changed
             html_content_changed = False
@@ -3756,7 +3757,6 @@ def serve_new_manifest():
     )
     return _disable_sensitive_cache_headers(response)
 
-
 # Serve /service-worker.js from static/new/ (PWA service worker)
 @app.route("/service-worker.js")
 @limiter.exempt
@@ -4510,6 +4510,131 @@ def stop_impersonation():
     session.modified = True
     
     return jsonify({"success": True, "message": "Zakończono impersonację."})
+
+
+@app.route("/admin/api/force-cache-refresh", methods=["POST"])
+@csrf.exempt
+@require_admin_login
+def api_force_cache_refresh():
+    """Bump the service worker cache version to force all clients to re-download assets."""
+    import re
+    sw_path = os.path.join(app.static_folder, "new", "service-worker.js")
+    try:
+        with open(sw_path, "r", encoding="utf-8") as f:
+            content = f.read()
+        match = re.search(r"const CACHE_NAME = 'mobywatel-v(\d+)';", content)
+        if not match:
+            return jsonify({"success": False, "error": "Nie znaleziono CACHE_NAME w service-worker.js"}), 500
+        old_ver = int(match.group(1))
+        new_ver = old_ver + 1
+        new_content = content.replace(
+            f"const CACHE_NAME = 'mobywatel-v{old_ver}';",
+            f"const CACHE_NAME = 'mobywatel-v{new_ver}';"
+        )
+        with open(sw_path, "w", encoding="utf-8") as f:
+            f.write(new_content)
+        return jsonify({
+            "success": True,
+            "message": f"Cache odświeżony! Wersja: v{old_ver} → v{new_ver}. Użytkownicy dostaną nowe pliki przy następnym wejściu."
+        })
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/admin/api/refresh-documents", methods=["POST"])
+@csrf.exempt
+@require_admin_login
+def api_refresh_documents():
+    """Regenerate existing user documents from latest templates using saved form data."""
+    DOC_MAP = {
+        "new_mdowod": ("dowodnowy_new.html", FIXED_INPUT_FILE_NEW, replace_html_data_new),
+        "new_mprawojazdy": ("prawojazdy_new.html", FIXED_INPUT_FILE_PJ, replace_html_data_mprawojazdy),
+        "new_school_id": ("school_id_new.html", FIXED_INPUT_FILE_SI, replace_html_data_school_id),
+        "new_student_id": ("student_id_new.html", FIXED_INPUT_FILE_STI, replace_html_data_student_id),
+    }
+
+    data = request.get_json() or {}
+    doc_types = data.get("doc_types", list(DOC_MAP.keys()))
+    target_usernames = data.get("usernames", [])
+
+    # Validate doc_types
+    doc_types = [dt for dt in doc_types if dt in DOC_MAP]
+    if not doc_types:
+        return _admin_error("Nie wybrano żadnego typu dokumentu.", 400, "NO_DOC_TYPES")
+
+    refreshed = 0
+    skipped = 0
+    errors = []
+
+    try:
+        user_dirs = os.listdir(USER_DATA_DIR)
+    except FileNotFoundError:
+        return _admin_error("Katalog user_data nie istnieje.", 500, "NO_USER_DATA")
+
+    for username in user_dirs:
+        if target_usernames and username not in target_usernames:
+            continue
+
+        user_folder = os.path.join(USER_DATA_DIR, username)
+        if not os.path.isdir(user_folder):
+            continue
+
+        files_folder = os.path.join(user_folder, "files")
+        logs_folder = os.path.join(user_folder, "logs")
+        form_data_path = os.path.join(logs_folder, "last_form_data.json")
+
+        if not os.path.exists(form_data_path):
+            skipped += 1
+            continue
+
+        try:
+            with open(form_data_path, "r", encoding="utf-8") as f:
+                saved_data = json.load(f)
+        except (json.JSONDecodeError, OSError) as e:
+            errors.append(f"{username}: nie można odczytać last_form_data.json ({e})")
+            continue
+
+        for doc_type in doc_types:
+            output_filename, template_path, replacer_func = DOC_MAP[doc_type]
+            output_filepath = os.path.join(files_folder, output_filename)
+
+            # Only regenerate documents that already exist
+            if not os.path.exists(output_filepath):
+                continue
+
+            try:
+                input_filepath = os.path.join(os.getcwd(), template_path)
+                with open(input_filepath, "r", encoding="utf-8") as f:
+                    soup = BeautifulSoup(f, "html.parser")
+
+                modified_soup = replacer_func(soup, saved_data)
+
+                # Update photo src for all user_photo images
+                img_tags = modified_soup.find_all("img", id="user_photo")
+                for img_tag in img_tags:
+                    if saved_data.get("image_filename"):
+                        img_tag["src"] = url_for(
+                            "serve_user_file",
+                            username=username,
+                            filename=saved_data["image_filename"],
+                        )
+
+                with open(output_filepath, "w", encoding="utf-8") as f:
+                    f.write(str(modified_soup))
+
+                refreshed += 1
+            except Exception as e:
+                errors.append(f"{username}/{output_filename}: {e}")
+
+    logging.info(
+        f"Admin document refresh: refreshed={refreshed}, skipped={skipped}, errors={len(errors)}"
+    )
+    return jsonify({
+        "success": True,
+        "refreshed": refreshed,
+        "skipped": skipped,
+        "errors": errors,
+    })
 
 
 if __name__ == "__main__":

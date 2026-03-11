@@ -960,7 +960,10 @@
 .scale\[1\.9\] { transform: scale(1.9) !important; }
 .scale\[2\] { transform: scale(2.0) !important; }
 
-.heightScreen { height: 100vh !important; }
+.heightScreen {
+    height: 100vh !important;
+    height: 100dvh !important;
+}
 .widthScreen { height: 100vw !important; }
 
 .halfHeight { height: 50% !important; }

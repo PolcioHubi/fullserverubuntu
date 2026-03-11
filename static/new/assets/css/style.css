@@ -1,5 +1,10 @@
 @import url(root.css);
 
+html, body {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+}
+
 /* Page transitions */
 body { opacity: 0; transform: translateY(6px); transition: opacity 100ms ease, transform 100ms ease; }
 body.pt-in { opacity: 1; transform: translateY(0); }
@@ -236,6 +241,16 @@ textarea.secondary:focus {
     padding-top: env(safe-area-inset-top);
 }
 
+[data-standalone].document-screen {
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+[data-standalone].document-screen .dashboard-navigation {
+    padding-top: 0;
+}
+
 .dashboard-navigation.scrolled {
     border-width: 0px;
 }
@@ -399,6 +414,12 @@ body.customize-document-open [data-group="navigation"] {
     overflow: hidden;
 }
 
+.add_document_list .add-document-list-card > .separator\[x\] {
+    width: calc(100% - 1.9rem) !important;
+    align-self: center;
+    background-color: rgba(var(--ring), 0.16);
+}
+
 .add_document_list .add-document-list-footer {
     position: sticky;
     bottom: 0;
@@ -534,6 +555,16 @@ body.customize-document-open [data-group="navigation"] {
     width: 100%;
 }
 
+.documents-layout-root[data-documents-ready="0"] {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.documents-layout-root[data-documents-ready="1"] {
+    opacity: 1;
+    transition: opacity 120ms ease;
+}
+
 .documents-layout-view {
     width: 100%;
 }
@@ -550,10 +581,83 @@ body.customize-document-open [data-group="navigation"] {
 }
 
 .documents-list {
-    display: flex;
-    flex-direction: column;
-    gap: var(--responsive-space-xs);
     padding: 0 var(--responsive-space-s) var(--responsive-space-s);
+}
+
+.documents-list-card {
+    background-color: rgba(var(--background), 1);
+    border-radius: 1.05rem;
+    box-shadow: 0 10px 20px rgba(17, 24, 39, 0.075);
+    overflow: hidden;
+}
+
+.document-list-row {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    min-height: 4.85rem;
+    padding: 0 0.95rem;
+    background-color: rgba(var(--background), 1);
+    cursor: pointer;
+    position: relative;
+}
+
+.document-list-row::after {
+    content: "";
+    position: absolute;
+    left: 0.95rem;
+    right: 0.95rem;
+    bottom: 0;
+    height: 1px;
+    background-color: rgba(var(--ring), 0.13);
+}
+
+.document-list-row.document-list-row-divider-strong::after {
+    height: 2px;
+    background-color: rgba(var(--ring), 0.18);
+}
+
+.document-list-row-last-visible::after,
+.document-list-row:last-child::after {
+    display: none;
+}
+
+.document-list-row-media {
+    width: 2.65rem;
+    min-width: 2.65rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.document-list-row-icon {
+    display: block;
+    width: 2.5rem;
+    height: auto;
+}
+
+.document-list-row-title {
+    flex: 1 1 auto;
+    color: rgba(var(--primary), 1);
+    font-family: "Inter", sans-serif;
+    font-size: 0.96rem;
+    font-weight: 600;
+    line-height: 1.12;
+    letter-spacing: -0.01em;
+}
+
+.document-list-row-chevron {
+    width: 1.15rem;
+    height: 1.15rem;
+    flex: 0 0 auto;
+    opacity: 0.38;
+}
+
+.document-screen [data-wrapper] > div:first-child > .card > .separator\[x\],
+.document-screen [data-wrapper] > div:first-child > div[data-group="categories"] > .card > .separator\[x\] {
+    width: calc(100% - 1.9rem) !important;
+    align-self: center;
+    background-color: rgba(var(--ring), 0.16);
 }
 
 .document-card-compact {
