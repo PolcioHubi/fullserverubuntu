@@ -3816,7 +3816,87 @@ def api_user_documents():
     result = {}
     for key, fname in doc_files.items():
         result[key] = 1 if os.path.exists(os.path.join(files_folder, fname)) else 0
+    # Sprawdź też allinone
+    result["allinone"] = 1 if os.path.exists(os.path.join(files_folder, "allinone.html")) else 0
     return jsonify({"success": True, "data": {"documents": result}})
+
+
+@app.route("/api/compile-allinone", methods=["POST"])
+@login_required
+def api_compile_allinone():
+    """Compile the All-in-One HTML file from user's existing documents."""
+    user_name = current_user.username
+    try:
+        user_folder, files_folder, logs_folder = create_user_folder(user_name)
+    except ValueError:
+        return jsonify({"success": False, "error": "Nieprawidłowa nazwa użytkownika"}), 400
+
+    # Pobierz wybrane dokumenty z request body
+    data = request.get_json(silent=True) or {}
+    selected_docs = data.get("selected_docs", [])
+    if not isinstance(selected_docs, list):
+        selected_docs = []
+    # Walidacja — dozwolone klucze
+    allowed = {"mdowod", "mprawojazdy", "school_id", "student_id"}
+    selected_docs = [d for d in selected_docs if d in allowed]
+
+    if not selected_docs:
+        return jsonify({"success": False, "error": "Nie wybrano żadnych dokumentów do kompilacji."}), 400
+
+    # Sprawdź czy wybrane dokumenty istnieją
+    doc_files = {
+        "mdowod": "dowodnowy_new.html",
+        "mprawojazdy": "prawojazdy_new.html",
+        "school_id": "school_id_new.html",
+        "student_id": "student_id_new.html",
+    }
+    missing = []
+    for doc in selected_docs:
+        fname = doc_files.get(doc)
+        if fname and not os.path.exists(os.path.join(files_folder, fname)):
+            missing.append(doc)
+    if missing:
+        return jsonify({
+            "success": False,
+            "error": f"Brakujące dokumenty: {', '.join(missing)}. Najpierw je wygeneruj.",
+        }), 400
+
+    # Uruchom kompilator
+    try:
+        from compile_allinone import Compiler
+        output_path = os.path.join(files_folder, "allinone.html")
+        compiler = Compiler(
+            output_path=output_path,
+            user_data_dir=files_folder,
+            selected_docs=selected_docs,
+        )
+        result_path = compiler.compile()
+        log_user_action(f"Compiled All-in-One with documents: {selected_docs}")
+
+        # Zapisz metadane pliku w bazie
+        allinone_hash = calculate_file_hash(output_path) or ""
+        allinone_size = os.path.getsize(output_path) if os.path.exists(output_path) else 0
+        statistics_service.add_or_update_file(
+            username=user_name,
+            filename="allinone.html",
+            filepath=output_path,
+            size=allinone_size,
+            file_hash=allinone_hash,
+        )
+        db.session.commit()
+
+        return jsonify({
+            "success": True,
+            "message": "All-in-One skompilowany pomyślnie.",
+            "redirect_url": url_for("user_files", filename="allinone.html"),
+        })
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"Error compiling All-in-One for {user_name}: {e}", exc_info=True)
+        return jsonify({
+            "success": False,
+            "error": "Błąd podczas kompilacji All-in-One.",
+        }), 500
 
 
 @app.route("/api/document-hashes", methods=["GET"])

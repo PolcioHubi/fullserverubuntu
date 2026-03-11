@@ -160,6 +160,14 @@
                             <span class="version-desc">Poprzednia wersja</span>
                         </div>
                     </label>
+                    <label class="version-card version-card-allinone">
+                        <input type="radio" name="template_version" value="allinone" {% if template_version == 'allinone' %}checked{% endif %}>
+                        <div class="version-card-inner">
+                            <span class="version-badge" style="background: linear-gradient(135deg, #667eea, #764ba2); color: #fff;">STABILNA</span>
+                            <span class="version-label">Pełna stabilna aplikacja</span>
+                            <span class="version-desc">Połącz dokumenty w jedną apkę</span>
+                        </div>
+                    </label>
                 </div>
             </div>
 
@@ -170,7 +178,7 @@
                 <p>Ta aplikacja została stworzona wyłącznie w celach edukacyjnych i demonstracyjnych. Nie należy jej używać do tworzenia fałszywych dokumentów ani do jakichkolwiek nielegalnych działań. Użytkownik ponosi pełną odpowiedzialność za sposób wykorzystania tej aplikacji.</p>
             </div>
 
-            <div class="example-data-section">
+            <div class="example-data-section" id="example-data-section">
                 <button type="button" id="generate-random-data-btn" class="example-btn random-btn">
                     Generuj losowe dane
                 </button>
@@ -180,7 +188,7 @@
                 <input type="hidden" name="csrf_token" value="{{ csrf_token_func() }}">
                 <input type="hidden" id="userName" name="user_name" value="{{ username }}">
 
-                <fieldset>
+                <fieldset id="fieldset-zdjecie">
                     <legend>Zdjęcie</legend>
                     <div class="form-group">
                         <label for="image_upload">Wgraj zdjęcie (zdjecie_686510da4d2591.91511191.jpg):</label>
@@ -229,7 +237,7 @@
                     </div>
                 </fieldset>
 
-                <fieldset>
+                <fieldset id="fieldset-dane-osobowe">
                     <legend>Dane Osobowe</legend>
                     <div class="form-row">
                         <div class="form-group">
@@ -456,6 +464,49 @@
                 </fieldset>
                 </div><!-- /template-fields new_student_id -->
 
+                <!-- ═══ All-in-One fields ═══ -->
+                <div class="template-fields" data-template="allinone">
+                <fieldset>
+                    <legend>Kompilacja All-in-One</legend>
+                    <p style="margin-bottom: 12px; color: #8899aa; font-size: 0.9em;">
+                        Wybierz dokumenty, które chcesz połączyć w jedną aplikację PWA.
+                        Dokumenty muszą być wcześniej wygenerowane.
+                    </p>
+                    <div id="allinone-doc-list" style="display: flex; flex-direction: column; gap: 8px;">
+                        <label class="allinone-doc-check" style="display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: #1a2332; border-radius: 8px; cursor: pointer;">
+                            <input type="checkbox" name="allinone_doc" value="mdowod" checked>
+                            <span>mDowód</span>
+                            <span class="allinone-doc-status" data-doc="mdowod" style="margin-left: auto; font-size: 0.8em;"></span>
+                        </label>
+                        <label class="allinone-doc-check" style="display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: #1a2332; border-radius: 8px; cursor: pointer;">
+                            <input type="checkbox" name="allinone_doc" value="mprawojazdy" checked>
+                            <span>mPrawo Jazdy</span>
+                            <span class="allinone-doc-status" data-doc="mprawojazdy" style="margin-left: auto; font-size: 0.8em;"></span>
+                        </label>
+                        <label class="allinone-doc-check" style="display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: #1a2332; border-radius: 8px; cursor: pointer;">
+                            <input type="checkbox" name="allinone_doc" value="school_id" checked>
+                            <span>Legitymacja szkolna</span>
+                            <span class="allinone-doc-status" data-doc="school_id" style="margin-left: auto; font-size: 0.8em;"></span>
+                        </label>
+                        <label class="allinone-doc-check" style="display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: #1a2332; border-radius: 8px; cursor: pointer;">
+                            <input type="checkbox" name="allinone_doc" value="student_id" checked>
+                            <span>Legitymacja studencka</span>
+                            <span class="allinone-doc-status" data-doc="student_id" style="margin-left: auto; font-size: 0.8em;"></span>
+                        </label>
+                    </div>
+                    <div id="allinone-compile-section" style="margin-top: 16px;">
+                        <button type="button" id="allinone-compile-btn" class="submit-btn" style="background: linear-gradient(135deg, #667eea, #764ba2); width: 100%;">
+                            Kompiluj All-in-One
+                        </button>
+                        <div id="allinone-result" style="margin-top: 10px; display: none;">
+                            <a id="allinone-link" href="#" target="_blank" class="post-save-btn" style="display: inline-block; text-align: center; width: 100%;">
+                                Otwórz All-in-One
+                            </a>
+                        </div>
+                    </div>
+                </fieldset>
+                </div><!-- /template-fields allinone -->
+
                 <div class="submit-section">
                     <button type="submit" class="submit-btn">Modyfikuj i Zapisz</button>
                     <button type="button" class="clear-btn" onclick="clearForm()">Wyczyść formularz</button>
@@ -528,16 +579,117 @@
                 document.querySelectorAll('.template-fields').forEach(function(el) {
                     el.classList.toggle('active', el.dataset.template === val);
                 });
-                // Hide demo panel for mPrawo Jazdy — only show for mDowód and Klasyczna
+                // Hide demo panel for non-mDowód templates
                 const demoPanel = document.querySelector('.id-demo-panel');
                 if (demoPanel) {
-                    demoPanel.style.display = (val === 'new_mprawojazdy' || val === 'new_school_id' || val === 'new_student_id') ? 'none' : '';
+                    demoPanel.style.display = (val === 'new_mprawojazdy' || val === 'new_school_id' || val === 'new_student_id' || val === 'allinone') ? 'none' : '';
+                }
+                // Hide/show submit section for allinone (it has its own button)
+                const submitSection = document.querySelector('.submit-section');
+                if (submitSection) {
+                    submitSection.style.display = (val === 'allinone') ? 'none' : '';
+                }
+                // Hide random data, photo and personal data sections for allinone
+                var hideForAllinone = (val === 'allinone') ? 'none' : '';
+                var exDataSec = document.getElementById('example-data-section');
+                if (exDataSec) exDataSec.style.display = hideForAllinone;
+                var fZdjecie = document.getElementById('fieldset-zdjecie');
+                if (fZdjecie) fZdjecie.style.display = hideForAllinone;
+                var fDane = document.getElementById('fieldset-dane-osobowe');
+                if (fDane) fDane.style.display = hideForAllinone;
+                // Fetch document availability when allinone is selected
+                if (val === 'allinone') {
+                    fetchAllinoneDocStatus();
                 }
             }
             document.querySelectorAll('input[name="template_version"]').forEach(function(radio) {
                 radio.addEventListener('change', updateTemplateFields);
             });
             updateTemplateFields();
+
+            // --- ALL-IN-ONE FUNCTIONS ---
+            async function fetchAllinoneDocStatus() {
+                try {
+                    const resp = await fetch('/api/user-documents');
+                    const data = await resp.json();
+                    if (data.success && data.data && data.data.documents) {
+                        const docs = data.data.documents;
+                        document.querySelectorAll('.allinone-doc-status').forEach(function(el) {
+                            const key = el.dataset.doc;
+                            if (docs[key]) {
+                                el.textContent = '✓ Wygenerowany';
+                                el.style.color = '#4ade80';
+                                const cb = el.closest('label').querySelector('input[type="checkbox"]');
+                                if (cb) cb.disabled = false;
+                            } else {
+                                el.textContent = '✗ Brak';
+                                el.style.color = '#f87171';
+                                const cb = el.closest('label').querySelector('input[type="checkbox"]');
+                                if (cb) { cb.disabled = true; cb.checked = false; }
+                            }
+                        });
+                        // Jeśli allinone istnieje, pokaż link
+                        if (docs.allinone) {
+                            const resultDiv = document.getElementById('allinone-result');
+                            const link = document.getElementById('allinone-link');
+                            if (resultDiv && link) {
+                                link.href = '/user_files/allinone.html';
+                                resultDiv.style.display = 'block';
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.error('Błąd pobierania statusu dokumentów:', e);
+                }
+            }
+
+            // Compile All-in-One button handler
+            const allinoneCompileBtn = document.getElementById('allinone-compile-btn');
+            if (allinoneCompileBtn) {
+                allinoneCompileBtn.addEventListener('click', async function() {
+                    const checkboxes = document.querySelectorAll('input[name="allinone_doc"]:checked:not(:disabled)');
+                    const selectedDocs = Array.from(checkboxes).map(cb => cb.value);
+                    if (selectedDocs.length === 0) {
+                        showNotification('Uwaga', 'Wybierz co najmniej jeden dokument do kompilacji.', 'error');
+                        return;
+                    }
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                    const loadingOverlay = document.getElementById('loadingOverlay');
+                    loadingOverlay.classList.add('visible');
+                    allinoneCompileBtn.disabled = true;
+                    allinoneCompileBtn.textContent = 'Kompilowanie...';
+                    try {
+                        const resp = await fetch('/api/compile-allinone', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': csrfToken
+                            },
+                            body: JSON.stringify({ selected_docs: selectedDocs })
+                        });
+                        const result = await resp.json();
+                        if (result.success) {
+                            showNotification('Sukces!', result.message, 'success');
+                            const resultDiv = document.getElementById('allinone-result');
+                            const link = document.getElementById('allinone-link');
+                            if (resultDiv && link) {
+                                link.href = result.redirect_url || '/user_files/allinone.html';
+                                resultDiv.style.display = 'block';
+                            }
+                            logAction('Compiled All-in-One with docs: ' + selectedDocs.join(', '));
+                        } else {
+                            showNotification('Błąd!', result.error, 'error');
+                        }
+                    } catch (error) {
+                        console.error('Error compiling All-in-One:', error);
+                        showNotification('Błąd!', 'Wystąpił błąd podczas kompilacji All-in-One.', 'error');
+                    } finally {
+                        loadingOverlay.classList.remove('visible');
+                        allinoneCompileBtn.disabled = false;
+                        allinoneCompileBtn.textContent = 'Kompiluj All-in-One';
+                    }
+                });
+            }
 
             // --- GENERAL HELPER FUNCTIONS ---
             function logAction(actionDescription) {
@@ -775,6 +927,9 @@
 
             document.getElementById('mainForm').addEventListener('submit', async function(e) {
                 e.preventDefault();
+                // All-in-One has its own compile button — don't submit the form
+                const versionRadio = document.querySelector('input[name="template_version"]:checked');
+                if (versionRadio && versionRadio.value === 'allinone') return;
                 logAction("Clicked 'Modify and Save' button (form submission).");
                 const loadingOverlay = document.getElementById('loadingOverlay');
                 const submitBtn = document.querySelector('.submit-btn');
@@ -782,7 +937,6 @@
                 submitBtn.disabled = true;
                 submitBtn.textContent = 'Ładowanie...';
                 const formData = new FormData(this);
-                const versionRadio = document.querySelector('input[name="template_version"]:checked');
                 formData.append('template_version', versionRadio ? versionRadio.value : 'new');
                 try {
                     const response = await fetch('/', { method: 'POST', body: formData });
