@@ -729,6 +729,25 @@ def handle_error(e):
     return response
 
 
+@app.errorhandler(RequestEntityTooLarge)
+@app.errorhandler(413)
+def handle_request_entity_too_large(e):
+    max_bytes = int(app.config.get("MAX_CONTENT_LENGTH") or 0)
+    max_mb = max(1, round(max_bytes / (1024 * 1024))) if max_bytes else None
+    message = (
+        f"Przesłany plik przekracza dozwolony rozmiar serwera ({max_mb} MB)."
+        if max_mb
+        else "Przesłany plik przekracza dozwolony rozmiar serwera."
+    )
+
+    logging.warning(f"HTTP Error 413: {message}", exc_info=True)
+
+    if _is_admin_api_request():
+        return _admin_error(message, 413, "REQUEST_ENTITY_TOO_LARGE")
+
+    return _json_no_store({"success": False, "error": message}, 413)
+
+
 def _filter_sensitive_data(data: dict) -> dict:
     """Recursively removes sensitive keys from a dictionary before logging."""
     if not isinstance(data, dict):
@@ -1063,9 +1082,9 @@ def calculate_file_hash(filepath: str) -> str | None:
 ALLOWED_IMPORT_ROOTS = {"user_data", "auth_data"}
 REQUIRED_IMPORT_DB_TABLES = {"users"}
 REQUIRED_USERS_COLUMNS = {"username", "password"}
-DEFAULT_IMPORT_MAX_UNCOMPRESSED_BYTES = 500 * 1024 * 1024
+DEFAULT_IMPORT_MAX_UNCOMPRESSED_BYTES = 2 * 1024 * 1024 * 1024
 DEFAULT_IMPORT_MAX_FILES = 10_000
-DEFAULT_IMPORT_MAX_SINGLE_FILE_BYTES = 100 * 1024 * 1024
+DEFAULT_IMPORT_MAX_SINGLE_FILE_BYTES = 512 * 1024 * 1024
 DEFAULT_IMPORT_MAX_COMPRESSION_RATIO = 100
 
 

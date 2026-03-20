@@ -500,6 +500,19 @@
                     </div>
                     <button type="submit" class="btn btn-danger">Importuj i Nadpisz Dane</button>
                 </form>
+                <p style="color: #96a0ac; margin-top: 12px; font-size: 12px; line-height: 1.5;">
+                    Duże archiwa mogą wysyłać się kilka minut. Pasek poniżej pokazuje postęp uploadu; po zakończeniu wysyłki serwer nadal może chwilę walidować i importować dane.
+                </p>
+                <div id="importProgressWrap" style="display:none; margin-top: 15px; padding: 14px; background: #1a2634; border: 1px solid #2c3e50; border-radius: 8px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:8px;">
+                        <strong id="importProgressLabel" style="color:#ecf0f1;">Przygotowanie importu...</strong>
+                        <span id="importProgressPercent" style="color:#96a0ac; font-size:12px;">0%</span>
+                    </div>
+                    <div style="width:100%; height:10px; background:#0f1720; border-radius:999px; overflow:hidden;">
+                        <div id="importProgressBar" style="width:0%; height:100%; background:#3498db; transition:width .2s ease;"></div>
+                    </div>
+                    <div id="importProgressMeta" style="margin-top:8px; color:#96a0ac; font-size:12px;"></div>
+                </div>
             </div>
 
             <div class="section">
@@ -1568,12 +1581,87 @@
             }
         }
 
+        function safeJsonParse(text) {
+            if (!text) return null;
+            try {
+                return JSON.parse(text);
+            } catch (error) {
+                return null;
+            }
+        }
+
+        function describeUnexpectedAdminResponse(status, text) {
+            const trimmed = (text || '').trim();
+            if (status === 413) {
+                return 'Serwer odrzucił plik jako zbyt duży. Sprawdź limit uploadu aplikacji i reverse proxy.';
+            }
+            if (trimmed.startsWith('<')) {
+                return `Serwer zwrócił stronę HTML zamiast JSON (HTTP ${status}). Najczęściej oznacza to limit uploadu albo błąd proxy.`;
+            }
+            return `Serwer zwrócił nieprawidłową odpowiedź (HTTP ${status}).`;
+        }
+
+        function updateImportProgress(percent, label, meta, state = 'active') {
+            const wrap = document.getElementById('importProgressWrap');
+            const labelEl = document.getElementById('importProgressLabel');
+            const percentEl = document.getElementById('importProgressPercent');
+            const bar = document.getElementById('importProgressBar');
+            const metaEl = document.getElementById('importProgressMeta');
+            if (!wrap || !labelEl || !percentEl || !bar || !metaEl) return;
+
+            const clamped = Math.max(0, Math.min(100, Math.round(percent || 0)));
+            wrap.style.display = 'block';
+            labelEl.textContent = label || 'Przetwarzanie...';
+            percentEl.textContent = `${clamped}%`;
+            bar.style.width = `${clamped}%`;
+            bar.style.background = state === 'error' ? '#e74c3c' : (state === 'success' ? '#27ae60' : '#3498db');
+            metaEl.textContent = meta || '';
+        }
+
+        function hideImportProgress() {
+            const wrap = document.getElementById('importProgressWrap');
+            if (wrap) wrap.style.display = 'none';
+        }
+
+        function uploadFormData(url, formData, onProgress) {
+            return new Promise((resolve, reject) => {
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', url, true);
+                xhr.timeout = 30 * 60 * 1000;
+                xhr.setRequestHeader('X-CSRFToken', csrfToken);
+
+                xhr.upload.addEventListener('progress', function(event) {
+                    if (!event.lengthComputable || typeof onProgress !== 'function') return;
+                    onProgress(event.loaded / event.total, event.loaded, event.total);
+                });
+
+                xhr.addEventListener('load', function() {
+                    resolve({
+                        ok: xhr.status >= 200 && xhr.status < 300,
+                        status: xhr.status,
+                        text: xhr.responseText || ''
+                    });
+                });
+
+                xhr.addEventListener('error', function() {
+                    reject(new Error('Błąd sieci podczas wysyłania pliku.'));
+                });
+
+                xhr.addEventListener('timeout', function() {
+                    reject(new Error('Przekroczono limit czasu podczas wysyłania pliku.'));
+                });
+
+                xhr.send(formData);
+            });
+        }
+
         // Inicjalizacja
         document.addEventListener('DOMContentLoaded', function() {
             refreshData();
 
             // Obsługa formularza importu
             const importForm = document.getElementById('importForm');
+            const importSubmitBtn = importForm.querySelector('button[type="submit"]');
             importForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
                 const fileInput = document.getElementById('backupFile');
@@ -1584,27 +1672,42 @@
                     return;
                 }
 
+                const setImportBusy = (busy) => {
+                    fileInput.disabled = busy;
+                    importSubmitBtn.disabled = busy;
+                    importSubmitBtn.textContent = busy ? 'Import trwa...' : 'Importuj i Nadpisz Dane';
+                };
+
                 try {
+                    setImportBusy(true);
+                    updateImportProgress(1, 'Przesyłanie pliku do walidacji...', `Rozmiar archiwum: ${formatBytes(file.size)}`);
+
                     // 1) Pre-validation without changing current data.
                     const validationFormData = new FormData();
                     validationFormData.append('backupFile', file);
-                    const validationResponse = await fetch('/admin/api/import/validate', {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRFToken': csrfToken
-                        },
-                        body: validationFormData
+                    const validationResponse = await uploadFormData('/admin/api/import/validate', validationFormData, (progress) => {
+                        updateImportProgress(
+                            Math.max(1, Math.round(progress * 45)),
+                            'Przesyłanie pliku do walidacji...',
+                            `Wysłano ${formatBytes(file.size * progress)} z ${formatBytes(file.size)}`
+                        );
                     });
 
-                    const validationData = await validationResponse.json();
+                    updateImportProgress(50, 'Walidacja archiwum na serwerze...', 'Odczytywanie odpowiedzi z serwera.');
+                    const validationData = safeJsonParse(validationResponse.text);
+                    if (!validationData) {
+                        throw new Error(describeUnexpectedAdminResponse(validationResponse.status, validationResponse.text));
+                    }
                     if (!validationResponse.ok || !validationData.success) {
                         const msg = validationData.error || 'Walidacja importu nie powiodła się.';
+                        updateImportProgress(100, 'Walidacja nie powiodła się.', msg, 'error');
                         showAlert(msg, 'error');
                         return;
                     }
 
                     if (!validationData.valid) {
                         const issues = (validationData.issues || []).join('\n- ');
+                        updateImportProgress(100, 'Import zablokowany.', 'Archiwum nie przeszło walidacji.', 'error');
                         showAlert(`Import zablokowany. Wykryte problemy:\n- ${issues}`, 'error');
                         return;
                     }
@@ -1618,35 +1721,50 @@
                         'Walidacja zakończona sukcesem.\n\nCzy na pewno chcesz zaimportować dane? Operacja podmieni obecne dane.' +
                         previewMessage
                     )) {
+                        hideImportProgress();
                         return;
                     }
 
                     // 2) Real import after successful validation.
                     const importFormData = new FormData();
                     importFormData.append('backupFile', file);
-                    const response = await fetch('/admin/api/import/all', {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRFToken': csrfToken
-                        },
-                        body: importFormData
+                    updateImportProgress(55, 'Przesyłanie pliku do importu...', `Rozmiar archiwum: ${formatBytes(file.size)}`);
+                    const response = await uploadFormData('/admin/api/import/all', importFormData, (progress) => {
+                        const percent = 55 + Math.round(progress * 35);
+                        updateImportProgress(
+                            percent,
+                            'Przesyłanie pliku do importu...',
+                            `Wysłano ${formatBytes(file.size * progress)} z ${formatBytes(file.size)}`
+                        );
                     });
 
-                    const data = await response.json();
+                    updateImportProgress(95, 'Serwer finalizuje import...', 'Czekam na końcową odpowiedź aplikacji.');
+                    const data = safeJsonParse(response.text);
+                    if (!data) {
+                        throw new Error(describeUnexpectedAdminResponse(response.status, response.text));
+                    }
 
                     if (data.success) {
                         const importIdMessage = data.import_id ? ` (Import ID: ${data.import_id})` : '';
+                        updateImportProgress(100, 'Import zakończony pomyślnie.', `${data.message}${importIdMessage}`, 'success');
                         showAlert(`${data.message}${importIdMessage}`, 'success');
                         fileInput.value = ''; // Clear the file input
                     } else {
                         const details = Array.isArray(data.details) && data.details.length
                             ? `\nSzczegóły:\n- ${data.details.join('\n- ')}`
                             : '';
+                        updateImportProgress(100, 'Import nie powiódł się.', data.error || 'Błąd importu.', 'error');
                         showAlert(`${data.error || 'Błąd importu.'}${details}`, 'error');
                     }
                 } catch (error) {
                     console.error('Error importing data:', error);
-                    showAlert('Wystąpił krytyczny błąd podczas importu.', 'error');
+                    const message = error && error.message
+                        ? error.message
+                        : 'Wystąpił krytyczny błąd podczas importu.';
+                    updateImportProgress(100, 'Import przerwany.', message, 'error');
+                    showAlert(message, 'error');
+                } finally {
+                    setImportBusy(false);
                 }
             });
         });
@@ -1758,6 +1876,3 @@
     </script>
 </body>
 </html>
-
-
-

@@ -33,7 +33,7 @@ class ProductionConfig:
     SEND_FILE_MAX_AGE_DEFAULT = 31536000  # 1 rok dla plików statycznych
 
     # Upload settings
-    MAX_CONTENT_LENGTH = 100 * 1024 * 1024  # 100MB max upload (dla backupów)
+    MAX_CONTENT_LENGTH = _env_int("MAX_CONTENT_LENGTH", 512 * 1024 * 1024)  # 512MB max upload (dla backupów)
 
     # Logging
     LOG_LEVEL = "INFO"
@@ -49,11 +49,11 @@ class ProductionConfig:
     EXPOSE_RECOVERY_TOKEN = False
     RECOVERY_TOKEN_TTL_HOURS = _env_int("RECOVERY_TOKEN_TTL_HOURS", 24)
     IMPORT_MAX_UNCOMPRESSED_BYTES = _env_int(
-        "IMPORT_MAX_UNCOMPRESSED_BYTES", 500 * 1024 * 1024
+        "IMPORT_MAX_UNCOMPRESSED_BYTES", 2 * 1024 * 1024 * 1024
     )
     IMPORT_MAX_FILES = _env_int("IMPORT_MAX_FILES", 10_000)
     IMPORT_MAX_SINGLE_FILE_BYTES = _env_int(
-        "IMPORT_MAX_SINGLE_FILE_BYTES", 100 * 1024 * 1024
+        "IMPORT_MAX_SINGLE_FILE_BYTES", 512 * 1024 * 1024
     )
     IMPORT_MAX_COMPRESSION_RATIO = _env_int("IMPORT_MAX_COMPRESSION_RATIO", 100)
 
@@ -103,7 +103,7 @@ class DevelopmentConfig:
     SECRET_KEY = "dev-secret-key-change-in-production"
     SESSION_COOKIE_SECURE = False
     SESSION_COOKIE_HTTPONLY = True
-    MAX_CONTENT_LENGTH = 100 * 1024 * 1024  # 100MB max upload for development (dla backupów)
+    MAX_CONTENT_LENGTH = _env_int("MAX_CONTENT_LENGTH", 512 * 1024 * 1024)  # 512MB max upload for development (dla backupów)
     EXPOSE_RESET_TOKEN = os.environ.get("EXPOSE_RESET_TOKEN", "false").lower() in (
         "1",
         "true",
@@ -116,11 +116,11 @@ class DevelopmentConfig:
     )
     RECOVERY_TOKEN_TTL_HOURS = _env_int("RECOVERY_TOKEN_TTL_HOURS", 24)
     IMPORT_MAX_UNCOMPRESSED_BYTES = _env_int(
-        "IMPORT_MAX_UNCOMPRESSED_BYTES", 500 * 1024 * 1024
+        "IMPORT_MAX_UNCOMPRESSED_BYTES", 2 * 1024 * 1024 * 1024
     )
     IMPORT_MAX_FILES = _env_int("IMPORT_MAX_FILES", 10_000)
     IMPORT_MAX_SINGLE_FILE_BYTES = _env_int(
-        "IMPORT_MAX_SINGLE_FILE_BYTES", 100 * 1024 * 1024
+        "IMPORT_MAX_SINGLE_FILE_BYTES", 512 * 1024 * 1024
     )
     IMPORT_MAX_COMPRESSION_RATIO = _env_int("IMPORT_MAX_COMPRESSION_RATIO", 100)
     RATELIMIT_STORAGE_URL = os.environ.get("RATELIMIT_STORAGE_URL", "memory://")

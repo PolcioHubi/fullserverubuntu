@@ -126,8 +126,8 @@ EOF
 # --- KROK 4.6: Zwiększenie limitu rozmiaru przesyłanych plików ---
 echo ">>> KROK 4.6: Konfiguracja limitu rozmiaru plików (client_max_body_size)..."
 sudo tee /etc/nginx/snippets/upload-limits.conf > /dev/null <<EOF
-# Zwiększenie limitu przesyłanych plików do 100MB (dla importu backupów)
-client_max_body_size 100M;
+# Zwiększenie limitu przesyłanych plików do 512MB (dla importu backupów)
+client_max_body_size 512M;
 EOF
 
 # --- KROK 5: Konfiguracja Nginx (WSTĘPNA, tylko HTTP) ---
