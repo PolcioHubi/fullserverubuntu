@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mobywatel-v28';
+const CACHE_NAME = 'mobywatel-v30';
 const HTML_ROUTE_PATTERN = /^\/(services|more|qr_code)(\/|$)/;
 
 // Core assets to precache on install — everything needed for instant PWA load
@@ -26,6 +26,7 @@ const PRECACHE_ASSETS = [
     // JS — document subpages
     '/assets/js/pages/documents/mdowod.js',
     '/assets/js/pages/documents/mprawojazdy.js',
+    '/assets/js/pages/documents/wozek.js',
     '/assets/js/pages/documents/school_id.js',
     '/assets/js/pages/documents/student_id.js',
     // SVG — logo & navigation
@@ -74,13 +75,17 @@ const PRECACHE_ASSETS = [
     '/assets/img/bg_light.png',
     '/assets/img/mdowod_card.png',
     '/assets/img/id_details.png',
+    '/assets/img/extracted-images/wozek.png',
+    '/assets/img/cards/wozek.png',
     // Images — document cards
     '/assets/img/cards/documents/mdowod.png',
     '/assets/img/cards/documents/mprawojazdy.png',
+    '/assets/img/cards/documents/wozek.png',
     '/assets/img/cards/documents/school_id.png',
     '/assets/img/cards/documents/student_id.png',
     '/assets/img/cards/small/mdowod_bg_small.png',
     '/assets/img/cards/small/prawo_jazdy_bg_small.png',
+    '/assets/img/cards/small/wozek_bg_small.png',
     '/assets/img/cards/small/leg_szkolna_bg_small.png',
     '/assets/img/cards/small/leg_studencka_bg_small.png',
     // Fonts (woff2)
@@ -153,8 +158,8 @@ self.addEventListener('fetch', (e) => {
         return;
     }
 
-    // Stale-while-revalidate for static assets (css, js, svg, img, fonts, json)
-    if (/^\/(assets|manifest\.json)/.test(path)) {
+    // Stale-while-revalidate for static assets (css, js, svg, img, fonts, json, manifests)
+    if (/^\/(assets|manifest\.json|allinone-manifest\.json)/.test(path)) {
         e.respondWith(
             caches.match(e.request).then(cached => {
                 const fetchPromise = fetch(e.request).then(response => {

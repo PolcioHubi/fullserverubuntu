@@ -37,11 +37,13 @@ from replace_new import replace_html_data_new
 from replace_new_mprawojazdy import replace_html_data_mprawojazdy
 from replace_new_school_id import replace_html_data_school_id
 from replace_new_student_id import replace_html_data_student_id
+from replace_new_wozek import replace_html_data_wozek
 from dotenv import load_dotenv
 from flask import (
     Flask,
     g,
     jsonify,
+    make_response,
     redirect,
     render_template,
     request,
@@ -681,6 +683,15 @@ FIXED_INPUT_FILE_NEW = "document_templates/mdowod.txt"
 FIXED_INPUT_FILE_PJ = "document_templates/mprawojazdy.txt"
 FIXED_INPUT_FILE_SI = "document_templates/school_id.txt"
 FIXED_INPUT_FILE_STI = "document_templates/student_id.txt"
+FIXED_INPUT_FILE_WOZEK = "document_templates/wozek.txt"
+
+NEW_UI_DOC_FILE_MAP = {
+    "mdowod": "dowodnowy_new.html",
+    "mprawojazdy": "prawojazdy_new.html",
+    "wozek": "wozek_new.html",
+    "school_id": "school_id_new.html",
+    "student_id": "student_id_new.html",
+}
 
 # Directory paths
 USER_DATA_DIR = "user_data"
@@ -1931,6 +1942,26 @@ def api_generate_random_data():
         pj_organ = random.choice(pj_organs)
         pj_ograniczenia = random.choice(["", "01.06", "01.01", "01.06, 02.01", ""])
 
+        # Uprawnienie na wózek widłowy random data
+        wozek_kategoria = random.choice(["I WJO", "II WJO", "III WJO"])
+        wozek_data_wydania_dt = today - timedelta(days=random.randint(30, 365 * 6))
+        wozek_data_wydania = wozek_data_wydania_dt.strftime("%Y-%m-%d")
+        wozek_data_waznosci_dt = wozek_data_wydania_dt + timedelta(days=5 * 365)
+        wozek_data_waznosci = wozek_data_waznosci_dt.strftime("%Y-%m-%d")
+        wozek_numer = f"WJO/{wozek_data_wydania_dt.strftime('%Y')}/{random.randint(100000, 999999)}"
+        wozek_zaswiadczenie = f"UDT-{random.randint(1000, 9999)}/{wozek_data_wydania_dt.strftime('%y')}"
+        wozek_organ = random.choice([
+            "URZĄD DOZORU TECHNICZNEGO",
+            "ODDZIAŁ UDT W WARSZAWIE",
+            "ODDZIAŁ UDT W KRAKOWIE",
+            "ODDZIAŁ UDT W POZNANIU",
+        ])
+        wozek_zakres = random.choice([
+            "WÓZKI JEZDNIOWE PODNOŚNIKOWE Z MECHANICZNYM NAPĘDEM PODNOSZENIA",
+            "WÓZKI JEZDNIOWE PODNOŚNIKOWE Z WYŁĄCZENIEM SPECJALIZOWANYCH",
+            "WÓZKI JEZDNIOWE PODNOŚNIKOWE WRAZ Z WYMIANĄ BUTLI GAZOWYCH",
+        ])
+
         # Legitymacja szkolna random data
         si_numer = f"{random.randint(100, 999)}/{random.randint(1, 30)}"
         si_data_wydania_dt = today - timedelta(days=random.randint(30, 365))
@@ -1997,6 +2028,14 @@ def api_generate_random_data():
             "pj_blankiet": pj_blankiet,
             "pj_organ": pj_organ,
             "pj_ograniczenia": pj_ograniczenia,
+            # Wózek widłowy fields
+            "wozek_kategoria": wozek_kategoria,
+            "wozek_numer": wozek_numer,
+            "wozek_data_wydania": wozek_data_wydania,
+            "wozek_data_waznosci": wozek_data_waznosci,
+            "wozek_organ": wozek_organ,
+            "wozek_zakres": wozek_zakres,
+            "wozek_zaswiadczenie": wozek_zaswiadczenie,
             # Legitymacja szkolna fields
             "si_numer": si_numer,
             "si_data_wydania": si_data_wydania,
@@ -2063,6 +2102,7 @@ def index():
             template_version = request.form.get("template_version", "new_mdowod")
             use_new = template_version == "new_mdowod"
             use_pj = template_version == "new_mprawojazdy"
+            use_wozek = template_version == "new_wozek"
             use_si = template_version == "new_school_id"
             use_sti = template_version == "new_student_id"
 
@@ -2075,6 +2115,9 @@ def index():
             elif use_pj:
                 output_filename = "prawojazdy_new.html"
                 base_template = FIXED_INPUT_FILE_PJ
+            elif use_wozek:
+                output_filename = "wozek_new.html"
+                base_template = FIXED_INPUT_FILE_WOZEK
             elif use_new:
                 output_filename = "dowodnowy_new.html"
                 base_template = FIXED_INPUT_FILE_NEW
@@ -2128,6 +2171,14 @@ def index():
                 "pj_blankiet": request.form.get("pj_blankiet"),
                 "pj_organ": request.form.get("pj_organ"),
                 "pj_ograniczenia": request.form.get("pj_ograniczenia"),
+                # Wózek widłowy fields
+                "wozek_kategoria": request.form.get("wozek_kategoria"),
+                "wozek_numer": request.form.get("wozek_numer"),
+                "wozek_data_wydania": request.form.get("wozek_data_wydania"),
+                "wozek_data_waznosci": request.form.get("wozek_data_waznosci"),
+                "wozek_organ": request.form.get("wozek_organ"),
+                "wozek_zakres": request.form.get("wozek_zakres"),
+                "wozek_zaswiadczenie": request.form.get("wozek_zaswiadczenie"),
                 # Legitymacja szkolna fields
                 "si_numer": request.form.get("si_numer"),
                 "si_data_wydania": request.form.get("si_data_wydania"),
@@ -2250,6 +2301,8 @@ def index():
                 modified_soup = replace_html_data_student_id(soup, new_data)
             elif use_pj:
                 modified_soup = replace_html_data_mprawojazdy(soup, new_data)
+            elif use_wozek:
+                modified_soup = replace_html_data_wozek(soup, new_data)
             elif use_new:
                 modified_soup = replace_html_data_new(soup, new_data)
             else:
@@ -3746,6 +3799,35 @@ def serve_new_api_data(filename):
     return send_from_directory(api_dir, filename, max_age=300)
 
 
+# Serve /allinone-manifest.json — dedicated manifest for All-in-One PWA
+@app.route("/allinone-manifest.json")
+@limiter.exempt
+def serve_allinone_manifest():
+    manifest = {
+        "id": "/user_files/allinone",
+        "name": "mObywatel",
+        "short_name": "mObywatel",
+        "display": "standalone",
+        "orientation": "portrait",
+        "scope": "/user_files/",
+        "start_url": "/user_files/allinone.html#login",
+        "background_color": "#f6f9fb",
+        "theme_color": "#f6f9fb",
+        "description": "Aplikacja mObywatel",
+        "categories": ["government", "utilities"],
+        "icons": [
+            {"src": "/assets/img/apple-180x.png", "sizes": "180x180", "type": "image/png", "purpose": "any"},
+            {"src": "/assets/img/logo.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+            {"src": "/assets/img/logo.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+            {"src": "/assets/img/logo.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+        ]
+    }
+    response = make_response(jsonify(manifest))
+    response.headers["Content-Type"] = "application/manifest+json"
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    return response
+
+
 # Serve /manifest.json from static/new/ (new UI PWA manifest)
 @app.route("/manifest.json")
 @limiter.exempt
@@ -3764,16 +3846,25 @@ def serve_service_worker():
     return send_from_directory(os.path.join(app.static_folder, "new"), "service-worker.js", max_age=0)
 
 
+# Serve /allinone-sw.js — dedicated service worker for All-in-One PWA
+@app.route("/allinone-sw.js")
+@limiter.exempt
+def serve_allinone_sw():
+    response = send_from_directory(
+        os.path.join(app.static_folder, "new"),
+        "allinone-sw.js",
+        max_age=0,
+    )
+    response.headers["Service-Worker-Allowed"] = "/user_files/"
+    response.headers["Content-Type"] = "application/javascript"
+    return response
+
+
 # Redirect /my-document/<doc_type> to the user's generated file
 @app.route("/my-document/<doc_type>")
 @login_required
 def my_document_redirect(doc_type):
-    doc_map = {
-        "mdowod": "dowodnowy_new.html",
-        "mprawojazdy": "prawojazdy_new.html",
-        "school_id": "school_id_new.html",
-        "student_id": "student_id_new.html",
-    }
+    doc_map = NEW_UI_DOC_FILE_MAP
     filename = doc_map.get(doc_type)
     if not filename:
         return jsonify({"success": False, "error": "Nieznany typ dokumentu"}), 404
@@ -3807,12 +3898,7 @@ def api_user_documents():
     """Return which documents actually exist for the current user."""
     user_name = current_user.username
     files_folder = os.path.join(USER_DATA_DIR, user_name, "files")
-    doc_files = {
-        "mdowod": "dowodnowy_new.html",
-        "mprawojazdy": "prawojazdy_new.html",
-        "school_id": "school_id_new.html",
-        "student_id": "student_id_new.html",
-    }
+    doc_files = NEW_UI_DOC_FILE_MAP
     result = {}
     for key, fname in doc_files.items():
         result[key] = 1 if os.path.exists(os.path.join(files_folder, fname)) else 0
@@ -3837,19 +3923,14 @@ def api_compile_allinone():
     if not isinstance(selected_docs, list):
         selected_docs = []
     # Walidacja — dozwolone klucze
-    allowed = {"mdowod", "mprawojazdy", "school_id", "student_id"}
+    allowed = set(NEW_UI_DOC_FILE_MAP.keys())
     selected_docs = [d for d in selected_docs if d in allowed]
 
     if not selected_docs:
         return jsonify({"success": False, "error": "Nie wybrano żadnych dokumentów do kompilacji."}), 400
 
     # Sprawdź czy wybrane dokumenty istnieją
-    doc_files = {
-        "mdowod": "dowodnowy_new.html",
-        "mprawojazdy": "prawojazdy_new.html",
-        "school_id": "school_id_new.html",
-        "student_id": "student_id_new.html",
-    }
+    doc_files = NEW_UI_DOC_FILE_MAP
     missing = []
     for doc in selected_docs:
         fname = doc_files.get(doc)
@@ -3888,7 +3969,7 @@ def api_compile_allinone():
         return jsonify({
             "success": True,
             "message": "All-in-One skompilowany pomyślnie.",
-            "redirect_url": url_for("user_files", filename="allinone.html"),
+            "redirect_url": url_for("user_files", filename="allinone.html") + "#login",
         })
     except Exception as e:
         db.session.rollback()
@@ -3905,12 +3986,7 @@ def api_document_hashes():
     """Return SHA256 hashes of the user's generated document files."""
     user_name = current_user.username
     files_folder = os.path.join(USER_DATA_DIR, user_name, "files")
-    doc_files = {
-        "mdowod": "dowodnowy_new.html",
-        "mprawojazdy": "prawojazdy_new.html",
-        "school_id": "school_id_new.html",
-        "student_id": "student_id_new.html",
-    }
+    doc_files = NEW_UI_DOC_FILE_MAP
     result = {}
     for key, fname in doc_files.items():
         fpath = os.path.join(files_folder, fname)
@@ -4629,6 +4705,7 @@ def api_refresh_documents():
     DOC_MAP = {
         "new_mdowod": ("dowodnowy_new.html", FIXED_INPUT_FILE_NEW, replace_html_data_new),
         "new_mprawojazdy": ("prawojazdy_new.html", FIXED_INPUT_FILE_PJ, replace_html_data_mprawojazdy),
+        "new_wozek": ("wozek_new.html", FIXED_INPUT_FILE_WOZEK, replace_html_data_wozek),
         "new_school_id": ("school_id_new.html", FIXED_INPUT_FILE_SI, replace_html_data_school_id),
         "new_student_id": ("student_id_new.html", FIXED_INPUT_FILE_STI, replace_html_data_student_id),
     }

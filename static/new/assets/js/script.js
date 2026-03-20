@@ -158,6 +158,9 @@ $(async function() {
         case 'mprawojazdy':
             mprawojazdyManager.init();
             break;
+        case 'wozek':
+            wozekManager.init();
+            break;
         case 'school_id':
             schoolIDManager.init();
             break;
@@ -173,7 +176,7 @@ $(async function() {
 
     let document_interval;
     if (path === 'documents') {
-        const DOCUMENT_KEYS = ['mdowod', 'mprawojazdy', 'school_id', 'student_id'];
+        const DOCUMENT_KEYS = ['mdowod', 'mprawojazdy', 'wozek', 'school_id', 'student_id'];
         const DOC_AVAILABILITY_CACHE_KEY = 'doc_availability_cache';
         const $documentsLayoutRoot = $('[data-documents-layout-root]');
         const getDocumentsLayoutMode = () => {
@@ -309,7 +312,10 @@ $(async function() {
                 const changedUrls = [];
                 const docUrlMap = {
                     mdowod: '/user_files/dowodnowy_new.html',
-                    mprawojazdy: '/user_files/prawojazdy_new.html'
+                    mprawojazdy: '/user_files/prawojazdy_new.html',
+                    wozek: '/user_files/wozek_new.html',
+                    school_id: '/user_files/school_id_new.html',
+                    student_id: '/user_files/student_id_new.html'
                 };
                 for (const [key, hash] of Object.entries(newHashes)) {
                     if (hash && oldHashes[key] !== hash) {
@@ -342,7 +348,7 @@ $(async function() {
         }, 30000);
     }
 
-    if (/(mdowod|dowodnowy|mprawojazdy|prawojazdy|school_id|student_id|qr_code)/.test(path)) {
+    if (/(mdowod|dowodnowy|mprawojazdy|prawojazdy|wozek|school_id|student_id|qr_code)/.test(path)) {
         const emblemEntries = Array.from(document.querySelectorAll('.emblem[data-emblem]'))
             .map((wrap) => {
                 const scope = wrap.querySelector('[id="emblem"]') || wrap.querySelector('.emblem\\[card\\]');

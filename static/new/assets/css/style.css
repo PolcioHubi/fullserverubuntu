@@ -463,6 +463,9 @@ body.customize-document-open [data-group="navigation"] {
 .card.mprawojazdy { position: relative; overflow: hidden; }
 .card.mprawojazdy > canvas.bg { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
 [data-mode="dark"] .mprawojazdy h1 { color: rgba(var(--secondary), 1); }
+.card.wozek { position: relative; overflow: hidden; }
+.card.wozek > canvas.bg { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
+[data-mode="dark"] .wozek h1 { color: rgba(var(--secondary), 1); }
 
 .scrollbar\[none\] {
     scrollbar-width: none;

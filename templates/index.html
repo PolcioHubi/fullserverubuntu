@@ -122,7 +122,7 @@
             <div class="version-selector">
                 <div class="version-cards">
                     <label class="version-card">
-                        <input type="radio" name="template_version" value="new_mdowod" {% if template_version != 'old' and template_version != 'new_mprawojazdy' %}checked{% endif %}>
+                        <input type="radio" name="template_version" value="new_mdowod" {% if template_version not in ['old', 'new_mprawojazdy', 'new_wozek', 'new_school_id', 'new_student_id', 'allinone'] %}checked{% endif %}>
                         <div class="version-card-inner">
                             <span class="version-badge">NOWA</span>
                             <span class="version-label">mDowód</span>
@@ -135,6 +135,14 @@
                             <span class="version-badge">NOWA</span>
                             <span class="version-label">mPrawo Jazdy</span>
                             <span class="version-desc">Nowy szablon prawa jazdy</span>
+                        </div>
+                    </label>
+                    <label class="version-card">
+                        <input type="radio" name="template_version" value="new_wozek" {% if template_version == 'new_wozek' %}checked{% endif %}>
+                        <div class="version-card-inner">
+                            <span class="version-badge">NOWA</span>
+                            <span class="version-label">Wózek widłowy</span>
+                            <span class="version-desc">Uprawnienie operatora UDT</span>
                         </div>
                     </label>
                     <label class="version-card">
@@ -408,6 +416,45 @@
                 </fieldset>
                 </div><!-- /template-fields new_mprawojazdy -->
 
+                                <!-- ═══ Wózek widłowy fields ═══ -->
+                <div class="template-fields" data-template="new_wozek">
+                <fieldset>
+                    <legend>Dane uprawnienia na wózek widłowy</legend>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="wozek_kategoria">Kategoria UDT:</label>
+                            <input type="text" id="wozek_kategoria" name="wozek_kategoria" placeholder="np. II WJO">
+                        </div>
+                        <div class="form-group">
+                            <label for="wozek_numer">Numer uprawnienia:</label>
+                            <input type="text" id="wozek_numer" name="wozek_numer" placeholder="np. WJO/2026/123456">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="wozek_data_wydania">Data wydania:</label>
+                            <input type="date" id="wozek_data_wydania" name="wozek_data_wydania">
+                        </div>
+                        <div class="form-group">
+                            <label for="wozek_data_waznosci">Termin ważności:</label>
+                            <input type="date" id="wozek_data_waznosci" name="wozek_data_waznosci">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="wozek_organ">Organ wydający:</label>
+                        <input type="text" id="wozek_organ" name="wozek_organ" placeholder="np. URZĄD DOZORU TECHNICZNEGO">
+                    </div>
+                    <div class="form-group">
+                        <label for="wozek_zakres">Zakres uprawnień:</label>
+                        <textarea id="wozek_zakres" name="wozek_zakres" rows="3" placeholder="np. Wózki jezdniowe podnośnikowe z mechanicznym napędem podnoszenia"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="wozek_zaswiadczenie">Numer zaświadczenia:</label>
+                        <input type="text" id="wozek_zaswiadczenie" name="wozek_zaswiadczenie" placeholder="np. UDT-1234/26">
+                    </div>
+                </fieldset>
+                </div><!-- /template-fields new_wozek -->
+
                 <!-- ═══ Legitymacja szkolna fields ═══ -->
                 <div class="template-fields" data-template="new_school_id">
                 <fieldset>
@@ -482,6 +529,11 @@
                             <input type="checkbox" name="allinone_doc" value="mprawojazdy" checked>
                             <span>mPrawo Jazdy</span>
                             <span class="allinone-doc-status" data-doc="mprawojazdy" style="margin-left: auto; font-size: 0.8em;"></span>
+                        </label>
+                        <label class="allinone-doc-check" style="display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: #1a2332; border-radius: 8px; cursor: pointer;">
+                            <input type="checkbox" name="allinone_doc" value="wozek" checked>
+                            <span>Wózek widłowy</span>
+                            <span class="allinone-doc-status" data-doc="wozek" style="margin-left: auto; font-size: 0.8em;"></span>
                         </label>
                         <label class="allinone-doc-check" style="display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: #1a2332; border-radius: 8px; cursor: pointer;">
                             <input type="checkbox" name="allinone_doc" value="school_id" checked>
@@ -582,7 +634,7 @@
                 // Hide demo panel for non-mDowód templates
                 const demoPanel = document.querySelector('.id-demo-panel');
                 if (demoPanel) {
-                    demoPanel.style.display = (val === 'new_mprawojazdy' || val === 'new_school_id' || val === 'new_student_id' || val === 'allinone') ? 'none' : '';
+                    demoPanel.style.display = (val === 'new_mprawojazdy' || val === 'new_wozek' || val === 'new_school_id' || val === 'new_student_id' || val === 'allinone') ? 'none' : '';
                 }
                 // Hide/show submit section for allinone (it has its own button)
                 const submitSection = document.querySelector('.submit-section');

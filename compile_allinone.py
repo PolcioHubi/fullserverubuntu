@@ -60,6 +60,7 @@ EXTRA_SCRIPTS = [
     "/assets/js/vendor/zxing.min.js",
     "/assets/js/pages/documents/mdowod.js",
     "/assets/js/pages/documents/mprawojazdy.js",
+    "/assets/js/pages/documents/wozek.js",
     "/assets/js/pages/documents/school_id.js",
     "/assets/js/pages/documents/student_id.js",
 ]
@@ -68,6 +69,7 @@ EXTRA_SCRIPTS = [
 USER_DOC_MAP = OrderedDict([
     ("mdowod", "dowodnowy_new.html"),
     ("mprawojazdy", "prawojazdy_new.html"),
+    ("wozek", "wozek_new.html"),
     ("school_id", "school_id_new.html"),
     ("student_id", "student_id_new.html"),
 ])
@@ -117,6 +119,23 @@ FORM_FIELD_MAP = {
             "blank": "pj_blankiet",
             "issuer": "pj_organ",
             "restrictions": "pj_ograniczenia",
+        },
+    },
+    "wozek": {
+        "main": {
+            "first_name": "imie",
+            "last_name": "nazwisko",
+            "birthdate": "data_urodzenia",
+            "pesel": "pesel",
+            "category": "wozek_kategoria",
+        },
+        "other": {
+            "number": "wozek_numer",
+            "issue": "wozek_data_wydania",
+            "expiration": "wozek_data_waznosci",
+            "issuer": "wozek_organ",
+            "scope": "wozek_zakres",
+            "certificate": "wozek_zaswiadczenie",
         },
     },
     "school": {
@@ -525,6 +544,7 @@ def generate_spa_router(selected_docs=None, is_per_user=False):
         manager_map = {
             "mdowod": "mdowodManager",
             "mprawojazdy": "mprawojazdyManager",
+            "wozek": "wozekManager",
             "school_id": "schoolIDManager",
             "student_id": "studentIDManager",
         }
@@ -532,6 +552,10 @@ def generate_spa_router(selected_docs=None, is_per_user=False):
             mgr = manager_map.get(doc, "")
             if mgr:
                 cases.append(f"""                case '{doc}_viewer':
+                    $('[data-button="additional_details"]').off('click');
+                    $('[data-button="restrict_pesel"], [data-button="restrict_pesel_back"]').off('click');
+                    $('[data-button="other_shortcuts"], [data-button="other_shortcuts_back"]').off('click');
+                    $('[data-standalone]').off('scroll');
                     if (typeof {mgr} !== 'undefined') {{
                         {mgr}.initialized = false;
                         {mgr}.init();
@@ -654,6 +678,11 @@ def generate_spa_router(selected_docs=None, is_per_user=False):
         updateActiveTab(resolved);
         _trackingEnabled.value = true;
         initPageManager(resolved);
+        if (window.__allInOneEmblemBridge && typeof window.__allInOneEmblemBridge.onPageShown === 'function') {{
+            requestAnimationFrame(function() {{
+                window.__allInOneEmblemBridge.onPageShown(resolved, target);
+            }});
+        }}
 
         console.log('[SPA Router] Przełączono na:', resolved);
     }}
@@ -861,9 +890,40 @@ def generate_spa_router(selected_docs=None, is_per_user=False):
     }});
 
     // --- Inicjalizacja ---
+    function resolveInitialPage() {{
+        var hash = location.hash.replace('#', '');
+        var resolvedHash = hash ? resolvePageName(hash) : null;
+        return resolvedHash || 'login';
+    }}
+
     function spaInit() {{
-        // Zawsze zaczynaj od logowania — jak w prawdziwej aplikacji
-        showPage('login');
+        var initialPage = resolveInitialPage();
+        if (initialPage === 'login') {{
+            showPage('login', false);
+            return;
+        }}
+
+        // Sprawdź czy użytkownik jest zalogowany (jedyny request do serwera)
+        $.ajax({{
+            url: '/api/data/get/subscription',
+            dataType: 'json',
+            timeout: 5000,
+            success: function(resp) {{
+                if (resp && resp.success) {{
+                    showPage(initialPage, false);
+                }} else {{
+                    showPage('login', false);
+                }}
+            }},
+            error: function(xhr) {{
+                if (xhr.status === 401 || xhr.status === 403 || xhr.status === 302) {{
+                    showPage('login', false);
+                }} else {{
+                    // Błąd sieci / offline — pokaż żądaną stronę, jeśli bundle jest już dostępny.
+                    showPage(initialPage, false);
+                }}
+            }}
+        }});
     }}
 
     if (document.readyState === 'loading') {{
@@ -979,6 +1039,341 @@ def generate_js_patches(is_per_user=False):
         });
 """
 
+    emblem_bridge = ""
+    if is_per_user:
+        emblem_bridge = r"""
+    (function() {
+        if (window.__allInOneEmblemBridge) return;
+
+        const VIEWER_RE = /_viewer$/;
+        const isAppleMobile =
+            /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+            (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) ||
+            (navigator.vendor && navigator.vendor.includes('Apple') && navigator.maxTouchPoints > 1);
+        const needsMotionPerm =
+            typeof DeviceMotionEvent !== 'undefined' &&
+            typeof DeviceMotionEvent.requestPermission === 'function';
+        const needsOrientPerm =
+            typeof DeviceOrientationEvent !== 'undefined' &&
+            typeof DeviceOrientationEvent.requestPermission === 'function';
+
+        const P = {
+            dirY: -1,
+            dirX: 1,
+            sensY: 24,
+            sensX: 18,
+            maxY: 78,
+            maxX: 18,
+            maxAng: 11,
+            alphaMin: 0.055,
+            alphaMax: 0.52,
+            topFadeStart: 0.76,
+            topFadeEnd: 1.0,
+            lerp: 0.18,
+            deadband: 0.008
+        };
+
+        const state = {
+            activeEntries: [],
+            requesting: false,
+            sensorsStarted: false,
+            motionActivated: false,
+            permissionGranted: !(needsMotionPerm || needsOrientPerm),
+            removeGestureListeners: null,
+            center: { tiltX: 0, tiltY: 0 },
+            live: { tiltX: 0, tiltY: 0 }
+        };
+
+        const clamp = (v, min, max) => v < min ? min : (v > max ? max : v);
+        const lerp = (a, b, t) => a + (b - a) * t;
+        const smooth = (e0, e1, x) => {
+            const t = clamp((x - e0) / (e1 - e0), 0, 1);
+            return t * t * (3 - 2 * t);
+        };
+
+        function getViewportAngle() {
+            if (window.screen && window.screen.orientation && Number.isFinite(window.screen.orientation.angle)) {
+                return ((window.screen.orientation.angle % 360) + 360) % 360;
+            }
+            if (typeof window.orientation === 'number') {
+                return ((window.orientation % 360) + 360) % 360;
+            }
+            return window.innerWidth > window.innerHeight ? 90 : 0;
+        }
+
+        function getScreenAlignedTilt(beta, gamma) {
+            const rawX = Number.isFinite(gamma) ? gamma : 0;
+            const rawY = Number.isFinite(beta) ? beta : 0;
+            const angle = getViewportAngle();
+
+            switch (angle) {
+                case 90:
+                    return { tiltX: rawY, tiltY: -rawX };
+                case 180:
+                    return { tiltX: -rawX, tiltY: -rawY };
+                case 270:
+                    return { tiltX: -rawY, tiltY: rawX };
+                default:
+                    return { tiltX: rawX, tiltY: rawY };
+            }
+        }
+
+        function setVars(entry, tx, ty, ang, alpha) {
+            entry.scope.style.setProperty('--em-tx', tx.toFixed(2) + '%');
+            entry.scope.style.setProperty('--em-ty', ty.toFixed(2) + '%');
+            entry.scope.style.setProperty('--em-ang', ang.toFixed(2) + 'deg');
+            entry.scope.style.setProperty('--em-alpha', alpha.toFixed(3));
+        }
+
+        function collectEntries(scopeRoot) {
+            if (!scopeRoot) return [];
+            return Array.from(scopeRoot.querySelectorAll('.emblem[data-emblem]'))
+                .map((wrap) => {
+                    const scope = wrap.querySelector('[id="emblem"]') || wrap.querySelector('.emblem\\[card\\]');
+                    if (!scope) return null;
+
+                    const style = getComputedStyle(scope);
+                    const base = {
+                        tx: parseFloat(style.getPropertyValue('--em-tx')) || 0,
+                        ty: parseFloat(style.getPropertyValue('--em-ty')) || 34,
+                        ang: parseFloat(style.getPropertyValue('--em-ang')) || 0,
+                        alpha: parseFloat(style.getPropertyValue('--em-alpha')) || 0.12
+                    };
+
+                    return {
+                        wrap,
+                        scope,
+                        gif: wrap.querySelector('img'),
+                        base,
+                        last: { ...base }
+                    };
+                })
+                .filter(Boolean);
+        }
+
+        function showCard(entries) {
+            entries.forEach((entry) => {
+                if (entry.gif) entry.gif.classList.add('display-none');
+                entry.scope.classList.remove('display-none');
+            });
+        }
+
+        function showGif(entries) {
+            entries.forEach((entry) => {
+                if (entry.gif) {
+                    entry.gif.classList.remove('display-none');
+                    entry.scope.classList.add('display-none');
+                } else {
+                    entry.scope.classList.remove('display-none');
+                }
+            });
+        }
+
+        function resetEntries(entries) {
+            entries.forEach((entry) => {
+                entry.last = { ...entry.base };
+                setVars(entry, entry.base.tx, entry.base.ty, entry.base.ang, entry.base.alpha);
+            });
+        }
+
+        function targetFrom(base, tilt) {
+            const dY = clamp((tilt.tiltY - state.center.tiltY) / P.sensY, -1, 1);
+            const dX = clamp((tilt.tiltX - state.center.tiltX) / P.sensX, -1, 1);
+            const signedY = dY * (P.dirY ?? 1);
+            const signedX = dX * (P.dirX ?? 1);
+            const mag = clamp(Math.hypot(dX, dY), 0, 1);
+
+            const tx = base.tx + signedX * P.maxX;
+            const ty = base.ty - signedY * P.maxY;
+            const ang = base.ang + signedX * P.maxAng;
+            const baseAlpha = P.alphaMin + mag * (P.alphaMax - P.alphaMin);
+
+            const progressUp = clamp((base.ty - ty) / P.maxY, 0, 1);
+            const topFade = 1 - smooth(P.topFadeStart, P.topFadeEnd, progressUp);
+            const alpha = clamp(baseAlpha * topFade, P.alphaMin * 0.55, P.alphaMax);
+
+            return { tx, ty, ang, alpha };
+        }
+
+        function animateActive(tilt) {
+            const near = (a, b) => Math.abs(a - b) < P.deadband * (1 + Math.abs(b) / 100);
+
+            state.activeEntries.forEach((entry) => {
+                const target = targetFrom(entry.base, tilt);
+                entry.last.tx = near(entry.last.tx, target.tx) ? target.tx : lerp(entry.last.tx, target.tx, P.lerp);
+                entry.last.ty = near(entry.last.ty, target.ty) ? target.ty : lerp(entry.last.ty, target.ty, P.lerp);
+                entry.last.ang = near(entry.last.ang, target.ang) ? target.ang : lerp(entry.last.ang, target.ang, P.lerp);
+                entry.last.alpha = near(entry.last.alpha, target.alpha) ? target.alpha : lerp(entry.last.alpha, target.alpha, P.lerp);
+                setVars(entry, entry.last.tx, entry.last.ty, entry.last.ang, entry.last.alpha);
+            });
+        }
+
+        function recenterToCurrentTilt() {
+            state.center.tiltX = state.live.tiltX;
+            state.center.tiltY = state.live.tiltY;
+        }
+
+        function onOrient(e) {
+            if (!state.activeEntries.length || (e.beta == null && e.gamma == null)) return;
+
+            if (!state.motionActivated) {
+                state.motionActivated = true;
+                showCard(state.activeEntries);
+            }
+
+            const tilt = getScreenAlignedTilt(e.beta, e.gamma);
+            state.live.tiltX = tilt.tiltX;
+            state.live.tiltY = tilt.tiltY;
+            animateActive(tilt);
+        }
+
+        function startSensors() {
+            if (state.sensorsStarted) return;
+            state.sensorsStarted = true;
+            window.addEventListener('deviceorientation', onOrient, true);
+            setTimeout(recenterToCurrentTilt, 180);
+        }
+
+        function probe(timeout = 560) {
+            return new Promise(resolve => {
+                let done = false;
+
+                const onAnyOrient = (ev) => {
+                    if (!ev || ev.beta == null) return;
+                    done = true;
+                    cleanup();
+                    resolve(true);
+                };
+
+                const onAnyMotion = () => {
+                    done = true;
+                    cleanup();
+                    resolve(true);
+                };
+
+                const cleanup = () => {
+                    window.removeEventListener('deviceorientation', onAnyOrient, true);
+                    window.removeEventListener('devicemotion', onAnyMotion, true);
+                };
+
+                window.addEventListener('deviceorientation', onAnyOrient, { once: true, capture: true, passive: true });
+                window.addEventListener('devicemotion', onAnyMotion, { once: true, capture: true, passive: true });
+
+                requestAnimationFrame(() => requestAnimationFrame(() => {
+                    if (done) return;
+                    setTimeout(() => {
+                        cleanup();
+                        resolve(false);
+                    }, timeout);
+                }));
+            });
+        }
+
+        function armGesture() {
+            if (state.removeGestureListeners) return;
+
+            const once = async () => {
+                if (state.removeGestureListeners) state.removeGestureListeners();
+                await requestAndStart();
+            };
+
+            state.removeGestureListeners = () => {
+                document.removeEventListener('click', once, true);
+                if (!isAppleMobile) {
+                    document.removeEventListener('pointerdown', once, true);
+                    document.removeEventListener('touchstart', once, true);
+                }
+                state.removeGestureListeners = null;
+            };
+
+            document.addEventListener('click', once, { capture: true });
+            if (!isAppleMobile) {
+                document.addEventListener('pointerdown', once, { capture: true, passive: true });
+                document.addEventListener('touchstart', once, { capture: true, passive: true });
+            }
+        }
+
+        async function requestAndStart() {
+            if (state.requesting) return;
+            state.requesting = true;
+
+            let ok = state.permissionGranted;
+            if (!state.permissionGranted) {
+                ok = true;
+                try {
+                    if (needsMotionPerm) ok = (await DeviceMotionEvent.requestPermission()) === 'granted' && ok;
+                    if (needsOrientPerm) ok = (await DeviceOrientationEvent.requestPermission()) === 'granted' && ok;
+                } catch (_) {
+                    ok = false;
+                }
+            }
+
+            if (ok) {
+                state.permissionGranted = true;
+                startSensors();
+                if (state.activeEntries.length) {
+                    showCard(state.activeEntries);
+                    animateActive(state.live);
+                    probe(isAppleMobile ? 640 : 320).then((fired) => {
+                        if (!fired && !state.motionActivated && state.activeEntries.length) {
+                            showGif(state.activeEntries);
+                        }
+                    });
+                }
+            } else if (state.activeEntries.length) {
+                showGif(state.activeEntries);
+                armGesture();
+            }
+
+            state.requesting = false;
+        }
+
+        function onPageShown(pageName, target) {
+            if (!VIEWER_RE.test(pageName || '')) {
+                state.activeEntries = [];
+                return;
+            }
+
+            state.activeEntries = collectEntries(target);
+            if (!state.activeEntries.length) return;
+
+            resetEntries(state.activeEntries);
+
+            if (state.permissionGranted) {
+                startSensors();
+                showCard(state.activeEntries);
+                animateActive(state.live);
+                setTimeout(recenterToCurrentTilt, 60);
+                return;
+            }
+
+            showGif(state.activeEntries);
+
+            try {
+                if (navigator.userActivation && navigator.userActivation.isActive) {
+                    requestAndStart();
+                    return;
+                }
+            } catch (_) {}
+
+            armGesture();
+        }
+
+        if (window.screen && window.screen.orientation && typeof window.screen.orientation.addEventListener === 'function') {
+            window.screen.orientation.addEventListener('change', () => {
+                setTimeout(recenterToCurrentTilt, 180);
+            });
+        }
+        window.addEventListener('orientationchange', () => {
+            setTimeout(recenterToCurrentTilt, 180);
+        });
+
+        window.__allInOneEmblemBridge = {
+            onPageShown: onPageShown
+        };
+    })();
+"""
+
     return f"""
 // ============================================================================
 // ALL-IN-ONE JS PATCHES — adaptacja istniejących skryptów pod SPA
@@ -1006,6 +1401,8 @@ def generate_js_patches(is_per_user=False):
 
         console.log('[SPA Patches] jQuery handlery przechwycone');
     }});
+
+{emblem_bridge}
 
     // Patch 3: Subscription check intercept
     var _origAjax = $.ajax;
@@ -1272,22 +1669,6 @@ class Compiler:
                     body.insert(0, soup.new_tag("style"))
                     body.find_all("style")[-1].string = style_tag.string or ""
 
-                # JS z <script src> w nagłówku — inline'uj (z deduplikacją)
-                for script_tag in head.find_all("script", src=True):
-                    src = script_tag["src"]
-                    resolved = resolve_path(STATIC_NEW, src)
-                    if resolved and resolved.exists():
-                        resolved = Path(resolved).resolve()
-                        if resolved in self.js_resolver._visited:
-                            log_verbose(f"  JS pominięty (duplikat): {resolved.name}")
-                            continue
-                        self.js_resolver._visited.add(resolved)
-                        content = read_text(resolved)
-                        content = self.js_resolver._inline_asset_urls(content)
-                        new_script = soup.new_tag("script")
-                        new_script.string = content
-                        body.append(new_script)
-
             viewer_name = f"{doc_key}_viewer"
             inner = body.decode_contents()
             section = (
@@ -1492,7 +1873,7 @@ class Compiler:
     // script.js uruchamia tę logikę tylko gdy path==='documents',
     // a w all-in-one path to 'allinone.html' — więc musimy ją dodać.
     // ---------------------------------------------------------------
-    var DOC_KEYS = ['mdowod', 'mprawojazdy', 'school_id', 'student_id'];
+    var DOC_KEYS = ['mdowod', 'mprawojazdy', 'wozek', 'school_id', 'student_id'];
 
     function getDocLayoutMode() {
         var s = localStorage.getItem('documents_layout_mode');
@@ -1624,8 +2005,41 @@ class Compiler:
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta property="og:title" content="mObywatel">
     <meta property="og:type" content="website">
-    <title>mObywatel - All in One</title>
-    <link rel="manifest" href="/static/manifest.json">
+    <title>mObywatel</title>
+    <link rel="shortcut icon" href="/assets/img/logo.png" type="image/x-icon">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-180x.png">
+    <link rel="apple-touch-startup-image" sizes="180x180" href="/assets/img/apple-180x.png">
+    <link rel="manifest" href="/allinone-manifest.json">
+    <script>
+    // Service Worker registration for All-in-One PWA install support
+    (function() {{
+        if (!('serviceWorker' in navigator)) return;
+        window.addEventListener('load', function() {{
+            navigator.serviceWorker.register('/allinone-sw.js', {{ scope: '/user_files/', updateViaCache: 'none' }})
+            .then(function(reg) {{
+                console.log('[AIO-SW] registered, scope:', reg.scope);
+                reg.update().catch(function() {{}});
+                if (reg.installing) {{
+                    reg.installing.addEventListener('statechange', function() {{
+                        if (this.state === 'installed' && navigator.serviceWorker.controller) {{
+                            this.postMessage({{ type: 'SKIP_WAITING' }});
+                        }}
+                    }});
+                }}
+                reg.addEventListener('updatefound', function() {{
+                    if (reg.installing) {{
+                        reg.installing.addEventListener('statechange', function() {{
+                            if (this.state === 'installed' && navigator.serviceWorker.controller) {{
+                                this.postMessage({{ type: 'SKIP_WAITING' }});
+                            }}
+                        }});
+                    }}
+                }});
+            }})
+            .catch(function(err) {{ console.warn('[AIO-SW] register error:', err); }});
+        }});
+    }})();
+    </script>
 {external_links}    <style>
 {css_content}
 

@@ -82,7 +82,7 @@
         if (!nav) return;
         var path = location.pathname.replace(/^\/+|\/+$/g, "") || "documents";
         var segment = path.split("/").pop().replace(/\.html$/, "");
-        var docPages = ["mdowod", "mprawojazdy", "school_id", "student_id", "dowodnowy_new", "prawojazdy_new", "school_id_new", "student_id_new"];
+        var docPages = ["mdowod", "mprawojazdy", "wozek", "school_id", "student_id", "dowodnowy_new", "prawojazdy_new", "wozek_new", "school_id_new", "student_id_new"];
         var activeSection = (path.indexOf("user_files/") === 0 || docPages.indexOf(segment) !== -1) ? "documents" : path;
         var links = nav.querySelectorAll("a[href]");
 

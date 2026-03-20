@@ -1,4 +1,4 @@
-﻿{
+{
     "success": true,
     "message": "Data retrieved successfully",
     "data": {
@@ -77,6 +77,24 @@
                 "address": "NOWY SWIAT 49, 00-042 WARSZAWA",
                 "principal": "MGR ANNA WISNIEWSKA",
                 "phone": "+48 22 123 45 67",
+                "last_update": "08.03.2026, 12:00"
+            }
+        },
+        "wozek": {
+            "main": {
+                "first_name": "JAN",
+                "last_name": "KOWALSKI",
+                "birthdate": "01.01.2000",
+                "pesel": "00210112345",
+                "category": "II WJO"
+            },
+            "other": {
+                "number": "WJO/2026/123456",
+                "issue": "15.06.2024",
+                "expiration": "15.06.2029",
+                "issuer": "URZĄD DOZORU TECHNICZNEGO",
+                "scope": "Wózki jezdniowe podnośnikowe z mechanicznym napędem podnoszenia",
+                "certificate": "UDT-1234/26",
                 "last_update": "08.03.2026, 12:00"
             }
         }

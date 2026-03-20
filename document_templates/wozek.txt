@@ -1,0 +1,307 @@
+﻿<!DOCTYPE html>
+
+<html data-custom="" data-mode="light" data-theme="default" lang="en">
+<head>
+<!-- Meta -->
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+<meta content="" name="description"/>
+<meta content="mObywatel" name="author"/>
+<!-- Default Meta -->
+<meta content="#f5f6fb" name="theme-color"/>
+<meta content="mObywatel" name="apple-mobile-web-app-title"/>
+<meta content="yes" name="apple-mobile-web-app-capable"/>
+<meta content="yes" name="mobile-web-app-capable"/>
+<meta content="default" name="apple-mobile-web-app-status-bar-style"/>
+<!-- [LOCAL] noscript redirect disabled -->
+<!-- Open Graph Meta -->
+<meta content="mObywatel" property="og:title"/>
+<meta content="" property="og:description"/>
+<meta content="website" property="og:type"/>
+<meta content="en_US" property="og:locale"/>
+<meta content="/assets/img/logo.png" property="og:image"/>
+<!-- Twitter Meta -->
+<meta content="summary" name="twitter:card"/>
+<meta content="mObywatel" name="twitter:title"/>
+<meta content="" name="twitter:description"/>
+<meta content="/assets/img/logo.png" name="twitter:image"/>
+<!-- Links -->
+<link href="/assets/img/logo.png" rel="shortcut icon" type="image/x-icon"/>
+<link href="/assets/img/apple-180x.png" rel="apple-touch-icon" sizes="180x180"/>
+<link href="/assets/img/apple-180x.png" rel="apple-touch-startup-image" sizes="180x180"/>
+<link href="/manifest.json" rel="manifest"/>
+<link href="/assets/css/style.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&amp;family=Roboto:ital,wght@0,100..900;1,100..900&amp;display=swap" rel="stylesheet"/>
+<!-- JavaScript -->
+<script src="/assets/js/global/jquery.js"></script>
+<script src="/assets/js/global/qrcode.js"></script>
+<!-- Service Worker -->
+<script src="/assets/js/global/worker-starter.js"></script>
+<!-- Libraries & Assets -->
+<script src="/assets/js/global/utilities.js"></script>
+<!-- Pages -->
+<script src="/assets/js/pages/index.js"></script>
+<!-- Documents -->
+<script src="/assets/js/pages/documents/wozek.js"></script> <!-- Main JavaScript -->
+<script src="/assets/js/script.js"></script>
+<script>
+        // Override data polling (data is already set server-side by BeautifulSoup)
+        if (typeof wozekManager !== 'undefined') {
+            wozekManager.startDataPolling = function() {};
+            $(function() { wozekManager.init(); });
+        }
+    </script>
+<script defer="" src="/assets/js/global/enhancements.js"></script>
+<!-- Title -->
+<title>mObywatel</title>
+<style>
+        body { opacity: 1 !important; transform: none !important; }
+        /* Disable skeleton shimmer — data is already injected server-side */
+        .skeleton { color: inherit !important; background: none !important; }
+        .skeleton::after { display: none !important; }
+    </style>
+</head>
+<body class="background[unset]">
+<div class="notification-group primary absolute bottom[50px] fillWidth height[80px] px[s] z[3] display-none">
+<div class="notification flex justify[between] align[center] fillWidth min-height[40px] radius[xs] px[s] shadow hide">
+<p class="font-weight[400] font[Inter] text-align[left] text-size[14]">Twoje dane są aktualne</p>
+</div>
+</div>
+<div class="fillWidth fillHeight overflow[y-auto] document-screen" data-standalone="">
+<div class="dashboard-navigation sticky top[0] background[unset] flex direction[row] justify[around] align[end] g[s] fillWidth height[45px] px[s] z[max] pb[xs]">
+<a class="redirect flex direction[row] g[4] align[center] font-weight[400] text-size[16] text-align[left] fillWidth text[nowrap] height[20px]" data-redirect="documents">
+<i class="far fa-chevron-left text-size[24]"></i>
+                Dokumenty            </a>
+<div class="fillWidth flex justify[center] align[center] height[20px]">
+<h1 class="font[Inter] text-align[center] font-weight[600] text-size[18] text[nowrap]">Wózek widłowy</h1>
+</div>
+<div class="flex justify[end] align[center] height[20px] fillWidth">
+<div class="square[5px]"></div>
+</div>
+</div>
+<div class="flex direction[row] justify[between] align[center] card danger fillWidth autoHeight p[xs] mb[s] display-none">
+<p class="primary font-weight[700] font[Inter] text-align[center] text-size[16]">Wersja demonstracyjna</p>
+<button class="radius[full] border[unset] max-height[20px] px[12] py[16] font-weight[600] text-size[16] flex justify[center] align[center]" data-button="hide_popup">
+<p class="danger font-weight[700] font[Inter] text-align[center] text-size[14]">Ukryj</p>
+</button>
+</div>
+<div class="relative fillWidth autoHeight us[none] px[s] pb[s] mb[80] documentFade" data-wrapper="">
+<div class="flex direction[column] g[s] justify[start] align[start] fillWidth fillHeight">
+<div class="flex fillWidth autoHeight">
+<p class="label font[Inter] text-align[center] fillWidth text-size[12]" data-p="time" data-time="Czas:"></p>
+</div>
+<div class="flex direction[column] autoHeight fillWidth">
+<div class="card wozek flex direction[row] justify[center] align[start] fillWidth autoHeight min-height[340px] radius[m] p[20] radius[none-bottom-left] radius[none-bottom-right]">
+<div class="z[1] fillWidth max-width[40] fillHeight flex direction[column] justify[start] align[start] g[8]">
+<div class="relative width[130px] min-width[130px] height[170px] min-height[170px] overflow[hidden] document-photo">
+<img alt="Uzupełnij obrazek" class="max-width[130px] fillWidth fillHeight radius[m]" data-placeholder="wozek_picture" id="user_photo" src="" style="filter: grayscale(100%); object-fit: cover; object-position: center; -webkit-mask-image: linear-gradient(to top, transparent, black 6.5%, black 96.5%, transparent), linear-gradient(to left, transparent, black 6.5%, black 96.5%, transparent); -webkit-mask-composite: intersect; mask-image: linear-gradient(to top, transparent, black 6.5%, black 96.5%, transparent), linear-gradient(to left, transparent, black 6.5%, black 96.5%, transparent); mask-composite: intersect;"/>
+</div>
+<div class="autoHeight fillWidth">
+<img class="width[70px]" src="/assets/img/flaga.gif"/>
+</div>
+<div class="flex direction[row] g[4] autoHeight max-height[50px] fillWidth align[center] justify[start]">
+<div class="emblem" data-emblem="">
+<img alt="" class="max-width[30px] display-flex" src="/assets/img/godlo.gif"/>
+<div class="emblem[card] display-none" id="emblem">
+<div class="emblem[eagle]" style="--img-url: url('/assets/img/godlo_mask.png');"></div>
+<div class="emblem[image]" style="--img-url: url('/assets/img/godlo.png');"></div>
+<div class="emblem[mask]">
+<div class="emblem[rainbow]"></div>
+<div class="emblem[spectral]"></div>
+</div>
+</div>
+</div>
+<div class="flex align[center] justify[start] fillWidth fillHeight">
+<p class="label text-size[10] max-width[60]" style="color: #808080;text-wrap: balance;">Rzeczpospolita Polska</p>
+</div>
+</div>
+</div>
+<div class="z[1] pl[20] fillWidth fillHeight flex direction[column] justify[start] align[start] g[xs] document-fields">
+<div class="flex autoHeight direction[column] g[4] justify[start] align[start] document-field">
+<h1 class="font[Inter] text-align[left] font-weight[600] text-size[16] text[uppercase]" data-placeholder="wozek_first_name"></h1>
+<p class="label font[Inter] text-align[center] font-weight[600] text-size[12]" style="color: #4a4a4a">Imię (Imiona)</p>
+</div>
+<div class="flex autoHeight direction[column] g[4] justify[start] align[start] document-field">
+<h1 class="font[Inter] text-align[left] font-weight[600] text-size[16] text[uppercase]" data-placeholder="wozek_last_name"></h1>
+<p class="label font[Inter] text-align[center] font-weight[600] text-size[12]" style="color: #4a4a4a">Nazwisko</p>
+</div>
+<div class="flex autoHeight direction[column] g[4] justify[start] align[start] document-field">
+<h1 class="font[Inter] text-align[left] font-weight[600] text-size[16] text[uppercase]" data-placeholder="wozek_birthdate"></h1>
+<p class="label font[Inter] text-align[center] font-weight[600] text-size[12]" style="color: #4a4a4a">Data urodzenia</p>
+</div>
+<div class="flex autoHeight direction[column] g[4] justify[start] align[start] document-field">
+<h1 class="font[Inter] text-align[left] font-weight[600] text-size[16] text[uppercase]" data-placeholder="wozek_pesel"></h1>
+<p class="label font[Inter] text-align[center] font-weight[600] text-size[12]" style="color: #4a4a4a">Numer PESEL</p>
+</div>
+<div class="flex autoHeight direction[column] g[4] justify[start] align[start] document-field">
+<h1 class="font[Inter] text-align[left] font-weight[600] text-size[16] text[uppercase]" data-placeholder="wozek_category"></h1>
+<p class="label font[Inter] text-align[center] font-weight[600] text-size[12]" style="color: #4a4a4a">Kategoria UDT</p>
+</div>
+</div>
+</div>
+<div class="card shadow p[8] fillWidth height[60px] radius[none-top-left] radius[none-top-right] radius[m] flex direction[row] g[s] document-status">
+<div class="flex direction[row] justify[start] align[center] fillWidth">
+<div class="flex justify[center] align[center] square[50px]">
+<img class="square[30px]" src="/assets/svg/mprawojazdy/checkmark.svg"/>
+</div>
+<div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth px[4]">
+<h1 class="font-weight[600] text-size[12] text-align[left] fillWidth" style="color: #16be2d;">Dokument ważny</h1>
+</div>
+</div>
+</div>
+</div>
+<div class="flex direction[row] justify[center] align[center] fillWidth autoHeight min-height[90px] pt[s] px[m] document-actions">
+<div class="flex direction[column] justify[start] align[center] g[4] fillHeight fillWidth height[90px] min-height[90px] min-width[80px] document-action" data-redirect="qr_code?tabOpen=scan_qr">
+<div class="card flex justify[center] align[center] square[50px] radius[full]">
+<img class="document-icon square[20px]" src="/assets/svg/mprawojazdy/check_document.svg"/>
+</div>
+<p class="font[Inter] text-align[center] font-weight[400] text-size[12] text[balance] max-width[80px]">Potwierdź swoje dane</p>
+</div>
+<div class="flex direction[column] justify[start] align[center] g[4] fillHeight fillWidth height[90px] min-height[90px] min-width[80px] document-action" data-button="identity_card">
+<div class="card flex justify[center] align[center] square[50px] radius[full]">
+<img class="document-icon square[25px]" src="/assets/svg/mprawojazdy/penalty_points.svg"/>
+</div>
+<p class="font[Inter] text-align[center] font-weight[400] text-size[12] text[balance] max-width[50px]">Zakres</p>
+</div>
+<div class="flex direction[column] justify[start] align[center] g[4] fillHeight fillWidth height[90px] min-height[90px] min-width[80px] document-action">
+<div class="card flex justify[center] align[center] square[50px] radius[full]">
+<img class="document-icon square[25px]" src="/assets/svg/mprawojazdy/car_crash.svg"/>
+</div>
+<p class="font[Inter] text-align[center] font-weight[400] text-size[12] text[balance] max-width[80px]">Dokument UDT</p>
+</div>
+<div class="flex direction[column] justify[start] align[center] g[4] fillHeight fillWidth height[90px] min-height[90px] min-width[80px] document-action" data-button="other_shortcuts">
+<div class="card flex justify[center] align[center] square[50px] radius[full]">
+<img class="document-icon square[20px]" src="/assets/svg/mprawojazdy/shortcuts.svg"/>
+</div>
+<p class="font[Inter] text-align[center] font-weight[400] text-size[12] text[balance] max-width[80px]">Pozostałe skróty</p>
+</div>
+</div>
+<div class="card flex direction[column] justify[center] align[start] fillWidth autoHeight min-height[80px] radius[xl] shadow">
+<div class="flex direction[row] justify[start] align[center] p[s] fillWidth">
+<div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth">
+<div class="flex direction[column] g[4] justify[start] align[center] autoWidth">
+<h1 class="label font-weight[400] text-size[14] text-align[left] fillWidth">Ostatnia aktualizacja</h1>
+<p class="font-weight[600] text-size[16] text-align[left] fillWidth" data-placeholder="wozek_last_update"></p>
+</div>
+<button class="secondary radius[m] border[unset] max-height[20px] px[16] py[16] font-weight[500] text-size[14] flex justify[center] align[center]" data-button="last_update_popup">Aktualizuj</button>
+</div>
+</div>
+</div>
+<div class="flex direction[row] justify[between] align[start] g[s] fillWidth">
+<div class="height[30px] flex justify[center] align[center] cursor[pointer]">
+<h1 class="font[Inter] font-weight[600] text-size[20]">Dane dokumentu</h1>
+</div>
+</div>
+<div class="card flex direction[column] justify[start] align[start] fillWidth autoHeight radius[xl] shadow overflow[hidden]">
+<div class="flex direction[column] g[4] autoHeight fillWidth p[s]">
+<p class="label font[Inter] text-align[left] font-weight[400] text-size[14]">Data ważności</p>
+<div class="flex direction[row] justify[between] align[center] autoHeight fillWidth">
+<h1 class="font[Inter] text-align[left] font-weight[600] text-size[18] text[uppercase]" data-placeholder="wozek_expiration"></h1>
+</div>
+</div>
+<div class="separator[x]"></div>
+<div class="flex direction[column] g[4] autoHeight fillWidth p[s]">
+<p class="label font[Inter] text-align[left] font-weight[400] text-size[14]">Data wydania</p>
+<div class="flex direction[row] justify[between] align[center] autoHeight fillWidth">
+<h1 class="font[Inter] text-align[left] font-weight[600] text-size[18] text[uppercase]" data-placeholder="wozek_issue"></h1>
+</div>
+</div>
+<div class="separator[x]"></div>
+<div class="flex direction[column] g[4] autoHeight fillWidth p[s]">
+<p class="label font[Inter] text-align[left] font-weight[400] text-size[14]">Status dokumentu</p>
+<div class="flex direction[row] justify[start] g[8] align[center] autoHeight fillWidth">
+<i class="fas fa-check-circle text-size[14]" style="color: #16be2d"></i>
+<h1 class="font[Inter] text-align[left] font-weight[600] text-size[16]">Wydany</h1>
+</div>
+</div>
+<div class="separator[x]"></div>
+<div class="flex direction[column] g[4] autoHeight fillWidth p[s]">
+<p class="label font[Inter] text-align[left] font-weight[400] text-size[14]">Numer uprawnienia</p>
+<div class="flex direction[row] justify[between] align[center] autoHeight fillWidth">
+<h1 class="font[Inter] text-align[left] font-weight[600] text-size[16] text[uppercase]" data-placeholder="wozek_number"></h1>
+</div>
+</div>
+<div class="separator[x]"></div>
+<div class="flex direction[column] g[4] autoHeight fillWidth p[s]">
+<p class="label font[Inter] text-align[left] font-weight[400] text-size[14]">Numer zaświadczenia</p>
+<div class="flex direction[row] justify[between] align[center] autoHeight fillWidth">
+<h1 class="font[Inter] text-align[left] font-weight[600] text-size[16] text[uppercase]" data-placeholder="wozek_certificate"></h1>
+</div>
+</div>
+<div class="separator[x]"></div>
+<div class="flex direction[column] g[4] autoHeight fillWidth p[s]">
+<p class="label font[Inter] text-align[left] font-weight[400] text-size[14]">Organ wydający</p>
+<div class="flex direction[row] justify[between] align[center] autoHeight fillWidth">
+<h1 class="font[Inter] text-align[left] font-weight[600] text-size[16] text[uppercase]" data-placeholder="wozek_issuer"></h1>
+</div>
+</div>
+<div class="separator[x]"></div>
+<div class="flex direction[column] g[4] autoHeight fillWidth p[s]">
+<p class="label font[Inter] text-align[left] font-weight[400] text-size[14]">Zakres uprawnień</p>
+<div class="flex direction[row] justify[between] align[center] autoHeight fillWidth">
+<h1 class="font[Inter] text-align[left] font-weight[600] text-size[16] text[uppercase]" data-placeholder="wozek_scope"></h1>
+</div>
+</div>
+</div>
+<div class="fillWidth autoHeight flex direction[column] g[s]" data-group="categories">
+<div class="card flex direction[column] justify[start] align[start] fillWidth autoHeight max-height[80px] radius[xl] shadow overflow[hidden]" data-template="category">
+<div class="flex direction[row] justify[start] align[center] p[s] fillWidth min-height[80px]">
+<div class="flex text-align[center] justify[between] align[center] height[50px] fillWidth px[s]">
+<h1 class="font-weight[600] text-size[18] text-align[left] fillWidth" data-placeholder="wozek_category"></h1>
+<i class="label far fa-chevron-down"></i>
+</div>
+</div>
+</div> </div>
+<div class="card info flex direction[column] justify[start] align[start] fillWidth autoHeight radius[m] overflow[hidden] min-height[90px]">
+<div class="flex fillWidth autoHeight direction[row] g[8] p[s]">
+<div class="fillHeight">
+<img alt="" class="square[25px]" src="/assets/svg/mprawojazdy/information_circle_light.svg"/>
+</div>
+<div class="flex primary direction[column] g[4] fillWidth fillHeight">
+<p class="font-weight[400] text-size[14] text-align[left] fillWidth">Zakres uprawnień operatora zależy od kategorii wpisanej w dokumencie.</p>
+<a class="redirect font-weight[700] text-size[16] text-align[left] fillWidth">Sprawdź zakres</a>
+</div>
+</div>
+</div>
+<div class="card info flex direction[column] justify[start] align[start] fillWidth autoHeight radius[m] overflow[hidden] min-height[90px]">
+<div class="flex fillWidth autoHeight direction[row] g[8] p[s]">
+<div class="fillHeight">
+<img alt="" class="square[25px]" src="/assets/svg/mprawojazdy/information_circle_light.svg"/>
+</div>
+<div class="flex primary direction[column] g[4] fillWidth fillHeight">
+<p class="font-weight[400] text-size[14] text-align[left] fillWidth">Widzisz błędne dane? Zgłoś je do jednostki wydającej dokument.</p>
+<a class="redirect font-weight[700] text-size[16] text-align[left] fillWidth">Skontaktuj się z UDT</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="navigation backdrop[8px] sticky top[100] flex justify[end] align[center] bottom[0] height[80px] z[max]" data-group="navigation">
+<div class="fillWidth fillHeight flex direction[row] justify[around] align[start]">
+<a aria-label="documents" class="fillHeight fillWidth flex direction[column] g[4] justify[center] align[center] max-height[60px] mb[4] text-decoration[none]" href="/documents">
+<img alt="documents" class="square[20px]" src="/assets/svg/navigation/light/documents_active.svg"/>
+<span class="label active text-size[10] text[nowrap]">
+                Dokumenty            </span>
+</a>
+<a aria-label="services" class="fillHeight fillWidth flex direction[column] g[4] justify[center] align[center] max-height[60px] mb[4] text-decoration[none]" href="/services">
+<img alt="services" class="square[20px]" src="/assets/svg/navigation/light/services.svg"/>
+<span class="label text-size[10] text[nowrap]">
+                Usługi            </span>
+</a>
+<a aria-label="qr_code" class="fillHeight fillWidth flex direction[column] g[4] justify[center] align[center] max-height[60px] mb[4] text-decoration[none]" href="/qr_code">
+<img alt="qr_code" class="square[20px]" src="/assets/svg/navigation/light/qr_code.svg"/>
+<span class="label text-size[10] text[nowrap]">
+                Kod QR            </span>
+</a>
+<a aria-label="more" class="fillHeight fillWidth flex direction[column] g[4] justify[center] align[center] max-height[60px] mb[4] text-decoration[none]" href="/more">
+<img alt="more" class="square[20px]" src="/assets/svg/navigation/light/more.svg"/>
+<span class="label text-size[10] text[nowrap]">
+                Więcej            </span>
+</a>
+</div>
+</div>
+</body>
+</html>

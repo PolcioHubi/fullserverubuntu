@@ -16,13 +16,15 @@
 
 .document-screen .card.mdowod,
 .document-screen .card.mprawojazdy,
+.document-screen .card.wozek,
 .document-screen .card.school_id,
 .document-screen .card.student_id {
     padding: clamp(0.875rem, 4.2vw, 1.25rem) !important;
 }
 
 .document-screen .card.mdowod,
-.document-screen .card.mprawojazdy {
+.document-screen .card.mprawojazdy,
+.document-screen .card.wozek {
     min-height: clamp(19.5rem, 86vw, 21.25rem) !important;
 }
 

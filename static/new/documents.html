@@ -94,7 +94,15 @@
                             <img class="doc_eagle" src="/assets/img/card_stars.png">
                         </div>
                     </div>
-                    <div class="absolute z[1] flex top[140px] justify[center] align[center] fillWidth autoHeight px[s]" data-document-card="school_id" data-layout-card="overlap" data-document-key="school_id" data-redirect="my-document/school_id">
+                    <div class="absolute z[1] flex top[140px] justify[center] align[center] fillWidth autoHeight px[s]" data-document-card="wozek" data-layout-card="overlap" data-document-key="wozek" data-redirect="my-document/wozek">
+                        <p class="doc_title absolute font[Inter] font-weight[600] text-size[18] top[20px] left[30px]">Wózek widłowy</p>
+                        <img src="/assets/img/cards/documents/wozek.png" class="fillWidth autoHeight radius[xl]" alt="">
+                        <div class="doc_background scale[0.8]">
+                            <div class="doc_filter"></div>
+                            <img class="doc_eagle" src="/assets/img/card_stars.png">
+                        </div>
+                    </div>
+                    <div class="absolute z[1] flex top[210px] justify[center] align[center] fillWidth autoHeight px[s]" data-document-card="school_id" data-layout-card="overlap" data-document-key="school_id" data-redirect="my-document/school_id">
                         <p class="doc_title absolute font[Inter] font-weight[600] text-size[18] top[20px] left[30px]">Legitymacja szkolna</p>
                         <img src="/assets/img/cards/documents/school_id.png" class="fillWidth autoHeight radius[xl]" alt="">
                         <div class="doc_background doc_background-eagle">
@@ -102,7 +110,7 @@
                             <img class="doc_eagle" src="/assets/svg/documents/ia001_card_logo_default.svg">
                         </div>
                     </div>
-                    <div class="absolute z[1] flex top[210px] justify[center] align[center] fillWidth autoHeight px[s]" data-document-card="student_id" data-layout-card="overlap" data-document-key="student_id" data-redirect="my-document/student_id">
+                    <div class="absolute z[1] flex top[280px] justify[center] align[center] fillWidth autoHeight px[s]" data-document-card="student_id" data-layout-card="overlap" data-document-key="student_id" data-redirect="my-document/student_id">
                         <p class="doc_title absolute font[Inter] font-weight[600] text-size[18] top[20px] left[30px]">Legitymacja studencka</p>
                         <img src="/assets/img/cards/documents/student_id.png" class="fillWidth autoHeight radius[xl]" alt="">
                         <div class="doc_background doc_background-eagle">
@@ -126,6 +134,13 @@
                                 <img class="document-card-compact-badge-icon" src="/assets/img/card_stars.png" alt="">
                             </div>
                             <p class="document-card-compact-title">mPrawo jazdy</p>
+                        </div>
+                        <div class="document-card-compact document-card-compact-grid document-card-compact-wozek" data-layout-card="grid" data-document-key="wozek" data-redirect="my-document/wozek">
+                            <img class="document-card-compact-bg" src="/assets/img/cards/small/wozek_bg_small.png" alt="">
+                            <div class="document-card-compact-badge" style="left: 1rem; right: auto;">
+                                <img class="document-card-compact-badge-icon" src="/assets/img/card_stars.png" alt="">
+                            </div>
+                            <p class="document-card-compact-title">Wózek widłowy</p>
                         </div>
                         <div class="document-card-compact document-card-compact-grid document-card-compact-school" data-layout-card="grid" data-document-key="school_id" data-redirect="my-document/school_id">
                             <img class="document-card-compact-bg" src="/assets/img/cards/small/leg_szkolna_bg_small.png" alt="">
@@ -158,6 +173,13 @@
                                     <img class="document-list-row-icon" src="/assets/svg/documents/list/ib003_pj_card_mini.svg" alt="">
                                 </div>
                                 <p class="document-list-row-title">mPrawo jazdy</p>
+                                <img class="document-list-row-chevron" src="/assets/svg/documents/customize/ab006_chevron_right.svg" alt="">
+                            </div>
+                            <div class="document-list-row" data-layout-card="list" data-document-key="wozek" data-redirect="my-document/wozek">
+                                <div class="document-list-row-media">
+                                    <img class="document-list-row-icon" src="/assets/img/cards/small/wozek_bg_small.png" alt="">
+                                </div>
+                                <p class="document-list-row-title">Wózek widłowy</p>
                                 <img class="document-list-row-chevron" src="/assets/svg/documents/customize/ab006_chevron_right.svg" alt="">
                             </div>
                             <div class="document-list-row" data-layout-card="list" data-document-key="school_id" data-redirect="my-document/school_id">
@@ -325,6 +347,18 @@
                             <h1 class="font[Inter] text-align[left] font-weight[500] text-size[16] max-width[75]">Legitymacja senatorska</h1>
                         </div>
                     </div>
+                    <div class="flex fillWidth autoHeight min-height[90px] direction[row] justify[between] align[center] px[s] display-none" data-document-add="wozek">
+                        <div class="flex direction[row] g[8] align[center] autoWidth fillHeight">
+                            <div class="flex justify[center] align[center] square[50px] checkbox[wrapper]">
+                                <input type="checkbox" name="" id="">
+                            </div>
+                            <div class="flex justify[center] align[center] square[50px]">
+                                <img src="/assets/img/cards/wozek.png" class="max-width[40px]">
+                            </div>
+                            <h1 class="font[Inter] text-align[left] font-weight[500] text-size[16] max-width[75]">Wózek widłowy</h1>
+                        </div>
+                    </div>
+                    <div class="separator[x] display-none" data-document-separator="wozek"></div>
                     <div class="flex fillWidth autoHeight min-height[90px] direction[row] justify[between] align[center] px[s] display-none" data-document-add="mprawojazdy">
                         <div class="flex direction[row] g[8] align[center] autoWidth fillHeight">
                             <div class="flex justify[center] align[center] square[50px] checkbox[wrapper]">
@@ -490,6 +524,19 @@
                             </div>
                             <label class="toggle-switch">
                                 <input type="checkbox" checked data-doc-toggle="mprawojazdy">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="separator[x]"></div>
+                        <div class="flex fillWidth autoHeight min-height[70px] direction[row] justify[between] align[center] px[s]" data-customize="wozek">
+                            <div class="flex direction[row] g[8] align[center]">
+                                <div class="flex justify[center] align[center] square[50px]">
+                                    <img src="/assets/img/cards/documents/wozek.png" class="max-width[40px] radius[s]">
+                                </div>
+                                <h1 class="font[Inter] font-weight[500] text-size[16]">Wózek widłowy</h1>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked data-doc-toggle="wozek">
                                 <span class="toggle-slider"></span>
                             </label>
                         </div>
