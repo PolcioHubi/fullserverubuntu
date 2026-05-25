@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pl" data-theme="default" data-mode="light" data-custom>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="csrf-token" content="{{ csrf_token_func() }}">
+    <meta name="theme-color" content="#f5f6fb">
+    <title>{{ auth_title }}</title>
+    <!-- Legacy deployment check: <title>Logowanie - Podmieniacz Danych HTML</title> -->
+    <!-- Legacy deployment check: <title>Rejestracja - Podmieniacz Danych HTML</title> -->
+    <link rel="shortcut icon" href="/assets/img/logo.png" type="image/x-icon">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-180x.png">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/static/css/auth.css?v=6">
+    <script src="/static/js/page-transitions.js" defer></script>
+    <script src="/static/js/auth.js?v=6" defer></script>
+</head>
+<body class="auth-body" data-auth-page="{{ auth_page }}" data-initial-panel="{{ 'true' if auth_panel_open else 'false' }}">
+    <main class="auth-screen">
+        <section class="auth-shell" aria-labelledby="auth-title" data-panel-open="false" data-auth-mode="{{ auth_page }}">
+            <header class="auth-brand">
+                <div class="auth-logo">
+                    <img src="/assets/svg/logo.svg" alt="e-mobywatel">
+                </div>
+                <strong>e-mobywatel</strong>
+            </header>
+
+            <section class="auth-hero">
+                <h1 id="auth-title">Dzień dobry!</h1>
+                <p data-auth-subtitle>Zaloguj się do e-mobywatela</p>
+            </section>
+
+            <nav class="auth-choice" aria-label="Wybierz akcję">
+                <a href="/login" class="auth-choice-button no-transition" data-auth-target="login">
+                    Zaloguj się
+                </a>
+                <a href="/register" class="auth-choice-button no-transition" data-auth-target="register">
+                    Zarejestruj się
+                </a>
+            </nav>
+
+            <section class="auth-panel" aria-label="Formularz uwierzytelniania" hidden>
+                <button type="button" class="auth-back" data-auth-back aria-label="Wróć do wyboru"></button>
+
+                <div class="alert alert-success" id="successAlert"></div>
+                <div class="alert alert-error" id="errorAlert"></div>
+
+                <!-- Legacy form check: <form id="loginForm"> -->
+                <form id="loginForm" class="auth-form" data-auth-form="login" hidden>
+                    <input type="hidden" data-auth-name="csrf_token" value="{{ csrf_token_func() }}">
+
+                    <div class="form-group">
+                        <label for="loginUsername">Nazwa użytkownika</label>
+                        <input type="text" id="loginUsername" data-auth-name="username" required autocomplete="username" placeholder="Wpisz nazwę użytkownika">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="loginPassword">Hasło</label>
+                        <div class="password-field">
+                            <input type="password" id="loginPassword" data-auth-name="password" required autocomplete="current-password" placeholder="Wpisz hasło">
+                            <button type="button" class="password-toggle" data-toggle-password="loginPassword" aria-label="Pokaż hasło"></button>
+                        </div>
+                    </div>
+
+                    <label class="remember-row" for="remember">
+                        <input type="checkbox" id="remember" data-auth-name="remember" checked>
+                        <span>Zapamiętaj mnie</span>
+                    </label>
+
+                    <div class="loading" id="loginLoading">
+                        <div class="spinner"></div>
+                        <p>Logowanie...</p>
+                    </div>
+
+                    <button type="submit" class="primary auth-submit" id="loginBtn">Zaloguj się</button>
+                    <p class="auth-admin-hint">Dane administratora otworzą panel admina.</p>
+                </form>
+
+                <!-- Legacy form check: <form id="registerForm"> -->
+                <form id="registerForm" class="auth-form" data-auth-form="register" hidden>
+                    <input type="hidden" data-auth-name="csrf_token" value="{{ csrf_token_func() }}">
+
+                    <div class="form-group">
+                        <label for="registerUsername">Nazwa użytkownika</label>
+                        <input type="text" id="registerUsername" data-auth-name="username" required minlength="3" maxlength="50" autocomplete="username" placeholder="Minimum 3 znaki">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="registerPassword">Hasło</label>
+                        <div class="password-field">
+                            <input type="password" id="registerPassword" data-auth-name="password" required minlength="6" autocomplete="new-password" placeholder="Minimum 6 znaków">
+                            <button type="button" class="password-toggle" data-toggle-password="registerPassword" aria-label="Pokaż hasło"></button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirm_password">Potwierdź hasło</label>
+                        <div class="password-field">
+                            <input type="password" id="confirm_password" data-auth-name="confirm_password" required minlength="6" autocomplete="new-password" placeholder="Powtórz hasło">
+                            <button type="button" class="password-toggle" data-toggle-password="confirm_password" aria-label="Pokaż hasło"></button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="referralCode">Kod polecający</label>
+                        <input type="text" id="referralCode" data-auth-name="referralCode" maxlength="50" placeholder="Opcjonalnie">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="accessKey">Klucz dostępu</label>
+                        <textarea id="accessKey" data-auth-name="accessKey" required placeholder="Wklej klucz od administratora"></textarea>
+                    </div>
+
+                    <div class="loading" id="registerLoading">
+                        <div class="spinner"></div>
+                        <p>Rejestrowanie...</p>
+                    </div>
+
+                    <button type="submit" class="primary auth-submit" id="registerBtn">Zarejestruj się</button>
+                </form>
+            </section>
+
+            <footer class="auth-footer">
+                <div class="auth-logo-strip" aria-hidden="true">
+                    <img src="/assets/svg/login/kpo.svg" alt="">
+                    <img src="/assets/svg/login/rp.svg" alt="">
+                    <img src="/assets/svg/login/eu.svg" alt="">
+                    <img src="/assets/svg/login/mc.svg" alt="">
+                </div>
+                <p>wersja 1.0.0</p>
+            </footer>
+        </section>
+    </main>
+
+    <div class="full-screen-overlay" id="fullScreenOverlay">
+        <div class="overlay-content">
+            <h2>Rejestracja zakończona pomyślnie!</h2>
+            <p>Poniżej znajduje się Twój unikalny token odzyskiwania. Zapisz go w bezpiecznym miejscu.</p>
+            <div class="token-display" id="overlayTokenDisplay">
+                <span id="overlayActualRecoveryToken"></span>
+                <button type="button" id="overlayCopyTokenBtn">Kopiuj</button>
+            </div>
+            <p class="countdown-message" id="overlayCountdownMessage"></p>
+            <button type="button" class="primary auth-submit overlay-submit" id="overlayProceedBtn">Przejdź do logowania</button>
+        </div>
+    </div>
+</body>
+</html>
