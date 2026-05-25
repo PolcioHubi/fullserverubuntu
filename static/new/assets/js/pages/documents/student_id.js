@@ -122,7 +122,7 @@ const studentIDManager = {
             self.$wrapper.addClass("scale[0.9]");
             self.$standalone.removeClass("overflow[x-hidden] overflow[y-auto] fixed").addClass("overflow[hidden]");
             $('[data-group="navigation"]').addClass("display-none");
-            $(".identity_card").css("transform", "").addClass("overflow[hidden]");
+            $(".identity_card").css("transform", "none").addClass("overflow[hidden]");
         });
         $('[data-button="identity_card_back"]').on("click", function() {
             $(".identity_card").css("transform", "translateX(100%)").removeClass("overflow[hidden]");
@@ -135,7 +135,7 @@ const studentIDManager = {
             self.$wrapper.addClass("scale[0.9]");
             self.$standalone.removeClass("overflow[x-hidden] overflow[y-auto] fixed").addClass("overflow[hidden]");
             $('[data-group="navigation"]').addClass("display-none");
-            $(".other_shortcuts").css("transform", "").addClass("overflow[hidden]");
+            $(".other_shortcuts").css("transform", "none").addClass("overflow[hidden]");
         });
         $('[data-button="other_shortcuts_back"]').on("click", function() {
             $(".other_shortcuts").css("transform", "translateX(100%)").removeClass("overflow[hidden]");

@@ -4,14 +4,31 @@ const servicesManager = {
     },
 
     listeners() {
+        // Expose for the All-in-One SPA router so cleanupPageState() can
+        // reset any sticky search-mode classes on the navigation bar.
+        window.servicesManager = servicesManager;
+        const $root = $(window._spaActiveSection || document);
+        const $searchInput = $root.find('input[type="text"]');
+        const $standalone = $root.find('[data-standalone]');
+        const $nav = $root.find('.dashboard-navigation');
+        const $largeTitle = $root.find('.dashboard-navigation-large-title');
+        const $smallTitle = $root.find('.dashboard-navigation-small-title');
+
+        $searchInput.off('input.servicesManager');
+        $standalone.off('scroll.servicesManager');
+        $root.find('.navigation').removeClass('fixed fillWidth').addClass('sticky');
+        $nav.removeClass('background[backdrop] scrolled');
+        $largeTitle.css({ opacity: '', transform: '' });
+        $smallTitle.removeClass('is-visible');
+
         // === Search / filter services ===
-        $('input[type="text"]').on('input', function () {
+        $searchInput.on('input.servicesManager', function () {
             const query = $(this).val().toLowerCase().trim();
 
             if (query.length >= 3) {
-                $('.navigation').addClass('fixed fillWidth').removeClass('sticky');
+                $root.find('.navigation').addClass('fixed fillWidth').removeClass('sticky');
 
-                $('.card').each(function () {
+                $root.find('.card').each(function () {
                     const $card = $(this);
                     const $buttons = $card.find('[data-button="service"]');
                     let visibleCount = 0;
@@ -36,29 +53,24 @@ const servicesManager = {
                     $card.toggle(visibleCount > 0);
                 });
 
-                $('[data-title]').each(function () {
+                $root.find('[data-title]').each(function () {
                     const $el = $(this);
                     const group = $el.data('title');
-                    const hasVisible = $(`.card[data-group="${group}"]:visible`).length > 0;
+                    const hasVisible = $root.find(`.card[data-group="${group}"]:visible`).length > 0;
                     $el.toggle(hasVisible);
                 });
             } else {
-                $('.navigation').removeClass('fixed fillWidth').addClass('sticky');
-                $('.card').each(function () {
+                $root.find('.navigation').removeClass('fixed fillWidth').addClass('sticky');
+                $root.find('.card').each(function () {
                     $(this).show();
                     $(this).find('[data-button="service"]').show();
                     $(this).find('.separator\\[x\\]').show();
                 });
-                $('[data-title]').show();
+                $root.find('[data-title]').show();
             }
         });
 
         // === Collapsible navigation header (large → small title on scroll) ===
-        const $standalone = $('[data-standalone]');
-        const $nav = $('.dashboard-navigation');
-        const $largeTitle = $('.dashboard-navigation-large-title');
-        const $smallTitle = $('.dashboard-navigation-small-title');
-
         const COLLAPSE_THRESHOLD = 0.7;
         const EXPAND_THRESHOLD = 0.35;
         const ANIM_DURATION = 160;
@@ -120,7 +132,7 @@ const servicesManager = {
             });
         }
 
-        $standalone.on('scroll', function () {
+        $standalone.on('scroll.servicesManager', function () {
             if (isAnimating) return;
 
             const m = getScrollMetrics();

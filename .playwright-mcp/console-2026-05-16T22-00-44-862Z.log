@@ -1,0 +1,10 @@
+[       8ms] [LOG] [SPA] initPageManager: documents @ http://127.0.0.1:5000/user_files/allinone.html:28077
+[      56ms] [LOG] [SPA Router] Przełączono na: documents @ http://127.0.0.1:5000/user_files/allinone.html:27993
+[   16655ms] [LOG] [SPA] initPageManager: qr_code @ http://127.0.0.1:5000/user_files/allinone.html:28077
+[   16676ms] [LOG] [SPA Router] Przełączono na: qr_code @ http://127.0.0.1:5000/user_files/allinone.html:27993
+[   96632ms] [LOG] [SPA] initPageManager: more @ http://127.0.0.1:5000/user_files/allinone.html:28077
+[   96659ms] [LOG] [SPA Router] Przełączono na: more @ http://127.0.0.1:5000/user_files/allinone.html:27993
+[  115519ms] [LOG] [SPA] initPageManager: services @ http://127.0.0.1:5000/user_files/allinone.html:28077
+[  115519ms] [LOG] [SPA Router] Przełączono na: services @ http://127.0.0.1:5000/user_files/allinone.html:27993
+[  133850ms] [LOG] [SPA] initPageManager: qr_code @ http://127.0.0.1:5000/user_files/allinone.html:28077
+[  133877ms] [LOG] [SPA Router] Przełączono na: qr_code @ http://127.0.0.1:5000/user_files/allinone.html:27993

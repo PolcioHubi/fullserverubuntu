@@ -1,0 +1,130 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - generic [ref=e5]:
+        - button "Otwórz chat" [ref=e6] [cursor=pointer]
+        - button "Otwórz powiadomienia" [ref=e7] [cursor=pointer]
+    - heading "Dokumenty" [level=1] [ref=e9]
+    - generic [ref=e10]:
+      - strong [ref=e11]: Tryb All-in-One aktywny
+      - generic [ref=e12]: Dokumenty są składane w jedną płynną aplikację po kompilacji.
+    - generic [ref=e13]:
+      - generic [ref=e15]:
+        - generic [ref=e16] [cursor=pointer]:
+          - radio "mDowód"
+          - generic [ref=e20]: mDowód
+        - generic [ref=e22] [cursor=pointer]:
+          - radio "mPrawo jazdy"
+          - generic [ref=e26]: mPrawo jazdy
+        - generic [ref=e28] [cursor=pointer]:
+          - radio "Wózek widłowy"
+          - generic [ref=e32]: Wózek widłowy
+        - generic [ref=e34] [cursor=pointer]:
+          - radio "Legitymacja szkolna" [checked] [active]
+          - generic [ref=e38]: Legitymacja szkolna
+        - generic [ref=e40] [cursor=pointer]:
+          - radio "Legitymacja studencka"
+          - generic [ref=e44]: Legitymacja studencka
+      - generic [ref=e46]:
+        - generic [ref=e47]: "2"
+        - paragraph [ref=e48]: użytkowników korzysta z e-mobywatela
+      - generic [ref=e49]:
+        - generic [ref=e50]:
+          - button "Wróć" [ref=e204]
+          - heading "Legitymacja szkolna" [level=2] [ref=e205]
+        - generic [ref=e54]:
+          - group "Zdjęcie" [ref=e206]:
+            - generic [ref=e56]: Zdjęcie
+            - generic [ref=e57]:
+              - generic [ref=e58]: "Wgraj zdjęcie (zdjecie_686510da4d2591.91511191.jpg):"
+              - button "Wgraj zdjęcie (zdjecie_686510da4d2591.91511191.jpg):" [ref=e207]
+              - generic [ref=e61]:
+                - paragraph [ref=e62]: Podgląd zdjęcia
+                - paragraph [ref=e63]: Miniatura jest pomniejszona dla wygody. Oryginał pozostaje bez zmian.
+          - button "Generuj losowe dane" [ref=e208] [cursor=pointer]
+          - group "Dane Osobowe" [ref=e209]:
+            - generic [ref=e92]: Dane Osobowe
+            - generic [ref=e93]:
+              - generic [ref=e94]:
+                - generic [ref=e95]: "Imię:"
+                - textbox "Imię:" [ref=e210]:
+                  - /placeholder: np. PIOTR
+              - generic [ref=e97]:
+                - generic [ref=e98]: "Nazwisko:"
+                - textbox "Nazwisko:" [ref=e211]:
+                  - /placeholder: np. KOWALSKI
+            - generic [ref=e100]:
+              - generic [ref=e101]:
+                - generic [ref=e102]: "Obywatelstwo:"
+                - textbox "Obywatelstwo:" [ref=e212]:
+                  - /placeholder: np. polskie
+              - generic [ref=e104]:
+                - generic [ref=e105]: "Data urodzenia (DD.MM.RRRR):"
+                - textbox "Data urodzenia (DD.MM.RRRR):" [ref=e213]:
+                  - /placeholder: np. 15.03.1990
+            - generic [ref=e107]:
+              - generic [ref=e108]: "Płeć:"
+              - combobox "Płeć:" [ref=e214]:
+                - option "Wybierz płeć" [selected]
+                - option "Mężczyzna"
+                - option "Kobieta"
+            - generic [ref=e110]:
+              - generic [ref=e111]: "Numer PESEL:"
+              - generic [ref=e112]:
+                - textbox "Numer PESEL:" [ref=e215]:
+                  - /placeholder: np. 90031512345
+                - button "Automatyczne generowanie PESELu" [ref=e216] [cursor=pointer]
+              - paragraph [ref=e115]: PESEL jest generowany automatycznie na podstawie daty urodzenia i płci. Upewnij się, że pola "Data urodzenia" i "Płeć" są wypełnione.
+          - group "Dane Legitymacji Szkolnej" [ref=e218]:
+            - generic [ref=e219]: Dane Legitymacji Szkolnej
+            - generic [ref=e220]:
+              - generic [ref=e221]:
+                - generic [ref=e222]: "Nr legitymacji:"
+                - textbox "Nr legitymacji:" [ref=e223]:
+                  - /placeholder: np. 303/9
+              - generic [ref=e224]:
+                - generic [ref=e225]: "Data wydania:"
+                - textbox "Data wydania:" [ref=e226]:
+                  - /placeholder: np. 07.09.2026
+            - generic [ref=e227]:
+              - generic [ref=e228]: "Termin ważności:"
+              - textbox "Termin ważności:" [ref=e229]:
+                - /placeholder: np. 30.09.2027
+            - generic [ref=e230]:
+              - generic [ref=e231]: "Nazwa szkoły:"
+              - textbox "Nazwa szkoły:" [ref=e232]:
+                - /placeholder: np. Liceum Ogólnokształcące nr 1
+            - generic [ref=e233]:
+              - generic [ref=e234]: "Adres szkoły:"
+              - textbox "Adres szkoły:" [ref=e235]:
+                - /placeholder: np. UL. Nowowiejska 35, 02-010 Warszawa
+            - generic [ref=e236]:
+              - generic [ref=e237]:
+                - generic [ref=e238]: "Dyrektor:"
+                - textbox "Dyrektor:" [ref=e239]:
+                  - /placeholder: np. Jan Kowalski
+              - generic [ref=e240]:
+                - generic [ref=e241]: "Telefon kontaktowy:"
+                - textbox "Telefon kontaktowy:" [ref=e242]:
+                  - /placeholder: np. 22 123 45 67
+          - generic [ref=e170]:
+            - button "Modyfikuj i Zapisz" [ref=e243] [cursor=pointer]
+            - button "Wyczyść formularz" [ref=e244] [cursor=pointer]
+  - generic [ref=e173]:
+    - generic [ref=e174]:
+      - button "Wróć" [ref=e175] [cursor=pointer]
+      - heading "Powiadomienia" [level=2] [ref=e176]
+    - paragraph [ref=e178]: Brak powiadomień
+  - generic [ref=e179]:
+    - generic [ref=e180]:
+      - button "Wróć" [ref=e181] [cursor=pointer]
+      - heading "Globalny chat" [level=2] [ref=e182]
+    - generic [ref=e183]:
+      - generic [ref=e185]:
+        - img [ref=e186]
+        - paragraph [ref=e188]: Brak wiadomości
+        - paragraph [ref=e189]: Napisz pierwszą wiadomość!
+      - generic [ref=e191]:
+        - textbox "Wpisz pytanie" [ref=e192]
+        - button "Wyślij" [disabled] [ref=e193]:
+          - img [ref=e194]

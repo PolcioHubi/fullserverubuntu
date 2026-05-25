@@ -1,0 +1,1 @@
+[    5730ms] [ERROR] Failed to load resource: the server responded with a status of 400 (BAD REQUEST) @ http://127.0.0.1:5000/api/theme/set:0

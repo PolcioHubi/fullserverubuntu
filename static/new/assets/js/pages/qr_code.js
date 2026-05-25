@@ -13,6 +13,18 @@ const qrCodeManager = {
     setupLayout() {
         this.$standalone = $("[data-standalone]");
         this.$wrapper = $("[data-wrapper]");
+        if (this.interval) {
+            clearInterval(this.interval);
+            this.interval = null;
+        }
+        this.stopCamera();
+        this.$wrapper.removeClass("scale[0.9]");
+        $('[class-wrapper="scan_qr"], [class-wrapper="show_qr"], [class-wrapper="type-code"]').removeClass("scale[0.9]");
+        $(".show_qr, .scan_qr, .share_data").css("transform", "translateX(100%)").removeClass("overflow[hidden] overflow[y-auto] overflow[x-hidden]");
+        $(".type_code, .shared_error").addClass("display-none hide").css("transform", "translateY(100%)");
+        $(".share_data").addClass("display-none hide");
+        $(".navigation").removeClass("display-none");
+        $('[data-input="type_code"]').val("");
         this.$standalone
             .removeClass("overflow[hidden]")
             .addClass("overflow[x-hidden] overflow[hidden] fixed");
@@ -224,7 +236,7 @@ const qrCodeManager = {
                 $(".type_code").addClass("display-none");
                 $(".share_data").removeClass("display-none");
                 setTimeout(() => {
-                    $(".share_data").removeClass("hide").css("transform", "");
+                    $(".share_data").removeClass("hide").css("transform", "none");
                 }, 50);
                 return true;
             };
@@ -473,9 +485,28 @@ const qrCodeManager = {
 
     listeners() {
         const self = this;
+        // Expose on window so the All-in-One SPA router can call stopCamera()
+        // / clear interval during page swap. Without this, the router's
+        // `window.qrCodeManager && …` guard in cleanupPageState falls through
+        // and the camera stream / countdown timer keep running after navigation.
+        window.qrCodeManager = qrCodeManager;
+
+        $('[data-button="show_qr"]').off("click.qrCodeManager");
+        $('[data-button="show_qr_back"]').off("click.qrCodeManager");
+        $('[data-button="scan_qr"]').off("click.qrCodeManager");
+        $('[data-button="scan_qr_back"]').off("click.qrCodeManager");
+        $('[data-button="type_code"]').off("click.qrCodeManager");
+        $('[data-input="type_code"]').off("input.qrCodeManager");
+        $('[data-button="type_code_back"]').off("click.qrCodeManager");
+        $('[data-button="type_code_submit"]').off("click.qrCodeManager");
+        $('[data-button="share_data"]').off("click.qrCodeManager");
+        $('[data-button="shared_error_back"]').off("click.qrCodeManager");
+        $('[data-button="share_data_back"]').off("click.qrCodeManager");
+        $("[data-standalone]").off("scroll.qrCodeManager");
+        $('[data-button="scan_close_warning"]').off("click.qrCodeManager");
 
         // Pokaż kod QR
-        $('[data-button="show_qr"]').on("click", () => {
+        $('[data-button="show_qr"]').on("click.qrCodeManager", () => {
             self.setTabOpen("show_qr");
             self.$wrapper.addClass("scale[0.9]");
             self.$standalone
@@ -483,12 +514,12 @@ const qrCodeManager = {
                 .removeClass("overflow[hidden]");
             $(".type_code").addClass("display-none");
             $(".show_qr").addClass("overflow[hidden] overflow[y-auto]");
-            $(".show_qr").css("transform", "");
+            $(".show_qr").css("transform", "none");
             this.showNewQRCode();
         });
 
         // Wróć z widoku QR
-        $('[data-button="show_qr_back"]').on("click", () => {
+        $('[data-button="show_qr_back"]').on("click.qrCodeManager", () => {
             self.removeTabOpen();
             $(".show_qr").css("transform", "translateX(100%)");
             self.$wrapper.removeClass("scale[0.9]");
@@ -503,7 +534,7 @@ const qrCodeManager = {
         });
 
         // Otwórz skaner QR (kamera)
-        $('[data-button="scan_qr"]').on("click", () => {
+        $('[data-button="scan_qr"]').on("click.qrCodeManager", () => {
             self.setTabOpen("scan_qr");
             this.startCamera();
             setTimeout(() => {
@@ -512,12 +543,12 @@ const qrCodeManager = {
                 $(".type_code").addClass("display-none");
                 self.calculateViewport(true)
                     && $(".scan_qr").addClass("overflow[x-hidden] overflow[hidden] overflow[y-auto]");
-                $(".scan_qr").css("transform", "");
+                $(".scan_qr").css("transform", "none");
             }, 150);
         });
 
         // Wróć ze skanera
-        $('[data-button="scan_qr_back"]').on("click", () => {
+        $('[data-button="scan_qr_back"]').on("click.qrCodeManager", () => {
             self.removeTabOpen();
             $(".scan_qr").css("transform", "translateX(100%)");
             self.$wrapper.removeClass("scale[0.9]");
@@ -526,25 +557,25 @@ const qrCodeManager = {
         });
 
         // Otwórz ręczne wpisywanie kodu
-        $('[data-button="type_code"]').on("click", () => {
+        $('[data-button="type_code"]').on("click.qrCodeManager", () => {
             $(".type_code").removeClass("display-none");
             setTimeout(() => {
-                $(".type_code").removeClass("hide").css("transform", "");
+                $(".type_code").removeClass("hide").css("transform", "none");
             }, 50);
         });
 
         // Ogranicz input do 6 cyfr
-        $('[data-input="type_code"]').on("input", function () {
+        $('[data-input="type_code"]').on("input.qrCodeManager", function () {
             $(this).val($(this).val().replace(/\D/g, "").slice(0, 6));
         });
 
         // Zamknij wpisywanie kodu
-        $('[data-button="type_code_back"]').on("click", () => {
+        $('[data-button="type_code_back"]').on("click.qrCodeManager", () => {
             $(".type_code").addClass("hide").css("transform", "translateY(100%)");
         });
 
         // Wpisano kod → pokaż ekran udostępniania danych
-        $('[data-button="type_code_submit"]').on("click", () => {
+        $('[data-button="type_code_submit"]').on("click.qrCodeManager", () => {
             const code = $('[data-input="type_code"]').val();
             if (!code || code.length < 6) return;
             $(".type_code").addClass("hide").css("transform", "translateY(100%)");
@@ -553,12 +584,12 @@ const qrCodeManager = {
                 .removeClass("overflow[hidden]");
             $(".share_data").removeClass("display-none");
             setTimeout(() => {
-                $(".share_data").removeClass("hide").css("transform", "");
+                $(".share_data").removeClass("hide").css("transform", "none");
             }, 50);
         });
 
         // Udostępnij dane → pokaż ekran błędu
-        $('[data-button="share_data"]').on("click", () => {
+        $('[data-button="share_data"]').on("click.qrCodeManager", () => {
             self.jumpTop();
             self.$standalone
                 .removeClass("overflow[y-auto] overflow[x-hidden]")
@@ -566,12 +597,12 @@ const qrCodeManager = {
             $(".shared_error").removeClass("display-none");
             setTimeout(() => {
                 $(".navigation").addClass("display-none");
-                $(".shared_error").removeClass("hide").css("transform", "");
+                $(".shared_error").removeClass("hide").css("transform", "none");
             }, 50);
         });
 
         // Wróć z błędu udostępniania → powrót do skanera
-        $('[data-button="shared_error_back"]').on("click", () => {
+        $('[data-button="shared_error_back"]').on("click.qrCodeManager", () => {
             self.jumpTop();
             self.$standalone.addClass("overflow[hidden]");
             $(".share_data").addClass("display-none").css("transform", "translateX(100%)");
@@ -583,7 +614,7 @@ const qrCodeManager = {
         });
 
         // Wróć z udostępniania danych → powrót do skanera
-        $('[data-button="share_data_back"]').on("click", () => {
+        $('[data-button="share_data_back"]').on("click.qrCodeManager", () => {
             self.jumpTop();
             self.$standalone.addClass("overflow[hidden]");
             self.calculateViewport(true)
@@ -594,7 +625,7 @@ const qrCodeManager = {
         });
 
         // Scroll → klasa "scrolled" na nawigacji
-        $("[data-standalone]").on("scroll", function () {
+        $("[data-standalone]").on("scroll.qrCodeManager", function () {
             const scrollTop = $(this).scrollTop();
             $(".dashboard-navigation").each(function () {
                 const $nav = $(this);
@@ -604,7 +635,7 @@ const qrCodeManager = {
         });
 
         // Zamknij ostrzeżenie skanera
-        $('[data-button="scan_close_warning"]').on("click", () => {
+        $('[data-button="scan_close_warning"]').on("click.qrCodeManager", () => {
             $('[data-div="scan_warning"]').addClass("display-none");
         });
     }

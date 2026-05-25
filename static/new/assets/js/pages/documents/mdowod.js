@@ -166,7 +166,7 @@ const mdowodManager = {
             self.setTabOpen("identity_card");
             self.$wrapper.addClass("scale[0.9]");
             self.$standalone.removeClass("overflow[x-hidden] overflow[y-auto] fixed").addClass("overflow[hidden] overflow[x-hidden]");
-            $(".identity_card").css("transform", "").addClass("overflow[hidden]");
+            $(".identity_card").css("transform", "none").addClass("overflow[hidden]");
         });
         $('[data-button="identity_card_back"]').on("click", function() {
             self.removeTabOpen();
@@ -179,7 +179,7 @@ const mdowodManager = {
             self.setTabOpen("restrict_pesel");
             self.$wrapper.addClass("scale[0.9]");
             self.$standalone.removeClass("overflow[x-hidden] overflow[y-auto] fixed").addClass("overflow[hidden] overflow[x-hidden]");
-            $(".restrict_pesel").css("transform", "").addClass("overflow[hidden]");
+            $(".restrict_pesel").css("transform", "none").addClass("overflow[hidden]");
         });
         $('[data-button="restrict_pesel_back"]').on("click", function() {
             self.removeTabOpen();
@@ -192,7 +192,7 @@ const mdowodManager = {
             self.setTabOpen("other_shortcuts");
             self.$wrapper.addClass("scale[0.9]");
             self.$standalone.removeClass("overflow[x-hidden] overflow[y-auto] fixed").addClass("overflow[hidden] overflow[x-hidden]");
-            $(".other_shortcuts").css("transform", "").addClass("overflow[hidden]");
+            $(".other_shortcuts").css("transform", "none").addClass("overflow[hidden]");
         });
         $('[data-button="other_shortcuts_back"]').on("click", function() {
             self.removeTabOpen();

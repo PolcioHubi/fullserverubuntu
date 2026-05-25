@@ -1,0 +1,2 @@
+[    2381ms] [ERROR] Failed to load resource: net::ERR_SSL_PROTOCOL_ERROR @ https://127.0.0.1:5000/login?next=%2Fapi%2Fnotifications:0
+[   31384ms] [ERROR] Failed to load resource: the server responded with a status of 401 (UNAUTHORIZED) @ http://127.0.0.1:5000/login:0

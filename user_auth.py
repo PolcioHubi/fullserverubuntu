@@ -11,6 +11,19 @@ from models import db, User
 from services import AccessKeyService, NotificationService
 
 
+def _utc_naive_now() -> datetime.datetime:
+    """Return the current UTC time as a *naive* datetime.
+
+    SQLAlchemy's ``DateTime`` columns are timezone-naive in this schema, and
+    ``func.now()`` on SQLite already records UTC. Using ``datetime.now()``
+    instead pulls the local timezone of the worker process — which silently
+    miscompares against rows persisted via ``func.now()``. This helper
+    keeps everything on a single naive-UTC clock without requiring a DB
+    schema migration to ``DateTime(timezone=True)``.
+    """
+    return datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
+
+
 # Add UserMixin to the User model from models.py for Flask-Login compatibility
 class AuthUser(User, UserMixin):
     def get_id(self):
@@ -29,6 +42,21 @@ class UserAuthManager:
         """Initializes the manager with its dependencies."""
         self.access_key_service = access_key_service
         self.notification_service = notification_service
+
+    @staticmethod
+    def _validate_password_length(password: str) -> Optional[str]:
+        """Validate password length against both UX limits and bcrypt's 72-byte cap.
+
+        Returns ``None`` when the password is acceptable, otherwise the
+        user-facing error message. Centralizing this avoids accidentally
+        forgetting one of the password-setting paths (register, reset,
+        recovery token, password reset token).
+        """
+        if len(password) < 6 or len(password) > 100:
+            return "Hasło musi mieć od 6 do 100 znaków"
+        if len(password.encode("utf-8")) > 72:
+            return "Hasło jest zbyt długie. Skróć je lub usuń znaki specjalne (limit 72 bajty UTF-8)."
+        return None
 
     def _hash_password(self, password: str) -> str:
         hashed = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt(rounds=self.BCRYPT_ROUNDS))
@@ -108,12 +136,29 @@ class UserAuthManager:
                     f"Registration failed for {username}: Password too short (length: {len(password)})."
                 )
                 return False, "Hasło musi mieć co najmniej 6 znaków", None
-            if len(password) > 100: # Dodana walidacja maksymalnej długości hasła
+            if len(password) > 100:
                 logging.warning(
                     f"Registration failed for {username}: Password too long (length: {len(password)})."
                 )
                 return False, "Hasło może mieć maksymalnie 100 znaków", None
+            # bcrypt silently truncates passwords beyond 72 BYTES (not chars).
+            # A 100-char password full of Polish diacritics or emoji can exceed
+            # that, so the bcrypt-stored hash would only cover the first 72
+            # bytes — invisible loss of entropy. Reject explicitly.
+            if len(password.encode("utf-8")) > 72:
+                logging.warning(
+                    f"Registration failed for {username}: Password byte length exceeds bcrypt 72-byte limit."
+                )
+                return (
+                    False,
+                    "Hasło jest zbyt długie. Skróć je lub usuń znaki specjalne (limit 72 bajty UTF-8).",
+                    None,
+                )
 
+            # Best-effort early reject for nicer UX. The authoritative race-safe
+            # check is the UNIQUE constraint on User.username enforced at COMMIT
+            # below — two concurrent requests can both pass this lookup, only
+            # one will reach commit successfully.
             user_exists = User.query.filter_by(username=username).first()
             if user_exists:
                 logging.warning(
@@ -132,7 +177,7 @@ class UserAuthManager:
                     )
                 except (TypeError, ValueError):
                     recovery_token_ttl_hours = 24
-            recovery_token_expires = datetime.datetime.now() + datetime.timedelta(
+            recovery_token_expires = _utc_naive_now() + datetime.timedelta(
                 hours=max(1, recovery_token_ttl_hours)
             )
 
@@ -177,10 +222,29 @@ class UserAuthManager:
             db.session.commit()
             logging.info(f"User {username} registered successfully.")
             return True, message, recovery_token
-        except IntegrityError:
+        except IntegrityError as exc:
             db.session.rollback()
+            # Disambiguate which UNIQUE constraint actually fired so the user
+            # gets a precise message instead of "either username or access key".
+            # SQLite/Postgres/MySQL all surface the column name in the error
+            # text, just under different formats — match conservatively.
+            err_text = str(getattr(exc, "orig", exc)).lower()
+            if "username" in err_text or "users.username" in err_text or "users_pkey" in err_text:
+                logging.warning(
+                    f"Registration failed for {username}: race lost on username UNIQUE."
+                )
+                return False, "Użytkownik o tej nazwie już istnieje", None
+            if "access_key_used" in err_text or "users.access_key_used" in err_text:
+                logging.warning(
+                    f"Registration failed for {username}: race lost on access_key_used UNIQUE."
+                )
+                return (
+                    False,
+                    "Ten klucz dostępu został już wykorzystany.",
+                    None,
+                )
             logging.warning(
-                f"Registration failed for {username}: IntegrityError - access key or username already used."
+                f"Registration failed for {username}: IntegrityError - {err_text!r}"
             )
             return (
                 False,
@@ -211,7 +275,7 @@ class UserAuthManager:
             return False, "Konto użytkownika zostało dezaktywowane", None
 
         if self._check_password(user.password, password):
-            user.last_login = datetime.datetime.now()
+            user.last_login = _utc_naive_now()
             db.session.commit()
             auth_user = db.session.get(AuthUser, user.username)
             logging.info(f"User {username} authenticated successfully.")
@@ -223,8 +287,44 @@ class UserAuthManager:
     def get_user_by_id(self, user_id: str) -> Optional[AuthUser]:
         return AuthUser.query.filter_by(username=user_id).first()
 
-    def get_all_users(self, include_passwords: bool = False) -> List[User]:
+    def get_all_users(self) -> List[User]:
+        """Return all users ordered by registration date (newest first).
+
+        Note: returned User instances include the bcrypt password hash on the
+        ``password`` field. Templates and serializers must not echo it back to
+        clients. The previous ``include_passwords`` parameter was unused and
+        was removed to avoid suggesting an opt-out that did nothing.
+
+        Heads-up: this loads every row into Python. For places that only need
+        counts or a top-N user, prefer ``count_users``, ``count_active_users``
+        or ``get_top_user_by_coins`` — they push aggregation into SQL.
+        """
         return User.query.order_by(User.created_at.desc()).all()
+
+    def count_users(self) -> int:
+        """Count all registered users via SQL ``COUNT(*)`` — no row hydration."""
+        return int(db.session.query(db.func.count(User.username)).scalar() or 0)
+
+    def count_active_users(self) -> int:
+        """Count users with ``is_active = True``."""
+        return int(
+            db.session.query(db.func.count(User.username))
+            .filter(User.is_active.is_(True))
+            .scalar()
+            or 0
+        )
+
+    def get_top_user_by_coins(self) -> Optional[User]:
+        """Return the single user with the highest hubert_coins balance.
+
+        Uses ``ORDER BY hubert_coins DESC LIMIT 1`` so the cost is one indexed
+        scan, not loading the whole users table.
+        """
+        return (
+            User.query.order_by(User.hubert_coins.desc(), User.username.asc())
+            .limit(1)
+            .first()
+        )
 
     def toggle_user_status(self, username: str) -> bool:
         user = User.query.filter_by(username=username).first()
@@ -276,8 +376,9 @@ class UserAuthManager:
             return False, "Wystąpił błąd podczas aktualizacji Hubert Coins"
 
     def reset_user_password(self, username: str, new_password: str) -> Tuple[bool, str]:
-        if len(new_password) < 6 or len(new_password) > 100:
-            return False, "Hasło musi mieć od 6 do 100 znaków"
+        err = self._validate_password_length(new_password)
+        if err is not None:
+            return False, err
 
         user = User.query.filter_by(username=username).first()
         if not user:
@@ -294,7 +395,7 @@ class UserAuthManager:
 
         token = secrets.token_urlsafe(32)
         user.password_reset_token = self._hash_token(token)
-        user.password_reset_expires = datetime.datetime.now() + datetime.timedelta(
+        user.password_reset_expires = _utc_naive_now() + datetime.timedelta(
             hours=1
         )
         db.session.commit()
@@ -309,11 +410,12 @@ class UserAuthManager:
         if not user:
             return False, "Nieprawidłowy token"
 
-        if datetime.datetime.now() > user.password_reset_expires:
+        if _utc_naive_now() > user.password_reset_expires:
             return False, "Token wygasł"
 
-        if len(new_password) < 6 or len(new_password) > 100:
-            return False, "Nowe hasło musi mieć od 6 do 100 znaków"
+        err = self._validate_password_length(new_password)
+        if err is not None:
+            return False, err
 
         user.password = self._hash_password(new_password)
         user.password_reset_token = None
@@ -324,8 +426,9 @@ class UserAuthManager:
     def reset_password_with_recovery_token(
         self, username: str, recovery_token: str, new_password: str
     ) -> Tuple[bool, str]:
-        if len(new_password) < 6 or len(new_password) > 100:
-            return False, "Nowe hasło musi mieć od 6 do 100 znaków"
+        err = self._validate_password_length(new_password)
+        if err is not None:
+            return False, err
 
         user = User.query.filter_by(
             username=username, recovery_token=self._hash_token(recovery_token)
@@ -334,7 +437,7 @@ class UserAuthManager:
             return False, "Nieprawidłowa nazwa użytkownika lub token odzyskiwania"
         if (
             user.recovery_token_expires is None
-            or datetime.datetime.now() > user.recovery_token_expires
+            or _utc_naive_now() > user.recovery_token_expires
         ):
             return False, "Nieprawidłowa nazwa użytkownika lub token odzyskiwania"
 

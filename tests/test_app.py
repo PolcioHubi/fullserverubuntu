@@ -218,6 +218,15 @@ def test_chat_flow_between_two_logged_in_users(app, auth_manager, access_key_ser
     unread_a = client_a.get("/api/chat/unread").get_json()
     assert unread_a["unread_count"] == 0
 
+    # Flask-Login caches the user on `g._login_user`, which is application-context
+    # scoped. The session-level `with app.app_context()` in conftest means BOTH
+    # test clients share the same `g`; without this clear, `client_b` would still
+    # see `<AuthUser testuser>` on its very first request and GET /login would
+    # 302-redirect away from the auth page. Reset the cache so client_b starts
+    # truly anonymous.
+    from flask import g as _flask_g
+    _flask_g.pop("_login_user", None)
+
     _login_json_client(client_b, "chat_user_b", "password123")
     unread_b = client_b.get("/api/chat/unread").get_json()
     assert unread_b["unread_count"] == 1

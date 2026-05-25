@@ -1,273 +1,162 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="pl" data-theme="default" data-mode="light" data-custom>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token_func() }}">
-    <title>Profil Użytkownika - {{ username }}</title>
-    <link rel="stylesheet" href="/static/css/profile.css">
+    <meta name="theme-color" content="#f5f6fb">
+    <title>Profil - {{ username }} - e-mobywatel</title>
+    <link rel="shortcut icon" href="/assets/img/logo.png" type="image/x-icon">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-180x.png">
+    <link rel="stylesheet" href="/static/css/profile.css?v=20260516-mode1">
+    <script src="/assets/js/global/jquery.js"></script>
+    <script src="/assets/js/global/notifications-bell.js?v=20260510-panels2" defer></script>
+    <script src="/assets/js/global/chat-feed.js?v=20260510-profile-chat3" defer></script>
     <script src="/static/js/page-transitions.js" defer></script>
+    <script src="/static/js/emulator-mode.js?v=20260516-mode1" defer></script>
+    <script src="/static/js/profile-page.js?v=20260516-tutorial1" defer></script>
+    <link rel="stylesheet" href="/static/css/csp-inline-utilities.css?v=1">
 </head>
-<body>
-    <div class="header">
-        <h1>Profil użytkownika: <span class="username">{{ username }}</span></h1>
-    </div>
-
-    <div class="profile-container">
-        <div class="section">
-            <h2>Informacje o Koncie</h2>
-            <div class="info-grid">
-                <div class="label">Nazwa Użytkownika:</div>
-                <div class="value">{{ username }}</div>
-                <div class="label">Status:</div>
-                <div class="value value-status">Aktywny</div>
-                <div class="label">Data Rejestracji:</div>
-                <div class="value">{{ created_at.strftime('%Y-%m-%d %H:%M') }}</div>
-                <div class="label">Hubert Coiny:</div>
-                <div class="value">{{ hubert_coins }}</div>
+<body class="profile-app-shell" data-standalone>
+    <main class="profile-app" data-wrapper>
+        <header class="profile-header">
+            <img class="profile-header-logo" src="/assets/svg/logo.svg" alt="e-mobywatel">
+            <div class="profile-header-actions">
+                <button type="button" class="profile-icon-button" id="chat-button" aria-label="Otwórz chat">
+                    <img class="theme-icon" src="/assets/svg/documents/ai.svg" alt="">
+                    <span id="chat-badge"></span>
+                </button>
+                <button type="button" class="profile-icon-button" id="notif-bell" aria-label="Otwórz powiadomienia">
+                    <img class="theme-icon" src="/assets/svg/documents/notifications.svg" alt="">
+                    <span id="notif-badge"></span>
+                </button>
             </div>
-            <p class="info-note">Hubert Coin to nagroda za zaproszenie użytkownika do zakupu naszej usługi.</p>
+        </header>
+
+        <section class="profile-title-row">
+            <h1>Profil</h1>
+        </section>
+
+        <section class="profile-section">
+            <h2>Konto</h2>
+            <div class="profile-list-card">
+                <div class="profile-list-row">
+                    <span class="profile-row-icon">
+                        <img src="/assets/svg/more/contact.svg" alt="">
+                    </span>
+                    <div class="profile-row-copy">
+                        <span class="profile-row-title">Użytkownik</span>
+                        <strong>{{ username }}</strong>
+                    </div>
+                </div>
+                <div class="profile-separator"></div>
+                <div class="profile-list-row">
+                    <span class="profile-row-icon profile-row-icon-blue">B</span>
+                    <div class="profile-row-copy">
+                        <span class="profile-row-title">Bertcoiny</span>
+                        <strong>{{ hubert_coins }} BC</strong>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="profile-section">
+            <h2>Ustawienia</h2>
+            <div class="profile-list-card">
+                <div class="profile-list-row profile-mode-row" data-emulator-mode-banner>
+                    <span class="profile-row-icon">
+                        <img src="/assets/svg/more/appearance.svg" alt="">
+                    </span>
+                    <div class="profile-row-copy">
+                        <span class="profile-row-title" data-emulator-mode-title>Tryb All-in-One aktywny</span>
+                        <p data-emulator-mode-copy>Dokumenty są składane w jedną płynną aplikację po kompilacji.</p>
+                    </div>
+                </div>
+                <div class="profile-mode-actions">
+                    <button type="button" data-emulator-profile-choice="allinone">
+                        <strong>All-in-One</strong>
+                        <span>Jedna płynna aplikacja</span>
+                    </button>
+                    <button type="button" data-emulator-profile-choice="split">
+                        <strong>Zwykły</strong>
+                        <span>Oddzielne pliki</span>
+                    </button>
+                </div>
+                <div class="profile-separator"></div>
+                <button type="button" class="profile-list-row profile-link-row profile-reset-tutorial" id="profileResetTutorial">
+                    <span class="profile-row-icon profile-row-icon-blue">?</span>
+                    <span class="profile-row-copy">
+                        <span class="profile-row-title">Pokaż samouczek ponownie</span>
+                        <p data-reset-tutorial-message>Uruchomi poradnik od początku.</p>
+                    </span>
+                    <span class="profile-chevron"></span>
+                </button>
+            </div>
+        </section>
+
+        <section class="profile-section">
+            <h2>Pozostałe</h2>
+            <div class="profile-list-card">
+                <a class="profile-list-row profile-link-row" href="/logout">
+                    <span class="profile-row-icon">
+                        <img src="/assets/svg/more/deactivate.svg" alt="">
+                    </span>
+                    <div class="profile-row-copy">
+                        <span class="profile-row-title">Wyloguj</span>
+                    </div>
+                    <span class="profile-chevron"></span>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <div id="notif-panel" class="profile-slide-panel csp-s-95508af6">
+        <div class="profile-panel-header">
+            <button type="button" id="notif-back" class="profile-panel-back">Wróć</button>
+            <h2>Powiadomienia</h2>
+            <span></span>
         </div>
-
-        <div class="section">
-            <h2>Zarządzanie Plikami</h2>
-            <p>Zarządzaj swoimi wygenerowanymi plikami i danymi.</p>
-            <div class="actions">
-                <a id="filesLink" href="#" data-target-url="/logowaniedozmodyfikowanieplikuhtml" role="button">Przejdź do dokumentu</a>
-                <a href="/">Strona Główna</a>
-            </div>
-        </div>
-
-        <div class="section">
-            <h2>Tabela Prowizji Hubert Coin</h2>
-            <table class="commission-table">
-                <thead>
-                    <tr>
-                        <th>Liczba zebranych Hubert Coinów</th>
-                        <th>Wartość do wypłaty</th>
-                        <th>Twoja prowizja od 1 osoby!</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>1 HC</td>
-                        <td>5 zł</td>
-                        <td>5 zł</td>
-                    </tr>
-                    <tr>
-                        <td>2 HC</td>
-                        <td>15 zł</td>
-                        <td>7,50 zł</td>
-                    </tr>
-                    <tr>
-                        <td>4 HC</td>
-                        <td>35 zł</td>
-                        <td>8,75 zł</td>
-                    </tr>
-                    <tr>
-                        <td>10 HC</td>
-                        <td>100 zł</td>
-                        <td class="commission-highlight">10 zł!</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <div class="footer">
-        <p>&copy; 2025. Wszelkie prawa zastrzeżone.</p>
-    </div>
-
-    <!-- Tutorial Modal -->
-    <div id="tutorialModal" class="tutorial-modal" style="display:none;">
-        <div class="tutorial-content">
-            <h2 id="tutorialTitle"></h2>
-            <p id="tutorialMessage"></p>
-            <div id="tutorial-step-3-options" style="display:none;">
-                <p>Na jakim urządzeniu chcesz zobaczyć instrukcję?</p>
-                <button class="btn-tutorial" onclick="showTutorialStep(4, 'iphone')">iPhone</button>
-                <button class="btn-tutorial" onclick="showTutorialStep(4, 'android')">Android</button>
-            </div>
-            <div id="tutorial-step-4-image" style="display:none;">
-                <img id="tutorial-platform-image" class="tutorial-platform-image" src="" alt="Instrukcja instalacji">
-                <p id="tutorial-step-4-instruction" class="tutorial-step-instruction"></p>
-            </div>
-            <div class="tutorial-buttons">
-                <button id="tutorialBtnSkip" class="btn-tutorial-skip">Pomiń</button>
-                <button id="tutorialBtnNext" class="btn-tutorial">Dalej</button>
-            </div>
-            <div class="tutorial-footer">
-                <input type="checkbox" id="tutorial-dont-show-again">
-                <label for="tutorial-dont-show-again">Nie pokazuj tego ponownie</label>
-            </div>
-        </div>
-    </div>
-
-    <div id="profileDisclaimerModal" class="disclaimer-modal" style="display:none;">
-        <div class="disclaimer-modal-content">
-            <h2>UWAGA - CELE EDUKACYJNE</h2>
-            <p class="disclaimer-modal-text">
-                Ta aplikacja została stworzona wyłącznie w celach edukacyjnych i demonstracyjnych.
-                Nie należy jej używać do tworzenia fałszywych dokumentów ani do jakichkolwiek nielegalnych działań.
-                Użytkownik ponosi pełną odpowiedzialność za sposób wykorzystania tej aplikacji.
-            </p>
-            <label class="disclaimer-check" for="profileDisclaimerAgree">
-                <input type="checkbox" id="profileDisclaimerAgree">
-                <span>Potwierdzam, że używam aplikacji wyłącznie w celach edukacyjnych i zgodnie z prawem.</span>
-            </label>
-            <div class="disclaimer-modal-actions">
-                <button type="button" id="profileDisclaimerCancel" class="disclaimer-cancel-btn">Anuluj</button>
-                <button type="button" id="profileDisclaimerConfirm" disabled>Otwórz dokument</button>
-            </div>
+        <div id="notif-list" class="profile-panel-list">
+            <p id="notif-empty" class="profile-panel-empty">Brak powiadomień</p>
         </div>
     </div>
 
-    <script>
-        // Ten sam kod co w index.html, ale z logiką startującą od etapu 3
-        document.addEventListener('DOMContentLoaded', function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('tutorial') === 'true') {
-                showTutorialStep(3);
-            }
+    <div id="chat-panel" class="profile-slide-panel profile-chat-panel csp-s-95508af6">
+        <div class="profile-panel-header">
+            <button type="button" id="chat-back" class="profile-panel-back">Wróć</button>
+            <h2>Globalny chat</h2>
+            <span></span>
+        </div>
+        <div class="profile-chat-body">
+            <div id="chat-list" class="profile-chat-list">
+                <div id="chat-empty-wrap">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    <p>Brak wiadomości</p>
+                    <p>Napisz pierwszą wiadomość!</p>
+                </div>
+            </div>
+            <div class="chat-composer-wrap">
+                <div id="chat-error"></div>
+                <div class="chat-input-bar">
+                    <textarea id="chat-input" maxlength="2000" placeholder="Wpisz pytanie" rows="1"></textarea>
+                    <button id="chat-send" type="button" aria-label="Wyślij" disabled><svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-            const filesLink = document.getElementById('filesLink');
-            const filesTargetUrl = (filesLink && filesLink.dataset.targetUrl) ? filesLink.dataset.targetUrl : '/logowaniedozmodyfikowanieplikuhtml';
-            const profileDisclaimerModal = document.getElementById('profileDisclaimerModal');
-            const profileDisclaimerAgree = document.getElementById('profileDisclaimerAgree');
-            const profileDisclaimerCancel = document.getElementById('profileDisclaimerCancel');
-            const profileDisclaimerConfirm = document.getElementById('profileDisclaimerConfirm');
-
-            function openProfileDisclaimer() {
-                if (!profileDisclaimerModal) return;
-                profileDisclaimerModal.style.display = 'block';
-                if (profileDisclaimerAgree) profileDisclaimerAgree.checked = false;
-                if (profileDisclaimerConfirm) profileDisclaimerConfirm.disabled = true;
-            }
-
-            function closeProfileDisclaimer() {
-                if (!profileDisclaimerModal) return;
-                profileDisclaimerModal.style.display = 'none';
-            }
-
-            if (filesLink) {
-                filesLink.addEventListener('click', function(event) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    if (typeof event.stopImmediatePropagation === 'function') {
-                        event.stopImmediatePropagation();
-                    }
-                    openProfileDisclaimer();
-                }, true);
-            }
-
-            if (profileDisclaimerCancel) {
-                profileDisclaimerCancel.addEventListener('click', function() {
-                    closeProfileDisclaimer();
-                });
-            }
-
-            if (profileDisclaimerAgree && profileDisclaimerConfirm) {
-                profileDisclaimerAgree.addEventListener('change', function() {
-                    profileDisclaimerConfirm.disabled = !profileDisclaimerAgree.checked;
-                });
-            }
-
-            if (profileDisclaimerConfirm) {
-                profileDisclaimerConfirm.addEventListener('click', function() {
-                    if (!profileDisclaimerAgree || !profileDisclaimerAgree.checked) return;
-                    window.location.href = filesTargetUrl;
-                });
-            }
-        });
-
-        let currentStep = 0;
-        const tutorialSteps = [
-            {},
-            {},
-            {},
-            {
-                title: "Etap 3: Hubert Coiny i Instalacja",
-                message: "Witaj na swoim profilu! Tutaj możesz zarządzać swoimi plikami. Możesz również zbierać <b>Hubert Coiny</b>, polecając aplikację znajomym. Wystarczy, że podczas rejestracji podadzą Twoją nazwę użytkownika (<b>{{ username }}</b>) w polu 'kod polecający'. Zebrane monety możesz wymienić na nagrody. <br><br>Teraz pokażemy Ci, jak dodać aplikację do ekranu głównego.",
-                showNext: false,
-                showSkip: true
-            },
-            {
-                title: "Etap 4: Instalacja na Twoim urządzeniu",
-                message: "", // Dynamicznie ustawiana wiadomość
-                showNext: true, // Zmienione na true, aby pokazać przycisk 'Zakończ'
-                showSkip: false
-            }
-        ];
-
-        function showTutorialStep(step, platform = null) {
-            currentStep = step;
-            const modal = document.getElementById('tutorialModal');
-            const title = document.getElementById('tutorialTitle');
-            const message = document.getElementById('tutorialMessage');
-            const nextBtn = document.getElementById('tutorialBtnNext');
-            const skipBtn = document.getElementById('tutorialBtnSkip');
-            const step3Options = document.getElementById('tutorial-step-3-options');
-            const step4ImageContainer = document.getElementById('tutorial-step-4-image');
-
-            modal.style.display = 'flex';
-
-            if (step === 3) { // Krok 3 w profile.html
-                title.textContent = tutorialSteps[3].title;
-                message.textContent = tutorialSteps[3].message;
-                nextBtn.style.display = 'none';
-                skipBtn.style.display = 'inline-block';
-                step3Options.style.display = 'block';
-                step4ImageContainer.style.display = 'none';
-            } else if (step === 4) { // Krok 4 w profile.html
-                title.textContent = tutorialSteps[4].title;
-                message.textContent = tutorialSteps[4].message;
-                step3Options.style.display = 'none';
-                step4ImageContainer.style.display = 'block';
-                const img = document.getElementById('tutorial-platform-image');
-                const instruction = document.getElementById('tutorial-step-4-instruction');
-                if (platform === 'iphone') {
-                    img.src = '/static/iphone/iphone.png';
-                    instruction.textContent = "Na iPhonie, aby dodać aplikację do ekranu głównego, postępuj zgodnie z instrukcjami na obrazku.";
-                } else {
-                    img.src = '/static/android/android.png';
-                    instruction.textContent = "Na Androidzie, aby dodać aplikację do ekranu głównego, kliknij 'Install', a nie 'Create shortcut'.";
-                }
-                nextBtn.textContent = "Zakończ samouczek";
-                nextBtn.style.display = 'inline-block';
-                skipBtn.style.display = 'none';
-            }
-        }
-
-        document.getElementById('tutorialBtnNext').addEventListener('click', () => {
-            if (currentStep === 4) {
-                completeTutorial();
-            }
-        });
-
-        document.getElementById('tutorialBtnSkip').addEventListener('click', () => {
-            completeTutorial();
-        });
-
-        document.getElementById('tutorial-dont-show-again').addEventListener('change', (e) => {
-            if (e.target.checked) {
-                completeTutorial();
-            }
-        });
-
-        function completeTutorial() {
-            const modal = document.getElementById('tutorialModal');
-            modal.style.display = 'none';
-            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-            fetch('/api/complete-tutorial', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrfToken
-                }
-            }).catch(err => console.error("Błąd podczas kończenia samouczka:", err));
-        }
-    </script>
+    <div class="profile-bottom-dock" data-group="navigation">
+        <a class="profile-main-action" href="/">Przejdź do dokumentów</a>
+        <nav class="profile-bottom-nav" aria-label="Nawigacja">
+            <a href="/" aria-label="Dokumenty">
+                <img src="/assets/svg/navigation/light/documents.svg" alt="">
+                <span>Dokumenty</span>
+            </a>
+            <a href="/profile" class="is-active" aria-label="Profil">
+                <span class="profile-nav-icon"></span>
+                <span>Profil</span>
+            </a>
+        </nav>
+    </div>
 </body>
 </html>
-
-

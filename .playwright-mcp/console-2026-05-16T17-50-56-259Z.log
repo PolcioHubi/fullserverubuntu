@@ -1,0 +1,1 @@
+[   17995ms] [ERROR] Failed to load resource: net::ERR_SSL_PROTOCOL_ERROR @ https://127.0.0.1:5000/login?next=%2Fapi%2Fchat%2Funread%3F_%3D1778953856292:0

@@ -1,0 +1,124 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - generic [ref=e5]:
+        - button "Otwórz chat" [ref=e6] [cursor=pointer]
+        - button "Otwórz powiadomienia" [ref=e7] [cursor=pointer]
+    - heading "Dokumenty" [level=1] [ref=e9]
+    - generic [ref=e10]:
+      - strong [ref=e11]: Tryb All-in-One aktywny
+      - generic [ref=e12]: Dokumenty są składane w jedną płynną aplikację po kompilacji.
+    - generic [ref=e13]:
+      - generic [ref=e15]:
+        - generic [ref=e16] [cursor=pointer]:
+          - radio "mDowód"
+          - generic [ref=e20]: mDowód
+        - generic [ref=e22] [cursor=pointer]:
+          - radio "mPrawo jazdy" [checked] [active]
+          - generic [ref=e26]: mPrawo jazdy
+        - generic [ref=e28] [cursor=pointer]:
+          - radio "Wózek widłowy"
+          - generic [ref=e32]: Wózek widłowy
+        - generic [ref=e34] [cursor=pointer]:
+          - radio "Legitymacja szkolna"
+          - generic [ref=e38]: Legitymacja szkolna
+        - generic [ref=e40] [cursor=pointer]:
+          - radio "Legitymacja studencka"
+          - generic [ref=e44]: Legitymacja studencka
+      - generic [ref=e46]:
+        - generic [ref=e47]:
+          - button "Wróć" [ref=e201]
+          - heading "mPrawo jazdy" [level=2] [ref=e202]
+        - generic [ref=e50]:
+          - button "Generuj losowe dane" [ref=e203] [cursor=pointer]
+          - generic [ref=e53]:
+            - group "Zdjęcie" [ref=e204]:
+              - generic [ref=e55]: Zdjęcie
+              - generic [ref=e56]:
+                - generic [ref=e57]: "Wgraj zdjęcie (zdjecie_686510da4d2591.91511191.jpg):"
+                - button "Wgraj zdjęcie (zdjecie_686510da4d2591.91511191.jpg):" [ref=e205]
+                - generic [ref=e60]:
+                  - paragraph [ref=e61]: Podgląd zdjęcia
+                  - paragraph [ref=e62]: Miniatura jest pomniejszona dla wygody. Oryginał pozostaje bez zmian.
+            - group "Dane Osobowe" [ref=e206]:
+              - generic [ref=e89]: Dane Osobowe
+              - generic [ref=e90]:
+                - generic [ref=e91]:
+                  - generic [ref=e92]: "Imię:"
+                  - textbox "Imię:" [ref=e207]:
+                    - /placeholder: np. PIOTR
+                - generic [ref=e94]:
+                  - generic [ref=e95]: "Nazwisko:"
+                  - textbox "Nazwisko:" [ref=e208]:
+                    - /placeholder: np. KOWALSKI
+              - generic [ref=e97]:
+                - generic [ref=e98]:
+                  - generic [ref=e99]: "Obywatelstwo:"
+                  - textbox "Obywatelstwo:" [ref=e209]:
+                    - /placeholder: np. polskie
+                - generic [ref=e101]:
+                  - generic [ref=e102]: "Data urodzenia (DD.MM.RRRR):"
+                  - textbox "Data urodzenia (DD.MM.RRRR):" [ref=e210]:
+                    - /placeholder: np. 15.03.1990
+              - generic [ref=e104]:
+                - generic [ref=e105]: "Płeć:"
+                - combobox "Płeć:" [ref=e211]:
+                  - option "Wybierz płeć" [selected]
+                  - option "Mężczyzna"
+                  - option "Kobieta"
+              - generic [ref=e107]:
+                - generic [ref=e108]: "Numer PESEL:"
+                - generic [ref=e109]:
+                  - textbox "Numer PESEL:" [ref=e212]:
+                    - /placeholder: np. 90031512345
+                  - button "Automatyczne generowanie PESELu" [ref=e213] [cursor=pointer]
+                - paragraph [ref=e112]: PESEL jest generowany automatycznie na podstawie daty urodzenia i płci. Upewnij się, że pola "Data urodzenia" i "Płeć" są wypełnione.
+            - group "Dane mPrawo Jazdy" [ref=e215]:
+              - generic [ref=e216]: Dane mPrawo Jazdy
+              - generic [ref=e217]:
+                - generic [ref=e218]:
+                  - generic [ref=e219]: "Kategorie prawa jazdy:"
+                  - textbox "Kategorie prawa jazdy:" [ref=e220]:
+                    - /placeholder: np. B, B1
+                - generic [ref=e221]:
+                  - generic [ref=e222]: "Data wydania:"
+                  - textbox "Data wydania:" [ref=e223]
+              - generic [ref=e224]:
+                - generic [ref=e225]:
+                  - generic [ref=e226]: "Numer dokumentu:"
+                  - textbox "Numer dokumentu:" [ref=e227]:
+                    - /placeholder: np. 12345/24/0001
+                - generic [ref=e228]:
+                  - generic [ref=e229]: "Numer blankietu:"
+                  - textbox "Numer blankietu:" [ref=e230]:
+                    - /placeholder: np. AK 1234567
+              - generic [ref=e231]:
+                - generic [ref=e232]:
+                  - generic [ref=e233]: "Organ wydający:"
+                  - textbox "Organ wydający:" [ref=e234]:
+                    - /placeholder: np. PREZYDENT M.ST. WARSZAWY
+                - generic [ref=e235]:
+                  - generic [ref=e236]: "Ograniczenia:"
+                  - textbox "Ograniczenia:" [ref=e237]:
+                    - /placeholder: np. 01.06
+            - generic [ref=e167]:
+              - button "Modyfikuj i Zapisz" [ref=e238] [cursor=pointer]
+              - button "Wyczyść formularz" [ref=e239] [cursor=pointer]
+  - generic [ref=e170]:
+    - generic [ref=e171]:
+      - button "Wróć" [ref=e172] [cursor=pointer]
+      - heading "Powiadomienia" [level=2] [ref=e173]
+    - paragraph [ref=e175]: Brak powiadomień
+  - generic [ref=e176]:
+    - generic [ref=e177]:
+      - button "Wróć" [ref=e178] [cursor=pointer]
+      - heading "Globalny chat" [level=2] [ref=e179]
+    - generic [ref=e180]:
+      - generic [ref=e182]:
+        - img [ref=e183]
+        - paragraph [ref=e185]: Brak wiadomości
+        - paragraph [ref=e186]: Napisz pierwszą wiadomość!
+      - generic [ref=e188]:
+        - textbox "Wpisz pytanie" [ref=e189]
+        - button "Wyślij" [disabled] [ref=e190]:
+          - img [ref=e191]

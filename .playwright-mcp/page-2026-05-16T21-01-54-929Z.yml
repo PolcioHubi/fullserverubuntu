@@ -1,0 +1,112 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]:
+      - banner [ref=e4]:
+        - generic [ref=e5]:
+          - button "Otwórz chat" [ref=e6] [cursor=pointer]
+          - button "Otwórz powiadomienia" [ref=e7] [cursor=pointer]:
+            - generic [ref=e127]: "1"
+      - heading "Dokumenty" [level=1] [ref=e9]
+      - generic [ref=e10]:
+        - strong [ref=e11]: Tryb All-in-One aktywny
+        - generic [ref=e12]: Dokumenty są składane w jedną płynną aplikację. Pierwsze uruchomienie na nowej przeglądarce może potrwać dłużej.
+      - generic [ref=e13]:
+        - generic [ref=e15]:
+          - generic [ref=e16] [cursor=pointer]:
+            - radio "mDowód"
+            - generic [ref=e20]: mDowód
+          - generic [ref=e22] [cursor=pointer]:
+            - radio "mPrawo jazdy"
+            - generic [ref=e26]: mPrawo jazdy
+          - generic [ref=e28] [cursor=pointer]:
+            - radio "Wózek widłowy"
+            - generic [ref=e32]: Wózek widłowy
+          - generic [ref=e34] [cursor=pointer]:
+            - radio "Legitymacja szkolna"
+            - generic [ref=e38]: Legitymacja szkolna
+          - generic [ref=e40] [cursor=pointer]:
+            - radio "Legitymacja studencka"
+            - generic [ref=e44]: Legitymacja studencka
+          - generic [ref=e46] [cursor=pointer]:
+            - radio "AIO All-in-One Połącz wygenerowane dokumenty w jedną aplikację." [checked]
+            - generic [ref=e47]:
+              - generic [ref=e49]: AIO
+              - generic [ref=e50]:
+                - generic [ref=e51]: All-in-One
+                - generic [ref=e52]: Połącz wygenerowane dokumenty w jedną aplikację.
+        - generic [ref=e54]:
+          - generic [ref=e55]: "3"
+          - paragraph [ref=e56]: użytkowników korzysta z e-mobywatela
+        - generic [ref=e57]:
+          - generic [ref=e58]:
+            - button [ref=e59]: Wróć
+            - heading [level=2] [ref=e60]: All-in-One
+          - group [ref=e64]:
+            - generic [ref=e65]: Kompilacja All-in-One
+            - paragraph [ref=e66]: Wybierz dokumenty, które chcesz połączyć w jedną aplikację PWA. Dokumenty muszą być wcześniej wygenerowane.
+            - generic [ref=e67]:
+              - generic [ref=e68] [cursor=pointer]:
+                - checkbox [disabled] [ref=e69]
+                - generic [ref=e70]: mDowód
+                - generic [ref=e128]: ✗ Brak
+              - generic [ref=e71] [cursor=pointer]:
+                - checkbox [disabled] [ref=e72]
+                - generic [ref=e73]: mPrawo Jazdy
+                - generic [ref=e129]: ✗ Brak
+              - generic [ref=e74] [cursor=pointer]:
+                - checkbox [disabled] [ref=e75]
+                - generic [ref=e76]: Wózek widłowy
+                - generic [ref=e130]: ✗ Brak
+              - generic [ref=e77] [cursor=pointer]:
+                - checkbox [disabled] [ref=e78]
+                - generic [ref=e79]: Legitymacja szkolna
+                - generic [ref=e131]: ✗ Brak
+              - generic [ref=e80] [cursor=pointer]:
+                - checkbox [disabled] [ref=e81]
+                - generic [ref=e82]: Legitymacja studencka
+                - generic [ref=e132]: ✗ Brak
+            - button [ref=e84] [cursor=pointer]: Kompiluj All-in-One
+    - generic [ref=e85]:
+      - generic [ref=e86]:
+        - button "Wróć" [ref=e87] [cursor=pointer]
+        - heading "Powiadomienia" [level=2] [ref=e88]
+      - generic [ref=e133]:
+        - generic [ref=e134]:
+          - generic [ref=e135]: Info · Powiadomienie
+          - button "×" [ref=e136] [cursor=pointer]
+        - generic [ref=e137]: Powiadomienie
+        - generic [ref=e138]: Witaj w mObywatel! Dziękujemy za rejestrację.
+        - generic [ref=e139]: 13 min temu
+    - generic [ref=e91]:
+      - generic [ref=e92]:
+        - button "Wróć" [ref=e93] [cursor=pointer]
+        - heading "Globalny chat" [level=2] [ref=e94]
+      - generic [ref=e95]:
+        - generic [ref=e97]:
+          - img [ref=e98]
+          - paragraph [ref=e100]: Brak wiadomości
+          - paragraph [ref=e101]: Napisz pierwszą wiadomość!
+        - generic [ref=e103]:
+          - textbox "Wpisz pytanie" [ref=e104]
+          - button "Wyślij" [disabled] [ref=e105]:
+            - img [ref=e106]
+    - generic [ref=e108]:
+      - button "Przejdź do dokumentu" [ref=e109]
+      - navigation "Nawigacja" [ref=e110]:
+        - link "Dokumenty" [ref=e111] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e112]: Dokumenty
+        - link "Profil" [ref=e113] [cursor=pointer]:
+          - /url: /profile
+          - generic [ref=e115]: Profil
+  - generic [ref=e117]:
+    - generic [ref=e118]: 2 z 10
+    - heading "Tryb działania" [level=2] [ref=e140]
+    - paragraph [ref=e120]: Ten pasek pokazuje aktywny tryb. All-in-One składa dokumenty w jedną płynną aplikację, a tryb zwykły zostawia je jako oddzielne pliki. Zmienisz to też później w profilu.
+    - paragraph [ref=e141]: Podświetlam aktywny tryb na stronie.
+    - generic [ref=e121]:
+      - button "Pomiń" [ref=e122] [cursor=pointer]
+      - button "Pokaż dokumenty" [active] [ref=e142] [cursor=pointer]
+    - generic [ref=e124]:
+      - checkbox "Nie pokazuj tego ponownie" [ref=e125]
+      - generic [ref=e126]: Nie pokazuj tego ponownie

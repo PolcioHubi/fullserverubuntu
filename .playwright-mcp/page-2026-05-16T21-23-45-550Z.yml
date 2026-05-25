@@ -1,0 +1,231 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - text: "Impersonujesz:"
+    - strong [ref=e3]: test
+    - link "[ Zakończ ]" [ref=e4] [cursor=pointer]:
+      - /url: "#"
+  - generic [ref=e5]:
+    - generic [ref=e6]:
+      - banner [ref=e7]:
+        - generic [ref=e8]:
+          - button "Otwórz chat" [ref=e9] [cursor=pointer]
+          - button "Otwórz powiadomienia" [ref=e10] [cursor=pointer]:
+            - generic [ref=e11]: "1"
+      - heading "Dokumenty" [level=1] [ref=e13]
+      - generic [ref=e14]:
+        - strong [ref=e15]: Tryb zwykły aktywny
+        - generic [ref=e16]: Dokumenty działają jako oddzielne pliki. Start jest lżejszy, ale przełączanie może być mniej płynne.
+      - generic [ref=e17]:
+        - generic [ref=e19]:
+          - generic [ref=e20] [cursor=pointer]:
+            - radio "mDowód" [checked]
+            - generic [ref=e24]: mDowód
+          - generic [ref=e26] [cursor=pointer]:
+            - radio "mPrawo jazdy"
+            - generic [ref=e30]: mPrawo jazdy
+          - generic [ref=e32] [cursor=pointer]:
+            - radio "Wózek widłowy"
+            - generic [ref=e36]: Wózek widłowy
+          - generic [ref=e38] [cursor=pointer]:
+            - radio "Legitymacja szkolna"
+            - generic [ref=e42]: Legitymacja szkolna
+          - generic [ref=e44] [cursor=pointer]:
+            - radio "Legitymacja studencka"
+            - generic [ref=e48]: Legitymacja studencka
+        - generic [ref=e50]:
+          - generic [ref=e51]: "1"
+          - paragraph [ref=e52]: użytkowników korzysta z e-mobywatela
+        - generic [ref=e53]:
+          - generic [ref=e54]:
+            - button [ref=e55]: Wróć
+            - heading [level=2] [ref=e56]: mDowód
+          - generic [ref=e58]:
+            - group [ref=e59]:
+              - generic [ref=e60]: Zdjęcie
+              - generic [ref=e61]:
+                - generic [ref=e62]: "Wgraj zdjęcie (zdjecie_686510da4d2591.91511191.jpg):"
+                - button [ref=e63]
+                - generic [ref=e64]:
+                  - generic [ref=e65]:
+                    - paragraph [ref=e66]: Podgląd zdjęcia
+                    - img [ref=e67]
+                    - paragraph [ref=e68]: Miniatura jest pomniejszona dla wygody. Oryginał pozostaje bez zmian.
+                  - generic [ref=e69]:
+                    - paragraph [ref=e70]: Demo na dowodzie (jak w szablonie)
+                    - generic [ref=e71]:
+                      - generic [ref=e72]:
+                        - generic [ref=e73]:
+                          - img [ref=e75]
+                          - img [ref=e76]
+                          - generic [ref=e77]:
+                            - img [ref=e78]
+                            - paragraph [ref=e79]: Rzeczpospolita Polska
+                        - generic [ref=e80]:
+                          - paragraph [ref=e81]: KSAWERY
+                          - paragraph [ref=e82]: Imię (Imiona)
+                          - paragraph [ref=e83]: BUCZEK
+                          - paragraph [ref=e84]: Nazwisko
+                          - paragraph [ref=e85]: POLSKIE
+                          - paragraph [ref=e86]: Obywatelstwo
+                          - paragraph [ref=e87]: 25.08.2007
+                          - paragraph [ref=e88]: Data urodzenia
+                          - paragraph [ref=e89]: "07282559253"
+                          - paragraph [ref=e90]: Numer PESEL
+                      - generic [ref=e91]:
+                        - img [ref=e92]
+                        - paragraph [ref=e93]: Dokument ważny
+            - button [ref=e95] [cursor=pointer]: Generuj losowe dane
+            - group [ref=e96]:
+              - generic [ref=e97]: Dane Osobowe
+              - generic [ref=e98]:
+                - generic [ref=e99]:
+                  - generic [ref=e100]: "Imię:"
+                  - textbox [ref=e101]:
+                    - /placeholder: np. PIOTR
+                    - text: KSAWERY
+                - generic [ref=e102]:
+                  - generic [ref=e103]: "Nazwisko:"
+                  - textbox [ref=e104]:
+                    - /placeholder: np. KOWALSKI
+                    - text: BUCZEK
+              - generic [ref=e105]:
+                - generic [ref=e106]:
+                  - generic [ref=e107]: "Obywatelstwo:"
+                  - textbox [ref=e108]:
+                    - /placeholder: np. polskie
+                    - text: Polskie
+                - generic [ref=e109]:
+                  - generic [ref=e110]: "Data urodzenia (DD.MM.RRRR):"
+                  - textbox [ref=e111]:
+                    - /placeholder: np. 15.03.1990
+                    - text: 25.08.2007
+              - generic [ref=e112]:
+                - generic [ref=e113]: "Płeć:"
+                - combobox [ref=e114]
+              - generic [ref=e115]:
+                - generic [ref=e116]: "Numer PESEL:"
+                - generic [ref=e117]:
+                  - textbox [ref=e118]:
+                    - /placeholder: np. 90031512345
+                    - text: "07282559253"
+                  - button [ref=e119] [cursor=pointer]: Automatyczne generowanie PESELu
+                - paragraph [ref=e120]: PESEL jest generowany automatycznie na podstawie daty urodzenia i płci. Upewnij się, że pola "Data urodzenia" i "Płeć" są wypełnione.
+            - generic [ref=e121]:
+              - group [ref=e122]:
+                - generic [ref=e123]: Dane mDowodu
+                - generic [ref=e124]:
+                  - generic [ref=e125]:
+                    - generic [ref=e126]: "Seria i numer mDowodu:"
+                    - textbox [ref=e127]:
+                      - /placeholder: np. ABC123456
+                      - text: BLM158824
+                  - generic [ref=e128]:
+                    - generic [ref=e129]: "Termin ważności mDowodu (RRRR-MM-DD):"
+                    - textbox [ref=e130]: 2032-04-22
+                - generic [ref=e131]:
+                  - generic [ref=e132]:
+                    - generic [ref=e133]: "Data wydania mDowodu (RRRR-MM-DD):"
+                    - textbox [ref=e134]: 2022-04-25
+                  - generic [ref=e135]:
+                    - generic [ref=e136]: "Imię ojca (mDowód):"
+                    - textbox [ref=e137]:
+                      - /placeholder: np. JAN
+                      - text: MARIUSZ
+                - generic [ref=e138]:
+                  - generic [ref=e139]: "Imię matki (mDowód):"
+                  - textbox [ref=e140]:
+                    - /placeholder: np. ANNA
+                    - text: ZOFIA
+              - group [ref=e141]:
+                - generic [ref=e142]: Dane Dowodu Osobistego
+                - generic [ref=e143]:
+                  - generic [ref=e144]:
+                    - generic [ref=e145]: "Seria i numer dowodu osobistego:"
+                    - textbox [ref=e146]:
+                      - /placeholder: np. DEF789012
+                      - text: KAQ984815
+                  - generic [ref=e147]:
+                    - generic [ref=e148]: "Termin ważności dowodu osobistego (RRRR-MM-DD):"
+                    - textbox [ref=e149]: 2034-12-04
+                - generic [ref=e150]:
+                  - generic [ref=e151]: "Data wydania dowodu osobistego (RRRR-MM-DD):"
+                  - textbox [ref=e152]: 2024-12-06
+              - group [ref=e153]:
+                - generic [ref=e154]: Dodatkowe Dane
+                - generic [ref=e155]:
+                  - generic [ref=e156]: "Nazwisko rodowe:"
+                  - textbox [ref=e157]:
+                    - /placeholder: np. KOWALSKA
+                    - text: Buczek
+                - generic [ref=e158]:
+                  - generic [ref=e159]:
+                    - generic [ref=e160]: "Nazwisko rodowe ojca:"
+                    - textbox [ref=e161]:
+                      - /placeholder: np. KOWALSKI
+                      - text: Buczek
+                  - generic [ref=e162]:
+                    - generic [ref=e163]: "Nazwisko rodowe matki:"
+                    - textbox [ref=e164]:
+                      - /placeholder: np. NOWAK
+                      - text: Wolska
+                - generic [ref=e165]:
+                  - generic [ref=e166]: "Miejsce urodzenia:"
+                  - textbox [ref=e167]:
+                    - /placeholder: np. Warszawa
+                    - text: Warszawa
+                - generic [ref=e168]:
+                  - generic [ref=e169]:
+                    - generic [ref=e170]: "Adres zameldowania:"
+                    - textbox [ref=e171]:
+                      - /placeholder: np. ul. Przykładowa 123, 00-001 Warszawa
+                      - text: Zwycięzców 45, 03-226 Warszawa
+                  - generic [ref=e172]:
+                    - generic [ref=e173]: "Data zameldowania (RRRR-MM-DD):"
+                    - textbox [ref=e174]: 2016-07-23
+            - generic [ref=e175]:
+              - button [ref=e176] [cursor=pointer]: Modyfikuj i Zapisz
+              - button [ref=e177] [cursor=pointer]: Wyczyść formularz
+    - generic [ref=e178]:
+      - generic [ref=e179]:
+        - button "Wróć" [ref=e180] [cursor=pointer]
+        - heading "Powiadomienia" [level=2] [ref=e181]
+      - generic [ref=e183]:
+        - generic [ref=e184]:
+          - generic [ref=e185]: Info · Powiadomienie
+          - button "×" [ref=e186] [cursor=pointer]
+        - generic [ref=e187]: Powiadomienie
+        - generic [ref=e188]: Witaj w mObywatel! Dziękujemy za rejestrację.
+        - generic [ref=e189]: 15 min temu
+    - generic [ref=e190]:
+      - generic [ref=e191]:
+        - button "Wróć" [ref=e192] [cursor=pointer]
+        - heading "Globalny chat" [level=2] [ref=e193]
+      - generic [ref=e194]:
+        - generic [ref=e196]:
+          - img [ref=e197]
+          - paragraph [ref=e199]: Brak wiadomości
+          - paragraph [ref=e200]: Napisz pierwszą wiadomość!
+        - generic [ref=e202]:
+          - textbox "Wpisz pytanie" [ref=e203]
+          - button "Wyślij" [disabled] [ref=e204]:
+            - img [ref=e205]
+    - generic [ref=e207]:
+      - button "Przejdź do dokumentu" [ref=e208]
+      - navigation "Nawigacja" [ref=e209]:
+        - link "Dokumenty" [ref=e210] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e211]: Dokumenty
+        - link "Profil" [ref=e212] [cursor=pointer]:
+          - /url: /profile
+          - generic [ref=e214]: Profil
+  - generic [ref=e227]:
+    - generic [ref=e228]: 2 z 11
+    - heading "Tryb działania" [level=2] [ref=e237]
+    - paragraph [ref=e230]: Ten pasek pokazuje aktywny tryb. All-in-One składa dokumenty w jedną płynną aplikację, a tryb zwykły zostawia je jako oddzielne pliki. Zmienisz to też później w profilu.
+    - paragraph [ref=e238]: Podświetlam aktywny tryb na stronie.
+    - generic [ref=e231]:
+      - button "Pomiń" [ref=e232] [cursor=pointer]
+      - button "Pokaż dokumenty" [active] [ref=e239] [cursor=pointer]
+    - generic [ref=e234]:
+      - checkbox "Nie pokazuj tego ponownie" [ref=e235]
+      - generic [ref=e236]: Nie pokazuj tego ponownie

@@ -1,0 +1,14 @@
+[    5760ms] [LOG] [All-in-One] Nadpisanie danych aktywne — osadzone dane @ http://127.0.0.1:5000/user_files/allinone.html:29088
+[    5765ms] [VERBOSE] [DOM] Password forms should have (optionally hidden) username fields for accessibility: (More info: https://goo.gl/9p2vKq) %o @ http://127.0.0.1:5000/user_files/allinone.html#more:0
+[    5791ms] [LOG] [SPA Patches] jQuery handlery przechwycone @ http://127.0.0.1:5000/user_files/allinone.html:28504
+[    5798ms] [LOG] [SPA] initPageManager: more @ http://127.0.0.1:5000/user_files/allinone.html:28237
+[    5830ms] [LOG] [SPA Router] Przełączono na: more @ http://127.0.0.1:5000/user_files/allinone.html:28153
+[    5837ms] [LOG] [AIO-SW] registered, scope: http://127.0.0.1:5000/user_files/ @ http://127.0.0.1:5000/user_files/allinone.html:26
+[    9412ms] [ERROR] Failed to load resource: the server responded with a status of 400 (BAD REQUEST) @ http://127.0.0.1:5000/api/theme/set:0
+[    9413ms] [ERROR] POST request failed: BAD REQUEST @ http://127.0.0.1:5000/user_files/allinone.html:24346
+[    9415ms] Error: BAD REQUEST
+    at Object.error (http://127.0.0.1:5000/user_files/allinone.html:24348:28)
+    at c (http://127.0.0.1:5000/user_files/allinone.html:24087:25304)
+    at Object.fireWith [as rejectWith] (http://127.0.0.1:5000/user_files/allinone.html:24087:26053)
+    at l (http://127.0.0.1:5000/user_files/allinone.html:24087:77807)
+    at XMLHttpRequest.<anonymous> (http://127.0.0.1:5000/user_files/allinone.html:24087:80265)

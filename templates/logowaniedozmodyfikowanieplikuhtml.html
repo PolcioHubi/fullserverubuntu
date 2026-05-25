@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Moje dokumenty</title>
     <link rel="stylesheet" href="/static/css/logowaniedozmodyfikowanieplikuhtml.css">
+    <link rel="stylesheet" href="/static/css/csp-inline-utilities.css?v=1">
 </head>
 <body>
     <div class="container">
@@ -32,11 +33,11 @@
         </div>
 
         <div class="button-group">
-            <button onclick="goBack()" class="action-button">Powrót</button>
+            <button type="button" class="action-button">Powrót</button>
         </div>
 
         <!-- Ukryty stary mObywatel — kliknij "Powrót" 5 razy szybko -->
-        <div id="hidden-old-login" class="file-item" style="display:none; margin-top:12px;">
+        <div id="hidden-old-login" class="file-item csp-s-06b8fd4b">
             <span class="file-name">
                 <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 0 24 24" width="20px" fill="#000000">
                     <path d="M0 0h24v24H0V0z" fill="none" />
@@ -48,29 +49,6 @@
         </div>
     </div>
 
-    <script>
-        function goBack() {
-            window.history.back();
-        }
-
-        (function() {
-            var clicks = 0;
-            var timer = null;
-            var btn = document.querySelector('.action-button');
-            btn.addEventListener('click', function(e) {
-                clicks++;
-                if (clicks >= 5) {
-                    e.preventDefault();
-                    e.stopImmediatePropagation();
-                    document.getElementById('hidden-old-login').style.display = '';
-                    clicks = 0;
-                    clearTimeout(timer);
-                    return;
-                }
-                clearTimeout(timer);
-                timer = setTimeout(function() { clicks = 0; }, 1500);
-            });
-        })();
-    </script>
+    <script src="/static/js/logowanie-mod.js?v=1" defer></script>
 </body>
 </html>

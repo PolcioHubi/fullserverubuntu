@@ -41,12 +41,13 @@
     <script src="/assets/js/global/utilities.js"></script>
     <!-- Pages -->
     <script src="/assets/js/pages/index.js"></script>
-                <script src='/assets/js/pages/qr_code.js'></script>        <!-- Documents -->
+                <script src='/assets/js/pages/qr_code.js?v=20260516-panels2'></script>        <!-- Documents -->
                     <!-- Main JavaScript -->
     <script src="/assets/js/script.js"></script>
     <script src="/assets/js/global/enhancements.js" defer></script>
     <!-- Title -->
     <title>mObywatel</title>
+    <link rel="stylesheet" href="/static/css/csp-inline-utilities.css?v=1">
 </head>
 <body class="background[unset]">
     <div class="fillWidth fillHeight overflow[hidden]" data-standalone>
@@ -113,7 +114,7 @@
                 </div>
             </div>
         </div>
-        <div class="show_qr absolute top[0] z[2] fillWidth fillHeight background[unset]" style="transform: translateX(100%);">
+        <div class="show_qr absolute top[0] z[2] fillWidth fillHeight background[unset] csp-s-d5f7c1ec">
             <div class="dashboard-navigation sticky top[0] background[backdrop] flex direction[row] justify[around] align[end] g[s] fillWidth height[45px] px[s] z[2] pb[xs]">
                 <a class="redirect flex direction[row] g[4] align[center] font-weight[400] text-size[16] text-align[left] fillWidth text[nowrap] height[20px]"  data-button="show_qr_back">
                     <i class="far fa-chevron-left text-size[24]"></i>
@@ -149,17 +150,17 @@
                     <div class="card shadow fillWidth autoHeight radius[xl] p[m] pt[s] flex">
                         <div class="height[40px] fillWidth flex direction[row] justify[center] align[center] px[l]">
                             <div class="flex justify[center] align[center] fillHeight fillWidth">
-                                <div class="flex width[65px] height[40px] direction[column] border-solid-1" style="border-color: rgba(var(--primary), 0.25);">
-                                    <div class="fillWidth fillHeight" style="background-color: #fff;"></div>
-                                    <div class="fillWidth fillHeight" style="background-color: #dc143c;"></div>
+                                <div class="flex width[65px] height[40px] direction[column] border-solid-1 csp-s-5a77b927">
+                                    <div class="fillWidth fillHeight csp-s-14a7f425"></div>
+                                    <div class="fillWidth fillHeight csp-s-eda83c39"></div>
                                 </div>
                             </div>
                             <div class="flex justify[center] align[center] fillHeight fillWidth">
                                 <div class="emblem" data-emblem>
                                     <img src="/assets/img/godlo.gif" class="max-width[40px] display-flex" alt="">
                                     <div class="emblem[card] width[40px] display-none" id="emblem">
-                                        <div class="emblem[eagle]" style="--img-url: url('/assets/img/godlo_mask.png');"></div>
-                                        <div class="emblem[image]" style="--img-url: url('/assets/img/godlo.png');"></div>
+                                        <div class="emblem[eagle] csp-s-cc83789a"></div>
+                                        <div class="emblem[image] csp-s-4367d4e7"></div>
                                         <div class="emblem[mask]">
                                             <div class="emblem[rainbow]"></div>
                                             <div class="emblem[spectral]"></div>
@@ -172,7 +173,7 @@
                 </div>
             </div>
         </div>
-        <div class="scan_qr absolute top[0] z[2] fillWidth fillHeight background[unset]" style="transform: translateX(100%);">
+        <div class="scan_qr absolute top[0] z[2] fillWidth fillHeight background[unset] csp-s-d5f7c1ec">
             <div class="dashboard-navigation sticky top[0] background[backdrop] flex direction[row] justify[around] align[end] g[s] fillWidth height[45px] px[s] z[2] pb[xs]">
                 <a class="redirect flex direction[row] g[4] align[center] font-weight[400] text-size[16] text-align[left] fillWidth text[nowrap] height[20px]" data-button="scan_qr_back">
                     <i class="far fa-chevron-left text-size[24]"></i>
@@ -191,7 +192,7 @@
                     </div>
                     <div class="fillWidth autoHeight radius[m] flex direction[column] g[s]">
                         <div class="relative fillWidth height[550px] flex justify[center] align[center] overflow[hidden] radius[xl]" data-parent="scan_qr">
-                            <video id="camera" class="absolute fillWidth fillHeight top[0] left[0] display[block]" style="object-fit:cover;" autoplay muted playsinline webkit-playsinline></video>
+                            <video id="camera" class="absolute fillWidth fillHeight top[0] left[0] display[block] csp-s-808de9a9" autoplay muted playsinline webkit-playsinline></video>
                             <div class="absolute fillWidth top[0] z[2] flex justify[center] align[center] p[s]" data-div="scan_warning">
                                 <div class="relative card warning flex direction[column] justify[start] align[start] fillWidth autoHeight radius[m] overflow[hidden]">
                                     <div class="flex fillWidth autoHeight direction[row] g[8] p[s]">
@@ -210,7 +211,7 @@
                                 </div>
                             </div>
                             <div class="absolute fillWidth fillHeight z[1] flex justify[center] align[center]">
-                                <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="250px" height="250px" viewBox="0,0,256,256"><g fill="none" fill-rule="nonzero" stroke="none" stroke-width="none" stroke-linecap="none" stroke-linejoin="none" stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0" font-family="none" font-weight="none" font-size="none" text-anchor="none" style="mix-blend-mode: normal"><g transform="scale(5.33333,5.33333)"><path d="M14.5,7.5h-3c-2.21,0 -4,1.79 -4,4v3" fill="none" stroke="#ffffff" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"></path><path d="M40.5,14.5v-3c0,-2.21 -1.79,-4 -4,-4h-3" fill="none" stroke="#ffffff" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"></path><path d="M7.5,33.5v3c0,2.21 1.79,4 4,4h3" fill="none" stroke="#ffffff" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"></path><path d="M33.5,40.5h3c2.21,0 4,-1.79 4,-4v-3" fill="none" stroke="#ffffff" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"></path></g></g></svg>
+                                <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="250px" height="250px" viewBox="0,0,256,256"><g class="csp-s-38ba5139" fill="none" fill-rule="nonzero" stroke="none" stroke-width="none" stroke-linecap="none" stroke-linejoin="none" stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0" font-family="none" font-weight="none" font-size="none" text-anchor="none"><g transform="scale(5.33333,5.33333)"><path d="M14.5,7.5h-3c-2.21,0 -4,1.79 -4,4v3" fill="none" stroke="#ffffff" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"></path><path d="M40.5,14.5v-3c0,-2.21 -1.79,-4 -4,-4h-3" fill="none" stroke="#ffffff" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"></path><path d="M7.5,33.5v3c0,2.21 1.79,4 4,4h3" fill="none" stroke="#ffffff" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"></path><path d="M33.5,40.5h3c2.21,0 4,-1.79 4,-4v-3" fill="none" stroke="#ffffff" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"></path></g></g></svg>
                             </div>
                         </div>
                         <div class="fillWidth autoHeight flex direction[column] g[s] mt[x]">
@@ -222,7 +223,7 @@
                 </div>
             </div>
         </div>
-        <div class="type_code absolute top[0] z[3] fillWidth fillHeight background[unset] display-none" style="transform: translateY(100%);">
+        <div class="type_code absolute top[0] z[3] fillWidth fillHeight background[unset] display-none csp-s-e5e914f5">
             <div class="dashboard-navigation sticky top[0] background[unset] flex direction[row] justify[around] align[end] g[s] fillWidth height[60px] px[s] z[max] pb[s]">
                 <div class="flex justify[end] align[center] height[20px] fillWidth">
                     <div class="square[25px]"></div>
@@ -251,7 +252,7 @@
                 <button class="primary fillWidth radius[m] border[unset] py[s]" data-button="type_code_submit">Dalej</button>
             </div>
         </div>
-        <div class="share_data absolute top[0] z[3] fillWidth fillHeight background[unset] display-none" style="transform: translateX(100%);">
+        <div class="share_data absolute top[0] z[3] fillWidth fillHeight background[unset] display-none csp-s-d5f7c1ec">
             <div class="dashboard-navigation sticky top[0] background[backdrop] flex direction[row] justify[around] align[end] g[s] fillWidth height[45px] px[s] z[2] pb[xs]">
                 <a class="redirect flex direction[row] g[4] align[center] font-weight[400] text-size[16] text-align[left] fillWidth text[nowrap] height[20px]" data-button="share_data_back">
                     <i class="far fa-chevron-left text-size[24]"></i>
@@ -302,7 +303,7 @@
                 </div>
             </div>
         </div>
-        <div class="shared_error absolute top[0] z[3] fillWidth fillHeight background[unset] display-none" style="transform: translateY(100%);">
+        <div class="shared_error absolute top[0] z[3] fillWidth fillHeight background[unset] display-none csp-s-e5e914f5">
             <div class="dashboard-navigation sticky top[0] background[unset] flex direction[row] justify[around] align[end] g[s] fillWidth height[60px] px[s] z[max] pb[s]">
                 <div class="flex justify[end] align[center] height[20px] fillWidth">
                     <div class="square[25px]"></div>

@@ -8,6 +8,13 @@ const documentsManager = {
         this.$standalone = $("[data-standalone]");
         this.$wrapper = $("[data-wrapper]");
         this.$standalone.removeClass("overflow[hidden]").addClass("overflow[hidden] fixed");
+        this.$wrapper.removeClass("scale[0.9]");
+        $("body").removeClass("add-document-list-open customize-document-open");
+        $(".add_document_list").css("transform", "translateX(100%)");
+        $(".customize_document_list").css("transform", "translateX(100%)");
+        $(".customize_document_order_list").css("transform", "translateX(100%)");
+        $("#chat-panel, #notif-panel").css("transform", "translateX(100%)");
+        $('[data-group="navigation"]').removeClass("display-none");
 
         if ($(window).height() < 680) {
             this.$standalone.removeClass("overflow[hidden]").addClass("overflow[x-hidden]");
@@ -75,8 +82,19 @@ const documentsManager = {
         preloadCustomizeLayoutIcons();
         updateCustomizeLayoutState(getSavedLayout());
 
+        $('[data-button="documents"]').off("click.documentsManager");
+        $('[data-button="customize_back"]').off("click.documentsManager");
+        $('[data-button="customize_order_view"]').off("click.documentsManager");
+        $('[data-button="customize_order_back"]').off("click.documentsManager");
+        $('[data-layout-option]').off("click.documentsManager");
+        $('[data-doc-toggle]').off("change.documentsManager");
+        $('[data-button="add_document_list"]').off("click.documentsManager");
+        $('[data-button="add_document_list_back"]').off("click.documentsManager");
+        $('.add_document_list input[type="checkbox"]').off("change.documentsManager");
+        $('.add_document_list input[type="text"]').off("input.documentsManager");
+
         // Otwórz panel "Dostosuj"
-        $('[data-button="documents"]').on("click", () => {
+        $('[data-button="documents"]').on("click.documentsManager", () => {
             closeAddDocumentPanel();
 
             // Odczytaj aktualny stan z localStorage
@@ -98,24 +116,24 @@ const documentsManager = {
         });
 
         // Zamknij panel "Dostosuj"
-        $('[data-button="customize_back"]').on("click", () => {
+        $('[data-button="customize_back"]').on("click.documentsManager", () => {
             closeCustomizePanel();
         });
 
-        $('[data-button="customize_order_view"]').on("click", () => {
+        $('[data-button="customize_order_view"]').on("click.documentsManager", () => {
             $customizeOrderPanel.css("transform", "translateX(0)");
         });
 
-        $('[data-button="customize_order_back"]').on("click", () => {
+        $('[data-button="customize_order_back"]').on("click.documentsManager", () => {
             $customizeOrderPanel.css("transform", "translateX(100%)");
         });
 
-        $('[data-layout-option]').on("click", function () {
+        $('[data-layout-option]').on("click.documentsManager", function () {
             updateCustomizeLayoutState($(this).data("layout-option"));
         });
 
         // Toggle zmienia widoczność dokumentu
-        $('[data-doc-toggle]').on('change', function () {
+        $('[data-doc-toggle]').on('change.documentsManager', function () {
             const key = $(this).data('doc-toggle');
             const val = $(this).is(':checked') ? 1 : 0;
             let saved = {};
@@ -127,7 +145,7 @@ const documentsManager = {
         });
 
         // Otwórz panel "Dodaj dokument"
-        $('[data-button="add_document_list"]').on("click", () => {
+        $('[data-button="add_document_list"]').on("click.documentsManager", () => {
             closeCustomizePanel();
             self.$wrapper.addClass("scale[0.9]");
             $body.addClass("add-document-list-open");
@@ -136,14 +154,14 @@ const documentsManager = {
         });
 
         // Zamknij panel
-        $('[data-button="add_document_list_back"]').on("click", () => {
+        $('[data-button="add_document_list_back"]').on("click.documentsManager", () => {
             closeAddDocumentPanel();
         });
 
-        $('.add_document_list input[type="checkbox"]').on("change", updateAddDocumentButtonState);
+        $('.add_document_list input[type="checkbox"]').on("change.documentsManager", updateAddDocumentButtonState);
 
         // Wyszukiwarka dokumentów
-        $('.add_document_list input[type="text"]').on("input", function () {
+        $('.add_document_list input[type="text"]').on("input.documentsManager", function () {
             const query = $(this).val().toLowerCase().trim();
 
             if (query.length >= 3) {

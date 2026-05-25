@@ -1,0 +1,28 @@
+- main [ref=e2]:
+  - region "Dzień dobry!" [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5]:
+        - img "e-mobywatel"
+      - strong [ref=e6]: e-mobywatel
+    - generic [ref=e7]:
+      - heading "Dzień dobry!" [level=1] [ref=e8]
+      - paragraph [ref=e9]: Zaloguj się do e-mobywatela
+    - region "Formularz uwierzytelniania" [ref=e10]:
+      - button "Wróć do wyboru" [ref=e11] [cursor=pointer]
+      - generic [ref=e12]:
+        - generic [ref=e13]:
+          - generic [ref=e14]: Nazwa użytkownika
+          - textbox "Nazwa użytkownika" [ref=e15]:
+            - /placeholder: Wpisz nazwę użytkownika
+        - generic [ref=e16]:
+          - generic [ref=e17]: Hasło
+          - generic [ref=e18]:
+            - textbox "Hasło" [ref=e19]:
+              - /placeholder: Wpisz hasło
+            - button "Pokaż hasło" [ref=e20] [cursor=pointer]
+        - generic [ref=e21]:
+          - checkbox "Zapamiętaj mnie" [ref=e22] [cursor=pointer]
+          - generic [ref=e23]: Zapamiętaj mnie
+        - button "Zaloguj się" [ref=e24] [cursor=pointer]
+        - paragraph [ref=e25]: Dane administratora otworzą panel admina.
+    - paragraph [ref=e28]: wersja 1.0.0

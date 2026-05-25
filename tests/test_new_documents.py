@@ -872,7 +872,12 @@ class TestUserFilesWithUsername:
     def test_unauthenticated_cannot_access(self, client):
         """Niezalogowany użytkownik nie może pobrać pliku z username w URL."""
         resp = client.get("/user_files/testuser/school_id_new.html")
-        assert resp.status_code == 403
+        # Endpoint is now @login_required — Flask-Login redirects anonymous
+        # users to /login (302) before the route's own ownership check fires.
+        # Either response status proves the file is not served to anonymous.
+        assert resp.status_code in (302, 401, 403)
+        if resp.status_code == 302:
+            assert "/login" in resp.headers.get("Location", "")
 
 
 # ──────────────────────────────────────────────

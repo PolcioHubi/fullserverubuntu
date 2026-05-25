@@ -4,36 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token_func() }}">
-    <title>Podmieniacz Danych HTML</title>
-    <link rel="stylesheet" href="/static/css/index.css">
-    <style>
-        /* Dyskretny widżet impersonacji */
-        .impersonation-widget {
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-            background-color: #20262d;
-            color: #eef1f4;
-            padding: 8px 12px;
-            border-radius: 8px;
-            z-index: 9999;
-            font-family: 'Segoe UI', Arial, sans-serif;
-            font-size: 12px;
-            border: 1px solid #2d343d;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
-            opacity: 0.9;
-        }
-        .impersonation-widget a {
-            color: #c4cfdd;
-            font-weight: bold;
-            text-decoration: underline;
-            cursor: pointer;
-            margin-left: 10px;
-        }
-    </style>
+    <title>e-mobywatel</title>
+    <link rel="shortcut icon" href="/assets/img/logo.png" type="image/x-icon">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-180x.png">
+    <link rel="stylesheet" href="/static/css/index.css?v=20260516-guide1">
+    <link rel="stylesheet" href="/static/css/index-extras.css?v=1">
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/assets/js/global/jquery.js"></script>
+    <script src="/assets/js/global/notifications-bell.js?v=20260510-panels2" defer></script>
+    <script src="/assets/js/global/chat-feed.js?v=20260510-index-chat3" defer></script>
     <script src="/static/js/page-transitions.js" defer></script>
+    <script src="/static/js/emulator-mode.js?v=20260516-mode1" defer></script>
+    <link rel="stylesheet" href="/static/css/csp-inline-utilities.css?v=1">
 </head>
 <body>
     {% if is_impersonating %}
@@ -47,7 +30,7 @@
     <!-- Strona logowania dla niezalogowanych użytkowników -->
     <div class="login-page">
         <div class="login-container">
-            <h1>Podmieniacz Danych HTML</h1>
+            <h1>e-mobywatel</h1>
             <p>Zaloguj się lub załóż konto, aby przejść dalej</p>
 
             <div class="login-buttons">
@@ -60,9 +43,9 @@
                 <p>Łącznie zarejestrowanych użytkowników: <strong>{{ total_registered_users }}</strong></p>
                 <p>Aktywnych użytkowników: <strong>{{ num_active_users }}</strong></p>
                 {% if top_user %}
-                    <p>Użytkownik z największą liczbą Hubert Coinów: <strong>{{ top_user.username }} ({{ top_user.hubert_coins }} HC)</strong></p>
+                    <p>Użytkownik z największą liczbą Bertcoinów: <strong>{{ top_user.username }} ({{ top_user.hubert_coins }} BC)</strong></p>
                 {% else %}
-                    <p>Brak użytkowników z Hubert Coinami.</p>
+                    <p>Brak użytkowników z Bertcoinami.</p>
                 {% endif %}
             </div>
 
@@ -73,7 +56,7 @@
     </div>
     {% else %}
     <!-- Główna aplikacja dla zalogowanych użytkowników -->
-    <div class="main-app">
+    <div class="main-app app-dashboard" data-standalone>
         <!-- Link do panelu administracyjnego -->
         <a href="/admin" class="admin-link">Admin</a>
 
@@ -83,12 +66,35 @@
                 Zalogowany: <strong>{{ username }}</strong>
             </div>
             <a href="/logout" class="logout-btn">Wyloguj</a>
-            <a href="/profile" class="logout-btn">Profil / Dokument</a>
+            <a href="/profile" class="logout-btn" data-tutorial-target="profile-link">Profil / Dokument</a>
         </div>
 
         <div id="mobileActionDock" class="mobile-action-dock" aria-hidden="true">
-            <a href="/profile" class="mobile-action-btn">Profil / Dokument</a>
+            <a href="/profile" class="mobile-action-btn" data-tutorial-target="profile-link-mobile">Profil / Dokument</a>
             <a href="/logout" class="mobile-action-btn">Wyloguj</a>
+        </div>
+
+        <div class="app-content" data-wrapper>
+        <header class="app-dashboard-header">
+            <img class="app-header-logo" src="/assets/svg/logo.svg" alt="">
+            <div class="app-header-actions">
+                <button type="button" class="app-icon-button" id="chat-button" aria-label="Otwórz chat">
+                    <img class="theme-icon" src="/assets/svg/documents/ai.svg" alt="">
+                    <span id="chat-badge"></span>
+                </button>
+                <button type="button" class="app-icon-button" id="notif-bell" aria-label="Otwórz powiadomienia">
+                    <img class="theme-icon" src="/assets/svg/documents/notifications.svg" alt="">
+                    <span id="notif-badge"></span>
+                </button>
+            </div>
+        </header>
+        <section class="app-title-row">
+            <h1>Dokumenty</h1>
+        </section>
+
+        <div class="emulator-mode-banner" data-emulator-mode-banner data-tutorial-target="mode-banner">
+            <strong data-emulator-mode-title>Tryb emulatora</strong>
+            <span data-emulator-mode-copy>Wybierz tryb działania.</span>
         </div>
 
         <div class="stats-section">
@@ -96,9 +102,9 @@
             <p>Łącznie zarejestrowanych użytkowników: <strong>{{ total_registered_users }}</strong></p>
             <p>Aktywnych użytkowników: <strong>{{ num_active_users }}</strong></p>
             {% if top_user %}
-                <p>Użytkownik z największą liczbą Hubert Coinów: <strong>{{ top_user.username }} ({{ top_user.hubert_coins }} HC)</strong></p>
+                <p>Użytkownik z największą liczbą Bertcoinów: <strong>{{ top_user.username }} ({{ top_user.hubert_coins }} BC)</strong></p>
             {% else %}
-                <p>Brak użytkowników z Hubert Coinami.</p>
+                <p>Brak użytkowników z Bertcoinami.</p>
             {% endif %}
         </div>
 
@@ -117,68 +123,85 @@
         {% endif %}
 
         <div class="container">
-            <h1>Podmieniacz Danych HTML</h1>
+            <h1>e-mobywatel</h1>
 
             <div class="version-selector">
                 <div class="version-cards">
-                    <label class="version-card">
-                        <input type="radio" name="template_version" value="new_mdowod" {% if template_version not in ['old', 'new_mprawojazdy', 'new_wozek', 'new_school_id', 'new_student_id', 'allinone'] %}checked{% endif %}>
+                    <label class="version-card" data-template-choice="new_mdowod" data-tutorial-target="mdowod-card">
+                        <input type="radio" name="template_version" value="new_mdowod" {% if template_version not in ['old', 'new_mprawojazdy', 'new_wozek', 'new_school_id', 'new_student_id'] %}checked{% endif %}>
                         <div class="version-card-inner">
-                            <span class="version-badge">NOWA</span>
-                            <span class="version-label">mDowód</span>
-                            <span class="version-desc">Nowy szablon dowodu</span>
+                            <span class="document-row-media">
+                                <img src="/assets/svg/documents/list/ib001_mdowod_card_mini.svg" alt="">
+                            </span>
+                            <span class="document-row-copy">
+                                <span class="version-label">mDowód</span>
+                            </span>
+                            <span class="document-row-chevron"></span>
                         </div>
                     </label>
-                    <label class="version-card">
+                    <label class="version-card" data-template-choice="new_mprawojazdy">
                         <input type="radio" name="template_version" value="new_mprawojazdy" {% if template_version == 'new_mprawojazdy' %}checked{% endif %}>
                         <div class="version-card-inner">
-                            <span class="version-badge">NOWA</span>
-                            <span class="version-label">mPrawo Jazdy</span>
-                            <span class="version-desc">Nowy szablon prawa jazdy</span>
+                            <span class="document-row-media">
+                                <img src="/assets/svg/documents/list/ib003_pj_card_mini.svg" alt="">
+                            </span>
+                            <span class="document-row-copy">
+                                <span class="version-label">mPrawo jazdy</span>
+                            </span>
+                            <span class="document-row-chevron"></span>
                         </div>
                     </label>
-                    <label class="version-card">
+                    <label class="version-card" data-template-choice="new_wozek">
                         <input type="radio" name="template_version" value="new_wozek" {% if template_version == 'new_wozek' %}checked{% endif %}>
                         <div class="version-card-inner">
-                            <span class="version-badge">NOWA</span>
-                            <span class="version-label">Wózek widłowy</span>
-                            <span class="version-desc">Uprawnienie operatora UDT</span>
+                            <span class="document-row-media">
+                                <img src="/assets/img/cards/small/wozek_bg_small.png" alt="">
+                            </span>
+                            <span class="document-row-copy">
+                                <span class="version-label">Wózek widłowy</span>
+                            </span>
+                            <span class="document-row-chevron"></span>
                         </div>
                     </label>
-                    <label class="version-card">
+                    <label class="version-card" data-template-choice="new_school_id">
                         <input type="radio" name="template_version" value="new_school_id" {% if template_version == 'new_school_id' %}checked{% endif %}>
                         <div class="version-card-inner">
-                            <span class="version-badge">NOWA</span>
-                            <span class="version-label">Legitymacja szkolna</span>
-                            <span class="version-desc">Legitymacja szkolna</span>
+                            <span class="document-row-media">
+                                <img src="/assets/svg/documents/list/ib006_lszkolna_card_mini.svg" alt="">
+                            </span>
+                            <span class="document-row-copy">
+                                <span class="version-label">Legitymacja szkolna</span>
+                            </span>
+                            <span class="document-row-chevron"></span>
                         </div>
                     </label>
-                    <label class="version-card">
+                    <label class="version-card" data-template-choice="new_student_id">
                         <input type="radio" name="template_version" value="new_student_id" {% if template_version == 'new_student_id' %}checked{% endif %}>
                         <div class="version-card-inner">
-                            <span class="version-badge">NOWA</span>
-                            <span class="version-label">Legitymacja studencka</span>
-                            <span class="version-desc">Legitymacja studencka</span>
-                        </div>
-                    </label>
-                    <label class="version-card">
-                        <input type="radio" name="template_version" value="old" {% if template_version == 'old' %}checked{% endif %}>
-                        <div class="version-card-inner">
-                            <span class="version-label">Klasyczna</span>
-                            <span class="version-desc">Poprzednia wersja</span>
-                        </div>
-                    </label>
-                    <label class="version-card version-card-allinone">
-                        <input type="radio" name="template_version" value="allinone" {% if template_version == 'allinone' %}checked{% endif %}>
-                        <div class="version-card-inner">
-                            <span class="version-badge" style="background: linear-gradient(135deg, #667eea, #764ba2); color: #fff;">STABILNA</span>
-                            <span class="version-label">Pełna stabilna aplikacja</span>
-                            <span class="version-desc">Połącz dokumenty w jedną apkę</span>
+                            <span class="document-row-media">
+                                <img src="/assets/svg/documents/list/ib007_lstudencka_card_mini.svg" alt="">
+                            </span>
+                            <span class="document-row-copy">
+                                <span class="version-label">Legitymacja studencka</span>
+                            </span>
+                            <span class="document-row-chevron"></span>
                         </div>
                     </label>
                 </div>
             </div>
 
+            <div class="app-usage-strip">
+                <span>{{ total_registered_users }}</span>
+                <p>użytkowników korzysta z e-mobywatela</p>
+            </div>
+
+            <section id="documentFormPanel" class="document-form-panel" aria-hidden="true">
+                <div class="document-form-panel-header">
+                    <button type="button" id="formPanelBack" class="document-form-back">Wróć</button>
+                    <h2 data-form-panel-title>Dane dokumentu</h2>
+                    <span></span>
+                </div>
+                <div class="document-form-panel-scroll">
             <p class="description">Wypełnij formularz nowymi danymi, które zastąpią istniejące dane w pliku HTML.</p>
 
             <div class="disclaimer">
@@ -186,17 +209,11 @@
                 <p>Ta aplikacja została stworzona wyłącznie w celach edukacyjnych i demonstracyjnych. Nie należy jej używać do tworzenia fałszywych dokumentów ani do jakichkolwiek nielegalnych działań. Użytkownik ponosi pełną odpowiedzialność za sposób wykorzystania tej aplikacji.</p>
             </div>
 
-            <div class="example-data-section" id="example-data-section">
-                <button type="button" id="generate-random-data-btn" class="example-btn random-btn">
-                    Generuj losowe dane
-                </button>
-            </div>
-
             <form method="POST" enctype="multipart/form-data" id="mainForm">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token_func() }}">
                 <input type="hidden" id="userName" name="user_name" value="{{ username }}">
 
-                <fieldset id="fieldset-zdjecie">
+                <fieldset id="fieldset-zdjecie" data-tutorial-target="photo-upload">
                     <legend>Zdjęcie</legend>
                     <div class="form-group">
                         <label for="image_upload">Wgraj zdjęcie (zdjecie_686510da4d2591.91511191.jpg):</label>
@@ -207,7 +224,7 @@
                                 <img id="imagePreview" class="photo-preview-image" src="" alt="Podgląd zdjęcia">
                                 <p class="photo-preview-note">Miniatura jest pomniejszona dla wygody. Oryginał pozostaje bez zmian.</p>
                             </div>
-                            <div class="id-demo-panel">
+                            <div class="id-demo-panel" data-tutorial-target="document-demo">
                                 <p class="photo-preview-title">Demo na dowodzie (jak w szablonie)</p>
                                 <div class="id-demo-card">
                                     <div class="id-demo-main">
@@ -245,7 +262,14 @@
                     </div>
                 </fieldset>
 
-                <fieldset id="fieldset-dane-osobowe">
+                <div class="example-data-section" id="example-data-section" data-tutorial-target="random-data">
+                    <button type="button" id="generate-random-data-btn" class="example-btn random-btn">
+                        Generuj losowe dane
+                    </button>
+                    <p id="random-data-message" class="inline-form-message" role="status" aria-live="polite"></p>
+                </div>
+
+                <fieldset id="fieldset-dane-osobowe" data-tutorial-target="personal-data">
                     <legend>Dane Osobowe</legend>
                     <div class="form-row">
                         <div class="form-group">
@@ -263,13 +287,13 @@
                             <label for="obywatelstwo">Obywatelstwo:</label>
                             <input type="text" id="obywatelstwo" name="obywatelstwo" placeholder="np. polskie">
                         </div>
-                        <div class="form-group">
+                        <div class="form-group" data-tutorial-target="birth-date">
                             <label for="data_urodzenia">Data urodzenia (DD.MM.RRRR):</label>
                             <input type="text" id="data_urodzenia" name="data_urodzenia" placeholder="np. 15.03.1990">
                         </div>
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-group" data-tutorial-target="gender">
                         <label for="plec">Płeć:</label>
                         <select id="plec" name="plec">
                             <option value="">Wybierz płeć</option>
@@ -280,7 +304,7 @@
 
                     <div class="form-group">
                         <label for="pesel">Numer PESEL:</label>
-                        <div class="pesel-group">
+                        <div class="pesel-group" data-tutorial-target="pesel">
                             <input type="text" id="pesel" name="pesel" placeholder="np. 90031512345" maxlength="11">
                             <button type="button" class="generate-pesel-btn">Automatyczne generowanie PESELu</button>
                         </div>
@@ -288,6 +312,7 @@
                             PESEL jest generowany automatycznie na podstawie daty urodzenia i płci.
                             Upewnij się, że pola "Data urodzenia" i "Płeć" są wypełnione.
                         </p>
+                        <p id="pesel-message" class="inline-form-message" role="status" aria-live="polite"></p>
                     </div>
                 </fieldset>
 
@@ -511,76 +536,153 @@
                 </fieldset>
                 </div><!-- /template-fields new_student_id -->
 
-                <!-- ═══ All-in-One fields ═══ -->
-                <div class="template-fields" data-template="allinone">
-                <fieldset>
-                    <legend>Kompilacja All-in-One</legend>
-                    <p style="margin-bottom: 12px; color: #8899aa; font-size: 0.9em;">
-                        Wybierz dokumenty, które chcesz połączyć w jedną aplikację PWA.
-                        Dokumenty muszą być wcześniej wygenerowane.
-                    </p>
-                    <div id="allinone-doc-list" style="display: flex; flex-direction: column; gap: 8px;">
-                        <label class="allinone-doc-check" style="display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: #1a2332; border-radius: 8px; cursor: pointer;">
-                            <input type="checkbox" name="allinone_doc" value="mdowod" checked>
-                            <span>mDowód</span>
-                            <span class="allinone-doc-status" data-doc="mdowod" style="margin-left: auto; font-size: 0.8em;"></span>
-                        </label>
-                        <label class="allinone-doc-check" style="display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: #1a2332; border-radius: 8px; cursor: pointer;">
-                            <input type="checkbox" name="allinone_doc" value="mprawojazdy" checked>
-                            <span>mPrawo Jazdy</span>
-                            <span class="allinone-doc-status" data-doc="mprawojazdy" style="margin-left: auto; font-size: 0.8em;"></span>
-                        </label>
-                        <label class="allinone-doc-check" style="display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: #1a2332; border-radius: 8px; cursor: pointer;">
-                            <input type="checkbox" name="allinone_doc" value="wozek" checked>
-                            <span>Wózek widłowy</span>
-                            <span class="allinone-doc-status" data-doc="wozek" style="margin-left: auto; font-size: 0.8em;"></span>
-                        </label>
-                        <label class="allinone-doc-check" style="display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: #1a2332; border-radius: 8px; cursor: pointer;">
-                            <input type="checkbox" name="allinone_doc" value="school_id" checked>
-                            <span>Legitymacja szkolna</span>
-                            <span class="allinone-doc-status" data-doc="school_id" style="margin-left: auto; font-size: 0.8em;"></span>
-                        </label>
-                        <label class="allinone-doc-check" style="display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: #1a2332; border-radius: 8px; cursor: pointer;">
-                            <input type="checkbox" name="allinone_doc" value="student_id" checked>
-                            <span>Legitymacja studencka</span>
-                            <span class="allinone-doc-status" data-doc="student_id" style="margin-left: auto; font-size: 0.8em;"></span>
-                        </label>
-                    </div>
-                    <div id="allinone-compile-section" style="margin-top: 16px;">
-                        <button type="button" id="allinone-compile-btn" class="submit-btn" style="background: linear-gradient(135deg, #667eea, #764ba2); width: 100%;">
-                            Kompiluj All-in-One
-                        </button>
-                        <div id="allinone-result" style="margin-top: 10px; display: none;">
-                            <a id="allinone-link" href="#" target="_blank" class="post-save-btn" style="display: inline-block; text-align: center; width: 100%;">
-                                Otwórz All-in-One
-                            </a>
-                        </div>
-                    </div>
-                </fieldset>
-                </div><!-- /template-fields allinone -->
-
-                <div class="submit-section">
+                <div class="submit-section" data-tutorial-target="submit-actions">
                     <button type="submit" class="submit-btn">Modyfikuj i Zapisz</button>
-                    <button type="button" class="clear-btn" onclick="clearForm()">Wyczyść formularz</button>
+                    <button type="button" class="clear-btn" data-action="clearForm">Wyczyść formularz</button>
                     <div id="postSaveActions" class="post-save-actions hidden">
                         <p class="post-save-text">Dane zapisane. Przejdź do dokumentu:</p>
                         <button type="button" id="openDocumentBtn" class="post-save-btn">Przejdź do dokumentu</button>
                     </div>
                 </div>
             </form>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <div id="notif-panel" class="app-slide-panel csp-s-95508af6">
+            <div class="app-panel-header">
+                <button type="button" id="notif-back" class="app-panel-back">Wróć</button>
+                <h2>Powiadomienia</h2>
+                <span></span>
+            </div>
+            <div id="notif-list" class="app-panel-list">
+                <p id="notif-empty" class="app-panel-empty">Brak powiadomień</p>
+            </div>
+        </div>
+
+        <div id="chat-panel" class="app-slide-panel app-chat-panel csp-s-95508af6">
+            <div class="app-panel-header">
+                <button type="button" id="chat-back" class="app-panel-back">Wróć</button>
+                <h2>Globalny chat</h2>
+                <span></span>
+            </div>
+            <div class="app-chat-body">
+                <div id="chat-list" class="app-chat-list">
+                    <div id="chat-empty-wrap">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                        <p>Brak wiadomości</p>
+                        <p>Napisz pierwszą wiadomość!</p>
+                    </div>
+                </div>
+                <div class="chat-composer-wrap">
+                    <div id="chat-error"></div>
+                    <div class="chat-input-bar">
+                        <textarea id="chat-input" maxlength="2000" placeholder="Wpisz pytanie" rows="1"></textarea>
+                        <button id="chat-send" type="button" aria-label="Wyślij" disabled><svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="app-bottom-dock" data-group="navigation">
+            <button class="app-main-action" id="openGeneratedDocumentBtn" type="button" data-tutorial-target="open-document-action">Przejdź do dokumentu</button>
+            <nav class="app-bottom-nav" aria-label="Nawigacja">
+                <a href="/" class="is-active" aria-label="Dokumenty">
+                    <img src="/assets/svg/navigation/light/documents_active.svg" alt="">
+                    <span>Dokumenty</span>
+                </a>
+                <a href="/profile" aria-label="Profil">
+                    <span class="app-profile-icon"></span>
+                    <span>Profil</span>
+                </a>
+            </nav>
+        </div>
+
+        <div id="documentChoiceModal" class="document-choice-modal" aria-hidden="true">
+            <div class="document-choice-card">
+                <h2>Wybierz dokument</h2>
+                <p id="documentChoiceMessage">Wybierz, który wygenerowany dokument chcesz otworzyć.</p>
+                <div id="documentChoiceList" class="document-choice-list"></div>
+                <button type="button" id="documentChoiceClose" class="document-choice-close">Wróć</button>
+            </div>
+        </div>
+
+        <div id="allinoneChoiceModal" class="document-choice-modal allinone-choice-modal" aria-hidden="true">
+            <div class="document-choice-card allinone-choice-card" role="dialog" aria-modal="true" aria-labelledby="allinoneChoiceTitle">
+                <span class="emulator-choice-kicker">All-in-One</span>
+                <h2 id="allinoneChoiceTitle">Wybierz dokumenty</h2>
+                <p>
+                    Zaznacz dokumenty, które mają zostać połączone w jedną aplikację.
+                    Dokument musi być wcześniej zapisany w formularzu, żeby dało się go dodać.
+                </p>
+                <div id="allinone-doc-list" class="allinone-doc-list">
+                    <label class="allinone-doc-check">
+                        <input type="checkbox" name="allinone_doc" value="mdowod" checked>
+                        <span>mDowód</span>
+                        <span class="allinone-doc-status" data-doc="mdowod"></span>
+                    </label>
+                    <label class="allinone-doc-check">
+                        <input type="checkbox" name="allinone_doc" value="mprawojazdy" checked>
+                        <span>mPrawo jazdy</span>
+                        <span class="allinone-doc-status" data-doc="mprawojazdy"></span>
+                    </label>
+                    <label class="allinone-doc-check">
+                        <input type="checkbox" name="allinone_doc" value="wozek" checked>
+                        <span>Wózek widłowy</span>
+                        <span class="allinone-doc-status" data-doc="wozek"></span>
+                    </label>
+                    <label class="allinone-doc-check">
+                        <input type="checkbox" name="allinone_doc" value="school_id" checked>
+                        <span>Legitymacja szkolna</span>
+                        <span class="allinone-doc-status" data-doc="school_id"></span>
+                    </label>
+                    <label class="allinone-doc-check">
+                        <input type="checkbox" name="allinone_doc" value="student_id" checked>
+                        <span>Legitymacja studencka</span>
+                        <span class="allinone-doc-status" data-doc="student_id"></span>
+                    </label>
+                </div>
+                <p id="allinone-modal-message" class="inline-form-message" role="status" aria-live="polite"></p>
+                <button type="button" id="allinone-compile-btn" class="document-choice-item">
+                    Kompiluj i przejdź do logowania
+                </button>
+                <button type="button" id="allinoneChoiceClose" class="document-choice-close">Wróć</button>
+            </div>
+        </div>
+
+        <div id="emulatorChoiceModal" class="emulator-choice-modal" aria-hidden="true">
+            <div class="emulator-choice-card" role="dialog" aria-modal="true" aria-labelledby="emulatorChoiceTitle">
+                <span class="emulator-choice-kicker">Tryb działania</span>
+                <h2 id="emulatorChoiceTitle">Wybierz domyślny tryb</h2>
+                <p>
+                    All-in-One składa wszystko w jedną płynną aplikację. Na nowej przeglądarce pierwsze wczytanie może potrwać dłużej, ale potem działa szybciej.
+                    Tryb zwykły trzyma dokumenty oddzielnie, więc start jest lżejszy, ale przełączanie może być mniej płynne.
+                </p>
+                <div class="emulator-choice-actions">
+                    <button type="button" data-emulator-choice="allinone">
+                        <strong>All-in-One</strong>
+                        <span>Jedna aplikacja, płynniejsze działanie po pierwszym wczytaniu.</span>
+                    </button>
+                    <button type="button" data-emulator-choice="split">
+                        <strong>Tryb zwykły</strong>
+                        <span>Oddzielne pliki i lżejszy start na nowym urządzeniu.</span>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- Modal powiadomienia o zapisie -->
-    <div id="notificationModal" class="notification-modal" style="display:none;">
+    <div id="notificationModal" class="notification-modal csp-s-6b99de8b">
         <div class="notification-modal-content">
             <h2 id="notificationTitle"></h2>
             <p id="notificationMessage"></p>
-            <button onclick="closeNotificationModal()">OK</button>
+            <button data-action="closeNotificationModal">OK</button>
         </div>
     </div>
 
-    <div id="documentDisclaimerModal" class="notification-modal" style="display:none;">
+    <div id="documentDisclaimerModal" class="notification-modal csp-s-6b99de8b">
         <div class="notification-modal-content disclaimer-modal-content">
             <h2>UWAGA - CELE EDUKACYJNE</h2>
             <p class="disclaimer-modal-text">
@@ -602,616 +704,7 @@
     <script id="index-bootstrap" type="application/json">
         {{ {'lastFormData': last_form_data, 'hasSeenTutorial': has_seen_tutorial, 'username': username} | tojson }}
     </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const bootstrapElement = document.getElementById('index-bootstrap');
-            let bootstrapData = {};
-            if (bootstrapElement) {
-                try {
-                    bootstrapData = JSON.parse(bootstrapElement.textContent);
-                } catch (error) {
-                    console.error('Nie udało się odczytać danych startowych strony:', error);
-                }
-            }
-
-            const lastFormData =
-                bootstrapData.lastFormData && typeof bootstrapData.lastFormData === 'object'
-                    ? bootstrapData.lastFormData
-                    : {};
-            const currentUsername = typeof bootstrapData.username === 'string'
-                ? bootstrapData.username
-                : '';
-            const hasSeenTutorial = Boolean(bootstrapData.hasSeenTutorial);
-
-            // --- TEMPLATE SELECTOR LOGIC ---
-            function updateTemplateFields() {
-                const selected = document.querySelector('input[name="template_version"]:checked');
-                if (!selected) return;
-                const val = selected.value;
-                document.querySelectorAll('.template-fields').forEach(function(el) {
-                    el.classList.toggle('active', el.dataset.template === val);
-                });
-                // Hide demo panel for non-mDowód templates
-                const demoPanel = document.querySelector('.id-demo-panel');
-                if (demoPanel) {
-                    demoPanel.style.display = (val === 'new_mprawojazdy' || val === 'new_wozek' || val === 'new_school_id' || val === 'new_student_id' || val === 'allinone') ? 'none' : '';
-                }
-                // Hide/show submit section for allinone (it has its own button)
-                const submitSection = document.querySelector('.submit-section');
-                if (submitSection) {
-                    submitSection.style.display = (val === 'allinone') ? 'none' : '';
-                }
-                // Hide random data, photo and personal data sections for allinone
-                var hideForAllinone = (val === 'allinone') ? 'none' : '';
-                var exDataSec = document.getElementById('example-data-section');
-                if (exDataSec) exDataSec.style.display = hideForAllinone;
-                var fZdjecie = document.getElementById('fieldset-zdjecie');
-                if (fZdjecie) fZdjecie.style.display = hideForAllinone;
-                var fDane = document.getElementById('fieldset-dane-osobowe');
-                if (fDane) fDane.style.display = hideForAllinone;
-                // Fetch document availability when allinone is selected
-                if (val === 'allinone') {
-                    fetchAllinoneDocStatus();
-                }
-            }
-            document.querySelectorAll('input[name="template_version"]').forEach(function(radio) {
-                radio.addEventListener('change', updateTemplateFields);
-            });
-            updateTemplateFields();
-
-            // --- ALL-IN-ONE FUNCTIONS ---
-            async function fetchAllinoneDocStatus() {
-                try {
-                    const resp = await fetch('/api/user-documents');
-                    const data = await resp.json();
-                    if (data.success && data.data && data.data.documents) {
-                        const docs = data.data.documents;
-                        document.querySelectorAll('.allinone-doc-status').forEach(function(el) {
-                            const key = el.dataset.doc;
-                            if (docs[key]) {
-                                el.textContent = '✓ Wygenerowany';
-                                el.style.color = '#4ade80';
-                                const cb = el.closest('label').querySelector('input[type="checkbox"]');
-                                if (cb) cb.disabled = false;
-                            } else {
-                                el.textContent = '✗ Brak';
-                                el.style.color = '#f87171';
-                                const cb = el.closest('label').querySelector('input[type="checkbox"]');
-                                if (cb) { cb.disabled = true; cb.checked = false; }
-                            }
-                        });
-                        // Jeśli allinone istnieje, pokaż link
-                        if (docs.allinone) {
-                            const resultDiv = document.getElementById('allinone-result');
-                            const link = document.getElementById('allinone-link');
-                            if (resultDiv && link) {
-                                link.href = '/user_files/allinone.html';
-                                resultDiv.style.display = 'block';
-                            }
-                        }
-                    }
-                } catch (e) {
-                    console.error('Błąd pobierania statusu dokumentów:', e);
-                }
-            }
-
-            // Compile All-in-One button handler
-            const allinoneCompileBtn = document.getElementById('allinone-compile-btn');
-            if (allinoneCompileBtn) {
-                allinoneCompileBtn.addEventListener('click', async function() {
-                    const checkboxes = document.querySelectorAll('input[name="allinone_doc"]:checked:not(:disabled)');
-                    const selectedDocs = Array.from(checkboxes).map(cb => cb.value);
-                    if (selectedDocs.length === 0) {
-                        showNotification('Uwaga', 'Wybierz co najmniej jeden dokument do kompilacji.', 'error');
-                        return;
-                    }
-                    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-                    const loadingOverlay = document.getElementById('loadingOverlay');
-                    loadingOverlay.classList.add('visible');
-                    allinoneCompileBtn.disabled = true;
-                    allinoneCompileBtn.textContent = 'Kompilowanie...';
-                    try {
-                        const resp = await fetch('/api/compile-allinone', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRFToken': csrfToken
-                            },
-                            body: JSON.stringify({ selected_docs: selectedDocs })
-                        });
-                        const result = await resp.json();
-                        if (result.success) {
-                            showNotification('Sukces!', result.message, 'success');
-                            const resultDiv = document.getElementById('allinone-result');
-                            const link = document.getElementById('allinone-link');
-                            if (resultDiv && link) {
-                                link.href = result.redirect_url || '/user_files/allinone.html';
-                                resultDiv.style.display = 'block';
-                            }
-                            logAction('Compiled All-in-One with docs: ' + selectedDocs.join(', '));
-                        } else {
-                            showNotification('Błąd!', result.error, 'error');
-                        }
-                    } catch (error) {
-                        console.error('Error compiling All-in-One:', error);
-                        showNotification('Błąd!', 'Wystąpił błąd podczas kompilacji All-in-One.', 'error');
-                    } finally {
-                        loadingOverlay.classList.remove('visible');
-                        allinoneCompileBtn.disabled = false;
-                        allinoneCompileBtn.textContent = 'Kompiluj All-in-One';
-                    }
-                });
-            }
-
-            // --- GENERAL HELPER FUNCTIONS ---
-            function logAction(actionDescription) {
-                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-                fetch('/api/log-action', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': csrfToken
-                    },
-                    body: JSON.stringify({ action: actionDescription }),
-                }).catch(error => console.error('Error logging action:', error));
-            }
-
-            function showAlert(message, type = 'info') {
-                Swal.fire({
-                    title: type.charAt(0).toUpperCase() + type.slice(1),
-                    text: message,
-                    icon: type,
-                    confirmButtonColor: '#667789',
-                    background: '#1b1f24',
-                    color: '#eef1f4'
-                });
-            }
-
-            function showNotification(title, message, type) {
-                document.getElementById('notificationTitle').textContent = title;
-                document.getElementById('notificationMessage').textContent = message;
-                document.getElementById('notificationModal').style.display = 'block';
-            }
-
-            const mobileActionDock = document.getElementById('mobileActionDock');
-            const userStatusPanel = document.querySelector('.user-status');
-            const profileButtons = document.querySelectorAll('a[href="/profile"]');
-
-            profileButtons.forEach((btn) => {
-                if (btn && btn.classList.contains('logout-btn')) {
-                    btn.textContent = 'Profil / Dokument';
-                }
-            });
-
-            function getScrollTopY() {
-                return (
-                    window.scrollY ||
-                    window.pageYOffset ||
-                    document.documentElement.scrollTop ||
-                    document.body.scrollTop ||
-                    0
-                );
-            }
-
-            function updateMobileActionDockVisibility() {
-                if (!mobileActionDock) return;
-
-                const isMobileLayout = window.matchMedia('(max-width: 900px)').matches;
-                if (!isMobileLayout) {
-                    mobileActionDock.classList.remove('is-visible');
-                    mobileActionDock.setAttribute('aria-hidden', 'true');
-                    if (userStatusPanel) userStatusPanel.classList.remove('is-condensed');
-                    return;
-                }
-
-                const shouldShow = getScrollTopY() > 60;
-                mobileActionDock.classList.toggle('is-visible', shouldShow);
-                mobileActionDock.setAttribute('aria-hidden', shouldShow ? 'false' : 'true');
-                if (userStatusPanel) userStatusPanel.classList.toggle('is-condensed', shouldShow);
-            }
-
-            updateMobileActionDockVisibility();
-            window.addEventListener('scroll', updateMobileActionDockVisibility, { passive: true });
-            window.addEventListener('touchmove', updateMobileActionDockVisibility, { passive: true });
-            window.addEventListener('wheel', updateMobileActionDockVisibility, { passive: true });
-            window.addEventListener('resize', updateMobileActionDockVisibility);
-
-            const imagePreview = document.getElementById('imagePreview');
-            const imagePreviewCard = document.getElementById('imagePreviewCard');
-            const imagePreviewCardPlaceholder = document.getElementById('imagePreviewCardPlaceholder');
-            let uploadObjectUrl = null;
-
-            function clearUploadObjectUrl() {
-                if (uploadObjectUrl) {
-                    URL.revokeObjectURL(uploadObjectUrl);
-                    uploadObjectUrl = null;
-                }
-            }
-
-            function updateImagePreviews(imageSrc) {
-                const hasImage = Boolean(imageSrc);
-
-                if (imagePreview) {
-                    imagePreview.src = hasImage ? imageSrc : '';
-                    imagePreview.style.display = hasImage ? 'block' : 'none';
-                }
-
-                if (imagePreviewCard) {
-                    imagePreviewCard.src = hasImage ? imageSrc : '';
-                    imagePreviewCard.style.display = hasImage ? 'block' : 'none';
-                }
-
-                if (imagePreviewCardPlaceholder) {
-                    imagePreviewCardPlaceholder.style.display = hasImage ? 'none' : 'inline';
-                }
-            }
-
-            function formatDemoValue(value, fallback = '—') {
-                if (!value || typeof value !== 'string') return fallback;
-                const cleaned = value.trim();
-                return cleaned ? cleaned.toUpperCase() : fallback;
-            }
-
-            function updateIdCardDemoText() {
-                const mappings = [
-                    { inputId: 'imie', outputId: 'demoImie', fallback: 'IMIĘ' },
-                    { inputId: 'nazwisko', outputId: 'demoNazwisko', fallback: 'NAZWISKO' },
-                    { inputId: 'obywatelstwo', outputId: 'demoObywatelstwo', fallback: 'POLSKIE' },
-                    { inputId: 'data_urodzenia', outputId: 'demoDataUrodzenia', fallback: '15.03.1985' },
-                    { inputId: 'pesel', outputId: 'demoPesel', fallback: '85031512345' }
-                ];
-
-                mappings.forEach(({ inputId, outputId, fallback }) => {
-                    const input = document.getElementById(inputId);
-                    const output = document.getElementById(outputId);
-                    if (!output) return;
-                    output.textContent = formatDemoValue(input ? input.value : '', fallback);
-                });
-            }
-
-            window.closeNotificationModal = function() {
-                document.getElementById('notificationModal').style.display = 'none';
-            }
-
-            const postSaveActions = document.getElementById('postSaveActions');
-            const openDocumentBtn = document.getElementById('openDocumentBtn');
-            const documentDisclaimerModal = document.getElementById('documentDisclaimerModal');
-            const disclaimerAgree = document.getElementById('disclaimerAgree');
-            const cancelOpenDocumentBtn = document.getElementById('cancelOpenDocumentBtn');
-            const confirmOpenDocumentBtn = document.getElementById('confirmOpenDocumentBtn');
-
-            function showPostSaveActions() {
-                if (!postSaveActions) return;
-                postSaveActions.classList.remove('hidden');
-                postSaveActions.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-
-            function openDocumentDisclaimer() {
-                if (!documentDisclaimerModal) return;
-                documentDisclaimerModal.style.display = 'block';
-                if (disclaimerAgree) disclaimerAgree.checked = false;
-                if (confirmOpenDocumentBtn) confirmOpenDocumentBtn.disabled = true;
-            }
-
-            function closeDocumentDisclaimer() {
-                if (!documentDisclaimerModal) return;
-                documentDisclaimerModal.style.display = 'none';
-            }
-
-            if (openDocumentBtn) {
-                openDocumentBtn.addEventListener('click', function() {
-                    logAction("Clicked 'Go to document' button.");
-                    openDocumentDisclaimer();
-                });
-            }
-
-            if (cancelOpenDocumentBtn) {
-                cancelOpenDocumentBtn.addEventListener('click', function() {
-                    closeDocumentDisclaimer();
-                });
-            }
-
-            if (disclaimerAgree && confirmOpenDocumentBtn) {
-                disclaimerAgree.addEventListener('change', function() {
-                    confirmOpenDocumentBtn.disabled = !disclaimerAgree.checked;
-                });
-            }
-
-            if (confirmOpenDocumentBtn) {
-                confirmOpenDocumentBtn.addEventListener('click', function() {
-                    if (!disclaimerAgree || !disclaimerAgree.checked) return;
-                    logAction("Accepted educational disclaimer and opened documents page.");
-                    window.location.href = '/logowaniedozmodyfikowanieplikuhtml';
-                });
-            }
-
-            // --- FORM LOGIC ---
-            async function generatePESEL() {
-                const birthDateInput = document.getElementById('data_urodzenia');
-                const genderSelect = document.getElementById('plec');
-                const peselInput = document.getElementById('pesel');
-                const birthDate = birthDateInput.value;
-                const gender = genderSelect.value;
-
-                if (!birthDate || !gender) {
-                    showAlert('Proszę wypełnić datę urodzenia i płeć, aby wygenerować PESEL.', 'error');
-                    return;
-                }
-
-                try {
-                    const response = await fetch('/generate_pesel', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                        },
-                        body: JSON.stringify({ birth_date: birthDate, gender: gender }),
-                    });
-                    const data = await response.json();
-                    if (data.success) {
-                        peselInput.value = data.pesel;
-                        updateIdCardDemoText();
-                        showAlert('PESEL został wygenerowany pomyślnie.', 'success');
-                    } else {
-                        showAlert(data.error || 'Nie udało się wygenerować numeru PESEL.', 'error');
-                    }
-                } catch (error) {
-                    console.error('Błąd podczas generowania PESEL:', error);
-                    showAlert('Wystąpił błąd komunikacji z serwerem.', 'error');
-                }
-            }
-
-            window.clearForm = function() {
-                logAction("Clicked 'Clear form' button.");
-                document.getElementById('mainForm').reset();
-                const inputs = document.getElementById('mainForm').querySelectorAll('input, textarea, select');
-                inputs.forEach(input => {
-                    if (input.type === 'radio' || input.type === 'checkbox') {
-                        input.checked = false;
-                    } else if (input.type !== 'hidden') {
-                        input.value = '';
-                    }
-                });
-                clearUploadObjectUrl();
-                updateImagePreviews('');
-                updateIdCardDemoText();
-            }
-
-            document.getElementById('mainForm').addEventListener('submit', async function(e) {
-                e.preventDefault();
-                // All-in-One has its own compile button — don't submit the form
-                const versionRadio = document.querySelector('input[name="template_version"]:checked');
-                if (versionRadio && versionRadio.value === 'allinone') return;
-                logAction("Clicked 'Modify and Save' button (form submission).");
-                const loadingOverlay = document.getElementById('loadingOverlay');
-                const submitBtn = document.querySelector('.submit-btn');
-                loadingOverlay.classList.add('visible');
-                submitBtn.disabled = true;
-                submitBtn.textContent = 'Ładowanie...';
-                const formData = new FormData(this);
-                formData.append('template_version', versionRadio ? versionRadio.value : 'new');
-                try {
-                    const response = await fetch('/', { method: 'POST', body: formData });
-                    const result = await response.json();
-                    if (result.success) {
-                        showNotification('Sukces!', result.message, 'success');
-                        showPostSaveActions();
-                        // NEW LOGIC: Trigger tutorial step 2 after successful form submission
-                        if (!hasSeenTutorial && currentStep === 1) {
-                            showTutorialStep(2);
-                        }
-                    } else {
-                        showNotification('Błąd!', result.error, 'error');
-                    }
-                } catch (error) {
-                    console.error('Error:', error);
-                    showNotification('Błąd!', 'Wystąpił błąd podczas wysyłania danych.', 'error');
-                } finally {
-                    loadingOverlay.classList.remove('visible');
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'Modyfikuj i Zapisz';
-                }
-            });
-
-            document.getElementById('image_upload').addEventListener('change', function(event) {
-                const [file] = event.target.files;
-                if (file) {
-                    logAction(`Selected an image to upload: ${file.name}`);
-                    clearUploadObjectUrl();
-                    uploadObjectUrl = URL.createObjectURL(file);
-                    updateImagePreviews(uploadObjectUrl);
-                } else {
-                    clearUploadObjectUrl();
-                    updateImagePreviews('');
-                }
-            });
-
-            const generateRandomBtn = document.getElementById('generate-random-data-btn');
-            if (generateRandomBtn) {
-                generateRandomBtn.addEventListener('click', async function() {
-                    logAction("Clicked 'Generate random data' button.");
-                    const plecSelect = document.getElementById('plec');
-                    const selectedPlec = plecSelect.value;
-                    if (!selectedPlec) {
-                        alert('Proszę najpierw wybrać płeć z listy.');
-                        return;
-                    }
-                    try {
-                        const response = await fetch(`/api/generate-random-data?plec=${selectedPlec}`, {
-                            method: 'GET',
-                            headers: { 'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').getAttribute('content') }
-                        });
-                        if (!response.ok) throw new Error('Błąd sieci lub serwera');
-                        const data = await response.json();
-                        for (const [key, value] of Object.entries(data)) {
-                            const element = document.getElementById(key);
-                            if (element) element.value = value;
-                        }
-                        updateIdCardDemoText();
-                    } catch (error) {
-                        console.error('Błąd podczas pobierania losowych danych:', error);
-                        alert('Nie udało się załadować losowych danych.');
-                    }
-                });
-            }
-
-            const generatePeselBtn = document.querySelector('.generate-pesel-btn');
-            if (generatePeselBtn) {
-                generatePeselBtn.addEventListener('click', generatePESEL);
-            }
-
-            ['imie', 'nazwisko', 'obywatelstwo', 'data_urodzenia', 'pesel'].forEach((fieldId) => {
-                const field = document.getElementById(fieldId);
-                if (!field) return;
-                field.addEventListener('input', updateIdCardDemoText);
-                field.addEventListener('change', updateIdCardDemoText);
-            });
-
-            // --- INITIAL DATA POPULATION ---
-            for (const [key, value] of Object.entries(lastFormData)) {
-                const element = document.getElementById(key);
-                if (element) {
-                    if (element.type === 'date' && typeof value === 'string') {
-                        const dateParts = value.split('.');
-                        if (dateParts.length === 3) {
-                            element.value = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
-                        } else {
-                            element.value = value;
-                        }
-                    } else {
-                        element.value = value;
-                    }
-                }
-            }
-            const imageFilename = lastFormData.image_filename;
-            if (imageFilename && currentUsername) {
-                const imageUrl = `/user_files/${encodeURIComponent(currentUsername)}/${imageFilename}`;
-                clearUploadObjectUrl();
-                updateImagePreviews(imageUrl);
-            } else {
-                updateImagePreviews('');
-            }
-            updateIdCardDemoText();
-
-            // --- TUTORIAL LOGIC ---
-            let currentStep = 0;
-            const tutorialSteps = [
-                { title: "Witaj w Poradniku!", message: "Czy chcesz zobaczyć krótki samouczek, jak korzystać z aplikacji?", showNext: true, showSkip: true },
-                { title: "Etap 1: Formularz i Twoje Dane", message: "To jest główny formularz. Możesz tu ręcznie wpisać dane lub użyć przycisku <b>Generuj losowe dane</b> (pamiętaj, aby najpierw wybrać płeć!). Przycisk <b>Automatyczne generowanie PESELu</b> stworzy poprawny numer PESEL na podstawie daty urodzenia i płci. Po wgraniu zdjęcia zobaczysz jego podgląd. <br><br>Jeśli chcesz, aby Twoje zdjęcie wyglądało idealnie (akceptowane przez rząd, idealne kolory), możesz zamówić profesjonalną korektę za <b>10 zł</b> lub <b>1 Hubert Coin</b>. Nie wiesz, czym są Hubert Coiny? Wszystko wyjaśni się w kolejnych etapach!", showNext: true, showSkip: true },
-                { title: "Etap 2: Modyfikacja i Profil", message: "Świetnie! Twoje dane zostały zapisane. Teraz przejdziemy do Twojego profilu, gdzie czeka na Ciebie kolejny etap samouczka.", showNext: true, showSkip: false }
-            ];
-
-            function showTutorialStep(step) {
-                currentStep = step;
-                const modal = document.getElementById('tutorialModal');
-                const title = document.getElementById('tutorialTitle');
-                const message = document.getElementById('tutorialMessage');
-                const nextBtn = document.getElementById('tutorialBtnNext');
-                const skipBtn = document.getElementById('tutorialBtnSkip');
-                const stepData = tutorialSteps[step];
-                title.innerHTML = stepData.title;
-                message.innerHTML = stepData.message;
-                nextBtn.style.display = stepData.showNext ? 'inline-block' : 'none';
-                skipBtn.style.display = stepData.showSkip ? 'inline-block' : 'none';
-                if (step === 0) nextBtn.textContent = "Tak, zacznijmy";
-                else if (step === 1) nextBtn.textContent = "Przejdźmy do wypełniania formularza";
-                else if (step === 2) nextBtn.textContent = "Przejdź do profilu";
-                else nextBtn.textContent = "Dalej";
-                modal.style.display = 'flex';
-            }
-
-            function completeTutorial(andCloseModal = true) {
-                if (andCloseModal) {
-                    document.getElementById('tutorialModal').style.display = 'none';
-                }
-                fetch('/api/complete-tutorial', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').getAttribute('content') }
-                }).catch(err => console.error("Błąd podczas kończenia samouczka:", err));
-            }
-
-            document.getElementById('tutorialBtnNext').addEventListener('click', () => {
-                if (currentStep === 0) {
-                    showTutorialStep(1);
-                } else if (currentStep === 1) {
-                    document.getElementById('tutorialModal').style.display = 'none'; // Just hide the modal
-                } else if (currentStep === 2) {
-                    window.location.href = '/profile?tutorial=true';
-                }
-            });
-
-            document.getElementById('tutorialBtnSkip').addEventListener('click', () => completeTutorial(true));
-            document.getElementById('tutorial-dont-show-again').addEventListener('change', (e) => {
-                if (e.target.checked) {
-                    completeTutorial(false);
-                }
-            });
-
-            if (!hasSeenTutorial) {
-                showTutorialStep(0);
-            }
-
-            window.deleteAnnouncement = async function(announcementId) {
-                if (!confirm('Czy na pewno chcesz usunąć to ogłoszenie?')) return;
-                try {
-                    const response = await fetch('/api/announcements/delete/' + announcementId, {
-                        method: 'DELETE',
-                        headers: {
-                            'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                        }
-                    });
-                    const data = await response.json();
-                    if (data.success) {
-                        const el = document.getElementById('announcement-' + announcementId);
-                        if (el) el.remove();
-                    } else {
-                        showAlert(data.error || 'Nie udało się usunąć ogłoszenia.', 'error');
-                    }
-                } catch (error) {
-                    console.error('Error deleting announcement:', error);
-                    showAlert('Błąd podczas usuwania ogłoszenia.', 'error');
-                }
-            };
-
-            window.stopImpersonation = async function() {
-                if (!confirm('Czy na pewno chcesz zakończyć impersonację i wrócić do swojego konta admina?')) return;
-
-                try {
-                    const response = await fetch('/admin/api/impersonate/stop', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                        }
-                    });
-                    const data = await response.json();
-                    if (data.success) {
-                        showAlert('Impersonacja zakończona. Przekierowywanie do panelu admina...', 'success');
-                        window.location.href = '/admin';
-                    } else {
-                        showAlert(data.error, 'error');
-                    }
-                } catch (error) {
-                    console.error('Error stopping impersonation:', error);
-                    showAlert('Błąd podczas kończenia impersonacji.', 'error');
-                }
-            };
-
-            const stopImpersonationLink = document.getElementById('stopImpersonationLink');
-            if (stopImpersonationLink) {
-                stopImpersonationLink.addEventListener('click', function(event) {
-                    event.preventDefault();
-                    window.stopImpersonation();
-                });
-            }
-
-            document.querySelectorAll('.delete-announcement-btn[data-announcement-id]').forEach((button) => {
-                button.addEventListener('click', function() {
-                    window.deleteAnnouncement(this.dataset.announcementId);
-                });
-            });
-        });
-    </script>
+    <script src="/static/js/index-page.js?v=20260516-guide1" defer></script>
     {% endif %}
 
     <!-- Loading Overlay -->
@@ -1220,19 +713,12 @@
     </div>
 
     <!-- Tutorial Modal -->
-    <div id="tutorialModal" class="tutorial-modal" style="display:none;">
+    <div id="tutorialModal" class="tutorial-modal csp-s-6b99de8b">
         <div class="tutorial-content">
+            <div id="tutorialStepCounter" class="tutorial-step-counter"></div>
             <h2 id="tutorialTitle">Witaj w Poradniku!</h2>
             <p id="tutorialMessage">Czy chcesz zobaczyć krótki samouczek, jak korzystać z aplikacji?</p>
-            <div id="tutorial-step-3-options" style="display:none;">
-                <p>Na jakim urządzeniu chcesz zobaczyć instrukcję?</p>
-                <button class="btn-tutorial" onclick="showTutorialStep(4, 'iphone')">iPhone</button>
-                <button class="btn-tutorial" onclick="showTutorialStep(4, 'android')">Android</button>
-            </div>
-            <div id="tutorial-step-4-image" style="display:none;">
-                <img id="tutorial-platform-image" src="" alt="Instrukcja instalacji" style="max-width: 100%; border: 1px solid #2d343d;"/>
-                <p id="tutorial-step-4-instruction" style="margin-top: 10px;"></p>
-            </div>
+            <p id="tutorialTargetHint" class="tutorial-target-hint"></p>
             <div class="tutorial-buttons">
                 <button id="tutorialBtnSkip" class="btn-tutorial-skip">Pomiń</button>
                 <button id="tutorialBtnNext" class="btn-tutorial">Dalej</button>
@@ -1243,48 +729,5 @@
             </div>
         </div>
     </div>
-<script>
-(function(){
-    var oldCard = document.querySelector('input[name="template_version"][value="old"]');
-    if(!oldCard) return;
-    var label = oldCard.closest('label.version-card');
-    if(!label) return;
-
-    label.style.opacity = '0.5';
-    label.style.position = 'relative';
-
-    var badge = document.createElement('span');
-    badge.className = 'version-badge';
-    badge.style.cssText = 'background:#dc3545;color:#fff;';
-    badge.textContent = 'WYCOFANA';
-    var inner = label.querySelector('.version-card-inner');
-    if(inner) inner.insertBefore(badge, inner.firstChild);
-
-    label.addEventListener('click', function(e){
-        e.preventDefault();
-        e.stopPropagation();
-
-        var existing = document.getElementById('old-version-toast');
-        if(existing) existing.remove();
-
-        var toast = document.createElement('div');
-        toast.id = 'old-version-toast';
-        toast.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:16px;padding:28px 24px;max-width:360px;width:calc(100% - 40px);text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.35);z-index:99999;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;';
-
-        var overlay = document.createElement('div');
-        overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:99998;';
-        overlay.addEventListener('click', function(){ overlay.remove(); toast.remove(); });
-
-        toast.innerHTML = '<div style="font-size:40px;margin-bottom:12px;">\u26D4</div>'
-            + '<h3 style="margin:0 0 10px;font-size:18px;color:#1a1a1a;">Wersja niewspierana</h3>'
-            + '<p style="margin:0 0 20px;font-size:14px;color:#555;line-height:1.5;">Klasyczna wersja szablonu nie jest ju\u017C wspierana. Wybierz jeden z nowych szablon\u00F3w (mDow\u00F3d, mPrawo Jazdy, Legitymacja).</p>'
-            + '<button id="old-version-toast-close" style="background:#0052cc;color:#fff;border:none;padding:10px 28px;border-radius:8px;font-size:15px;cursor:pointer;font-weight:600;">Rozumiem</button>';
-
-        document.body.appendChild(overlay);
-        document.body.appendChild(toast);
-        document.getElementById('old-version-toast-close').addEventListener('click', function(){ overlay.remove(); toast.remove(); });
-    }, true);
-})();
-</script>
 </body>
 </html>

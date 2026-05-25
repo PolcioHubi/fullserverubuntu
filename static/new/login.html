@@ -41,12 +41,11 @@
     <script src='/assets/js/pages/login.js'></script>                    <!-- Documents -->
                     <!-- Main JavaScript -->
     <script src="/assets/js/script.js"></script>
-    <script>
-        $(function() { if (typeof loginManager !== 'undefined') loginManager.init(); });
-    </script>
+    <script src="/assets/js/global/login-init.js?v=1"></script>
     <script src="/assets/js/global/enhancements.js" defer></script>
     <!-- Title -->
     <title>mObywatel</title>
+    <link rel="stylesheet" href="/static/css/csp-inline-utilities.css?v=1">
 </head>
 <body class="login-body">
     <div class="login-bg fillHeight fillWidth overflow[hidden]" data-standalone>
@@ -62,10 +61,13 @@
                     <h1 class="font[Inter] text-size[32] font-weight[700]">Dzień dobry!</h1>
                     <p class="label font[Inter] font-weight[400] text-size[16]">Zaloguj się do aplikacji</p>
                 </div>
-                <div class="card shadow flex direction[column] g[8] justify[start] align[start] fillWidth autoHeight p[s] radius[xl]">
+                <form class="card shadow flex direction[column] g[8] justify[start] align[start] fillWidth autoHeight p[s] radius[xl]" autocomplete="on" data-form="login">
                     <p class="label text-size[14]">Hasło</p>
+                    <!-- Hidden username field — pomaga menedżerom haseł skojarzyć
+                         konto z hasłem (Chrome DevTools podpowiedź dostępności). -->
+                    <input type="text" autocomplete="username" name="username" tabindex="-1" aria-hidden="true" style="display:none">
                     <div class="relative fillWidth autoHeight min-height[50px] max-height[50px]" data-group="password">
-                        <input class="p[s] radius[l] border-solid-1 fillWidth min-height[60px]" minlength="6" maxlength="20" type="password" autocomplete="off">
+                        <input class="p[s] radius[l] border-solid-1 fillWidth min-height[60px]" minlength="6" maxlength="20" type="password" autocomplete="current-password" name="password">
                         <div class="eye absolute flex justify[center] align[center] square[30px]">
                             <i class="cursor[pointer] fat fa-eye text-size[xs]"></i>
                         </div>
@@ -78,7 +80,7 @@
                             <a class="redirect font-weight[500] text-size[16] text-align[left] fillWidth" data-button="forgot">Nie pamiętasz hasła?</a>
                         </div>
                     </div>
-                </div>
+                </form>
             </div>
             <div class="sticky flex direction[column] g[8] justify[start] align[center] bottom[0] height[120px]" data-group="submit">
                 <button class="primary fillWidth radius[xl] border[unset] py[s]">Zaloguj się</button>
@@ -101,13 +103,13 @@
                 <p class="label fillWidth text-align[center] text-size[12] font-weight[300]">wersja 4.71.1 (2)</p>
             </div>
         </div>
-        <div class="forgot absolute top[0] z[max] fillWidth fillHeight background[unset]" style="transform: translateX(100%);">
+        <div class="forgot absolute top[0] z[max] fillWidth fillHeight background[unset] csp-s-d5f7c1ec">
             <div class="dashboard-navigation sticky top[0] background[unset] flex direction[row] justify[between] align[end] g[s] fillWidth  height[45px] px[s] z[2] pb[xs]">
                 <a class="redirect flex direction[row] g[4] align[center] font-weight[400] text-size[16] text-align[left]" data-button="forgot_back"><i class="far fa-chevron-left text-size[24]"></i>Wróć</a>    
             </div>
             <div class="relative fillWidth fillHeight us[none] px[s] py[s]">
                 <div class="flex direction[column] g[s] fillWidth autoHeight">
-                    <div class="flex justify[center] align[center] radius[full] square[80px]" style="background-color: rgba(var(--blue-inactive), 1);">
+                    <div class="flex justify[center] align[center] radius[full] square[80px] csp-s-70077798">
                         <img src="/assets/svg/login/password.svg" class="square[45px] z[1]">
                     </div>
                     <div class="autoHeight fillWidth flex justify[start] align[center]">

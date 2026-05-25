@@ -377,7 +377,10 @@ def test_reset_password_with_expired_recovery_token(auth_manager, access_key_ser
 
     user = User.query.filter_by(username=username).first()
     assert user is not None
-    user.recovery_token_expires = datetime.datetime.now() - datetime.timedelta(minutes=1)
+    # Expiry comparison in user_auth.py uses UTC-naive (see _utc_naive_now).
+    # Use the same clock here so the test is timezone-independent.
+    utc_now = datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
+    user.recovery_token_expires = utc_now - datetime.timedelta(minutes=1)
     db.session.commit()
 
     success, message = auth_manager.reset_password_with_recovery_token(

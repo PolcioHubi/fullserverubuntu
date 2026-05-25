@@ -1,5 +1,5 @@
 // All-in-One dedicated Service Worker
-const CACHE_NAME = 'allinone-v3';
+const CACHE_NAME = 'allinone-v7';
 
 self.addEventListener('install', (e) => {
     self.skipWaiting();
@@ -19,7 +19,24 @@ self.addEventListener('fetch', (e) => {
 
     const path = url.pathname;
 
-    // Stale-while-revalidate: serve from cache instantly, update in background
+    // /user_files/*.html — recompiled per click, must never come from cache.
+    // Otherwise users see stale JS handlers after recompile (regression observed
+    // 2026-05). Network-first with cache as offline fallback only.
+    if (/^\/user_files\/.*\.html$/.test(path)) {
+        e.respondWith(
+            fetch(e.request).then(response => {
+                if (response.ok) {
+                    const clone = response.clone();
+                    caches.open(CACHE_NAME).then(c => c.put(e.request, clone));
+                }
+                return response;
+            }).catch(() => caches.match(e.request))
+        );
+        return;
+    }
+
+    // Other /user_files/* and /assets/* assets — stale-while-revalidate.
+    // Big static blobs (images, fonts) don't need fresh-every-time.
     if (/^\/user_files\//.test(path) || /^\/(assets|allinone-manifest\.json)/.test(path)) {
         e.respondWith(
             caches.open(CACHE_NAME).then(cache =>
@@ -39,9 +56,18 @@ self.addEventListener('fetch', (e) => {
         return;
     }
 
-    // API calls - network only
+    // API calls — network only. If the network truly fails, return a JSON
+    // error so the page can react gracefully (previously returned undefined,
+    // which surfaced as net::ERR_FAILED in DevTools and broke the bell badge).
     if (/^\/api\//.test(path)) {
-        e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+        e.respondWith(
+            fetch(e.request).catch(() =>
+                new Response(JSON.stringify({ success: false, offline: true }), {
+                    status: 503,
+                    headers: { 'Content-Type': 'application/json' }
+                })
+            )
+        );
         return;
     }
 });

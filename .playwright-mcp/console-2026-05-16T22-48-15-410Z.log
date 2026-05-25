@@ -1,0 +1,2 @@
+[    6666ms] [INFO] Evaluating a string as JavaScript violates the following Content Security Policy directive because 'unsafe-eval' is not an allowed source of script: "script-src 'self' 'nonce-451SvsxK9oltYiqUwcwYFg' https://cdn.jsdelivr.net".
+ The policy is report-only, so the violation has been logged but no further action has been taken. @ :7

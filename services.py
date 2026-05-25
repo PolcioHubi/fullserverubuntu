@@ -3,6 +3,11 @@ import secrets
 import datetime
 from typing import Dict, List, Optional, Tuple, Any
 from models import db, AccessKey, Announcement, ChatMessage, File, Notification, User
+
+
+def _utc_naive_now() -> datetime.datetime:
+    """UTC-naive "now" — see user_auth._utc_naive_now docstring."""
+    return datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
 from sqlalchemy import func, desc
 
 
@@ -14,7 +19,7 @@ class AccessKeyService:
             key_val = secrets.token_urlsafe(32)
             expires_at = None
             if expires_days > 0:
-                expires_at = datetime.datetime.now() + datetime.timedelta(
+                expires_at = _utc_naive_now() + datetime.timedelta(
                     days=expires_days
                 )
 
@@ -50,7 +55,7 @@ class AccessKeyService:
             return False, "Klucz dostępu został dezaktywowany"
 
         if key_data.expires_at:
-            if datetime.datetime.now() > key_data.expires_at:
+            if _utc_naive_now() > key_data.expires_at:
                 key_data.is_active = False
                 try:
                     db.session.commit()
@@ -87,7 +92,7 @@ class AccessKeyService:
             
             if key_data and key_data.is_active:
                 key_data.used_count += 1
-                key_data.last_used = datetime.datetime.now()
+                key_data.last_used = _utc_naive_now()
                 key_data.is_active = False  # Deactivate after use
                 if commit:
                     db.session.commit()
@@ -178,7 +183,7 @@ class AnnouncementService:
             return False
 
     def get_active_announcements(self) -> List[Announcement]:
-        now = datetime.datetime.now()
+        now = _utc_naive_now()
         return (
             Announcement.query.filter(
                 Announcement.is_active,
@@ -217,7 +222,7 @@ class StatisticsService:
             .all()
         )
 
-    def get_all_users_with_stats(self, page=1, per_page=10) -> Dict[str, Any]:
+    def get_all_users_with_stats(self, page=1, per_page=10, excluded_usernames=None) -> Dict[str, Any]:
         # Using a subquery to count files and sum sizes for performance
         # Type ignore: SQLAlchemy column attributes are dynamically generated
         file_stats = (
@@ -236,6 +241,8 @@ class StatisticsService:
             .outerjoin(file_stats, User.username == file_stats.c.user_username)
             .order_by(desc(User.last_login))
         )
+        if excluded_usernames:
+            query = query.filter(~User.username.in_(excluded_usernames))
         
         # Manual pagination for compatibility
         total = query.count()
@@ -267,8 +274,11 @@ class StatisticsService:
             "has_prev": has_prev,
         }
 
-    def get_overall_stats(self) -> Dict:
-        total_users = db.session.query(func.count(User.username)).scalar()  # type: ignore[arg-type]
+    def get_overall_stats(self, excluded_usernames=None) -> Dict:
+        users_query = db.session.query(func.count(User.username))  # type: ignore[arg-type]
+        if excluded_usernames:
+            users_query = users_query.filter(~User.username.in_(excluded_usernames))
+        total_users = users_query.scalar()
         result = db.session.query(
             func.count(File.id), func.sum(File.size)
         ).first()
@@ -285,7 +295,7 @@ class StatisticsService:
     ):
         try:
             file_record = File.query.filter_by(filepath=filepath).first()
-            modified_at = datetime.datetime.now()
+            modified_at = _utc_naive_now()
 
             if file_record:
                 # Update existing record

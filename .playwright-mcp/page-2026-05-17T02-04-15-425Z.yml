@@ -1,0 +1,68 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - heading "Panel Administracyjny" [level=1] [ref=e4]
+    - link "Wyloguj" [ref=e5] [cursor=pointer]:
+      - /url: /admin/logout
+  - generic [ref=e6]:
+    - button "Przegląd" [ref=e7] [cursor=pointer]
+    - button "Klucze Dostępu" [ref=e8] [cursor=pointer]
+    - button "Zarejestrowani Użytkownicy" [ref=e9] [cursor=pointer]
+    - button "Użytkownicy Plików" [ref=e10] [cursor=pointer]
+    - button "Logi Systemowe" [ref=e11] [cursor=pointer]
+    - button "Odświeżanie Dokumentów" [ref=e12] [cursor=pointer]
+  - generic [ref=e13]:
+    - generic [ref=e14]:
+      - generic [ref=e15]:
+        - generic [ref=e16]: "0"
+        - generic [ref=e17]: Łączna liczba użytkowników plików
+      - generic [ref=e18]:
+        - generic [ref=e19]: "0"
+        - generic [ref=e20]: Łączna liczba plików
+      - generic [ref=e21]:
+        - generic [ref=e22]: 0 B
+        - generic [ref=e23]: Łączny rozmiar danych
+      - generic [ref=e24]:
+        - generic [ref=e25]: "0"
+        - generic [ref=e26]: Zarejestrowani użytkownicy
+      - generic [ref=e27]:
+        - generic [ref=e28]: "0"
+        - generic [ref=e29]: Aktywne klucze dostępu
+    - generic [ref=e30]:
+      - button "Odśwież dane" [ref=e31] [cursor=pointer]
+      - button "Eksportuj wszystkie dane" [ref=e32] [cursor=pointer]
+    - generic [ref=e33]:
+      - heading "Import danych z archiwum" [level=2] [ref=e34]
+      - paragraph [ref=e35]: "Wybierz plik .zip z kopią zapasową, aby przywrócić dane. Uwaga: obecne dane zostaną nadpisane!"
+      - generic [ref=e36]:
+        - generic [ref=e37]:
+          - generic [ref=e38]: "Plik kopii zapasowej (.zip):"
+          - button "Plik kopii zapasowej (.zip):" [active] [ref=e39]
+        - button "Importuj i Nadpisz Dane" [ref=e40] [cursor=pointer]
+      - paragraph [ref=e41]: Duże archiwa mogą wysyłać się kilka minut. Pasek poniżej pokazuje postęp uploadu; po zakończeniu wysyłki serwer nadal może chwilę walidować i importować dane.
+    - generic [ref=e42]:
+      - heading "Restart serwera" [level=2] [ref=e43]
+      - paragraph [ref=e44]: Po imporcie danych wymagany jest restart serwera, aby zmiany w bazie danych zostały załadowane.
+      - button "Zrestartuj serwer" [ref=e46] [cursor=pointer]
+      - paragraph [ref=e47]: Restart spowoduje chwilową niedostępność strony (~5-10 sekund). Strona odświeży się automatycznie.
+    - generic [ref=e48]:
+      - heading "Wyślij nowe ogłoszenie" [level=2] [ref=e49]
+      - generic [ref=e50]:
+        - generic [ref=e51]:
+          - generic [ref=e52]: "Tytuł:"
+          - textbox "Tytuł:" [ref=e53]:
+            - /placeholder: Ważna informacja
+        - generic [ref=e54]:
+          - generic [ref=e55]: "Treść ogłoszenia:"
+          - textbox "Treść ogłoszenia:" [ref=e56]:
+            - /placeholder: Treść...
+        - generic [ref=e57]:
+          - generic [ref=e58]:
+            - generic [ref=e59]: "Typ:"
+            - combobox "Typ:" [ref=e60]:
+              - option "Informacja (niebieski)" [selected]
+              - option "Ostrzeżenie (żółty)"
+              - option "Ważne (czerwony)"
+          - generic [ref=e61]:
+            - generic [ref=e62]: "Data wygaśnięcia (opcjonalnie):"
+            - textbox "Data wygaśnięcia (opcjonalnie):" [ref=e63]
+        - button "Wyślij Ogłoszenie" [ref=e64] [cursor=pointer]

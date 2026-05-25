@@ -428,6 +428,70 @@ def test_api_get_registered_users(admin_client, temp_user):
     assert any(u['username'] == temp_user['username'] for u in response.json['users'])
 
 
+def _ensure_admin_user_record(admin_username):
+    if not User.query.filter_by(username=admin_username).first():
+        db.session.add(User(username=admin_username, password="not-used-by-admin-login"))
+        db.session.commit()
+
+
+def test_admin_account_is_hidden_from_user_management(admin_client, db_session):
+    """The configured admin account must not appear as a regular managed user."""
+    admin_username = os.environ["ADMIN_USERNAME"]
+    with app.app_context():
+        _ensure_admin_user_record(admin_username)
+        _ensure_admin_user_record("admin")
+
+    registered_response = admin_client.get("/admin/api/registered-users")
+    assert registered_response.status_code == 200
+    assert registered_response.json["success"]
+    assert all(
+        user["username"] != admin_username
+        and user["username"] != "admin"
+        for user in registered_response.json["users"]
+    )
+
+    file_users_response = admin_client.get("/admin/api/users")
+    assert file_users_response.status_code == 200
+    assert file_users_response.json["success"]
+    assert all(
+        user["name"] != admin_username
+        and user["name"] != "admin"
+        for user in file_users_response.json["users_data"]["users"]
+    )
+    assert file_users_response.json["stats"]["total_users"] == 0
+
+    stats_response = admin_client.get("/admin/api/stats")
+    assert stats_response.status_code == 200
+    assert stats_response.json["success"]
+    assert stats_response.json["stats"]["total_users"] == 0
+    assert stats_response.json["stats"]["active_users"] == 0
+
+
+def test_admin_account_cannot_be_managed_as_regular_user(admin_client, db_session):
+    """Admin-user actions should reject the configured admin username."""
+    admin_username = os.environ["ADMIN_USERNAME"]
+    with app.app_context():
+        _ensure_admin_user_record(admin_username)
+
+    blocked_requests = [
+        admin_client.get(f"/admin/api/user-logs/{admin_username}"),
+        admin_client.get(f"/admin/api/download-user/{admin_username}"),
+        admin_client.delete(f"/admin/api/delete-registered-user/{admin_username}?delete_files=true"),
+        admin_client.delete(f"/admin/api/delete-user-files/{admin_username}"),
+        admin_client.post("/admin/api/toggle-user-status", json={"username": admin_username}),
+        admin_client.post("/admin/api/update-hubert-coins", json={"username": admin_username, "amount": 1}),
+        admin_client.post(
+            "/admin/api/reset-password",
+            json={"username": admin_username, "new_password": "new_password_123"},
+        ),
+        admin_client.post("/admin/api/impersonate/start", json={"username": admin_username}),
+    ]
+
+    for response in blocked_requests:
+        assert response.status_code == 403
+        assert response.json["success"] is False
+
+
 def test_api_toggle_user_status(admin_client, temp_user):
     """Tests toggling a user's active status."""
     username = temp_user['username']

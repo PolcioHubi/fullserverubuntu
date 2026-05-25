@@ -1,3 +1,5 @@
+@import url("/assets/css/fonts/fonts.css");
+
 :root {
     --bg-page: #111315;
     --bg-card: #1b1f24;
@@ -1230,5 +1232,1482 @@ select {
     .login-container h1,
     .container h1 {
         font-size: 1.6rem;
+    }
+}
+
+/* App-style dashboard redesign */
+body {
+    min-height: 100dvh;
+    background: #f5f6fb;
+    color: #191919;
+    font-family: "Inter", "Roboto", "Segoe UI", Arial, sans-serif;
+    overflow-x: hidden;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: #f5f6fb url("/assets/img/bg_light.png") center / cover no-repeat;
+}
+
+.display-none {
+    display: none !important;
+}
+
+[class~="scale[0.9]"] {
+    transform: scale(0.98);
+    transition: transform 0.24s ease;
+}
+
+.app-dashboard {
+    width: min(100%, 460px);
+    min-height: 100dvh;
+    margin: 0 auto;
+    padding: max(14px, env(safe-area-inset-top)) 16px 150px;
+    position: relative;
+    background: transparent;
+}
+
+.app-content {
+    transition: transform 0.24s ease;
+}
+
+.app-dashboard > .admin-link,
+.app-dashboard > .mobile-action-dock,
+.app-dashboard > .user-status,
+.app-dashboard .stats-section {
+    display: none !important;
+}
+
+.app-dashboard .user-status {
+    position: static;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 8px;
+    margin: 8px 0 14px;
+    z-index: auto;
+}
+
+.app-dashboard .user-info-box,
+.app-dashboard .logout-btn {
+    border: 0;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.9);
+    color: #191919;
+    box-shadow: 0 1px 5px rgba(20, 34, 68, 0.08);
+}
+
+.app-dashboard .user-status .logout-btn[href="/profile"] {
+    display: none;
+}
+
+.app-dashboard-header {
+    min-height: 58px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 14px;
+}
+
+.app-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+.app-brand img {
+    width: 38px;
+    height: 38px;
+    flex: 0 0 auto;
+}
+
+.app-brand p {
+    margin: 0;
+    color: #6f7481;
+    font-size: 13px;
+    line-height: 1.2;
+    font-weight: 600;
+}
+
+.app-brand h1 {
+    margin: 0;
+    color: #191919;
+    font-size: 34px;
+    line-height: 1.05;
+    letter-spacing: 0;
+    font-weight: 800;
+}
+
+.app-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 0 0 auto;
+}
+
+.app-icon-button {
+    width: 38px;
+    height: 38px;
+    position: relative;
+    display: grid;
+    place-items: center;
+    border: 0;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.82);
+    cursor: pointer;
+    box-shadow: 0 1px 5px rgba(20, 34, 68, 0.08);
+}
+
+.app-icon-button img {
+    width: 24px;
+    height: 24px;
+    display: block;
+}
+
+#chat-badge,
+#notif-badge {
+    display: none;
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    min-width: 16px;
+    height: 16px;
+    border-radius: 999px;
+    color: #fff;
+    font-size: 10px;
+    line-height: 16px;
+    font-weight: 800;
+    text-align: center;
+    padding: 0 4px;
+}
+
+#chat-badge {
+    background: #285ff4;
+}
+
+#notif-badge {
+    background: #e53935;
+}
+
+.emulator-mode-banner {
+    display: grid;
+    gap: 3px;
+    margin: 2px 0 14px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    background: rgba(230, 236, 251, 0.95);
+    color: #285ff4;
+}
+
+.emulator-mode-banner strong {
+    font-size: 14px;
+    line-height: 1.25;
+}
+
+.emulator-mode-banner span {
+    color: #535b6b;
+    font-size: 12px;
+    line-height: 1.35;
+}
+
+.emulator-mode-banner.is-allin {
+    background: #e6f7ed;
+    color: #116531;
+}
+
+.app-dashboard .announcements-container {
+    margin: 10px 0 14px;
+    padding: 0;
+}
+
+.app-dashboard .announcement {
+    border: 0;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.94);
+    box-shadow: 0 1px 5px rgba(20, 34, 68, 0.08);
+}
+
+.app-dashboard .container {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+.app-dashboard .container > h1 {
+    margin: 0 0 14px;
+    color: #191919;
+    text-align: left;
+    font-size: 22px;
+    line-height: 1.15;
+    font-weight: 800;
+}
+
+.document-list-heading {
+    margin-bottom: 10px;
+}
+
+.document-list-heading h2 {
+    margin: 0;
+    color: #191919;
+    font-size: 18px;
+    line-height: 1.25;
+    font-weight: 800;
+}
+
+.document-list-heading p {
+    margin: 4px 0 0;
+    color: #6f7481;
+    font-size: 13px;
+    line-height: 1.35;
+}
+
+.app-dashboard .version-selector {
+    margin: 0 0 18px;
+}
+
+.app-dashboard .version-cards {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+    overflow: hidden;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 1px 6px rgba(20, 34, 68, 0.09);
+}
+
+.app-dashboard .version-card:not(:last-child) .version-card-inner {
+    border-bottom: 1px solid rgba(25, 25, 25, 0.08);
+}
+
+.app-dashboard .version-card-inner {
+    min-height: 72px;
+    display: grid;
+    grid-template-columns: 52px 1fr 22px;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 14px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+.app-dashboard .version-card input:checked ~ .version-card-inner {
+    background: #eef3ff;
+    border-color: transparent;
+    box-shadow: inset 3px 0 0 #285ff4;
+}
+
+.document-row-media {
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    border-radius: 8px;
+    background: #f1f3f8;
+    color: #6f7481;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.document-row-media img {
+    width: 36px;
+    max-height: 36px;
+    object-fit: contain;
+}
+
+.document-row-media-muted {
+    background: #eef0f4;
+}
+
+.document-row-media-allin {
+    background: #e6f7ed;
+    color: #116531;
+}
+
+.app-dashboard .version-card-legacy .version-badge {
+    display: none;
+}
+
+.document-row-copy {
+    min-width: 0;
+    display: grid;
+    gap: 3px;
+}
+
+.app-dashboard .version-label {
+    color: #191919;
+    text-align: left;
+    font-size: 16px;
+    line-height: 1.25;
+    font-weight: 800;
+}
+
+.app-dashboard .version-desc {
+    color: #6f7481;
+    text-align: left;
+    font-size: 12px;
+    line-height: 1.3;
+}
+
+.document-row-chevron {
+    width: 10px;
+    height: 10px;
+    border-right: 2px solid #a3a8b3;
+    border-bottom: 2px solid #a3a8b3;
+    transform: rotate(-45deg);
+}
+
+.app-dashboard .description,
+.app-dashboard .disclaimer {
+    display: none;
+}
+
+.app-dashboard .example-data-section {
+    margin: 0 0 14px;
+    text-align: left;
+}
+
+.app-dashboard .example-btn,
+.app-dashboard .generate-pesel-btn,
+.app-dashboard .submit-btn,
+.app-dashboard .clear-btn,
+.app-dashboard .post-save-btn {
+    min-height: 48px;
+    border: 0;
+    border-radius: 8px;
+    font-weight: 800;
+}
+
+.app-dashboard .example-btn,
+.app-dashboard .clear-btn,
+.app-dashboard .post-save-btn {
+    background: #e6ecfb;
+    color: #285ff4;
+}
+
+.app-dashboard .submit-btn,
+.app-dashboard .generate-pesel-btn {
+    background: #285ff4;
+    color: #fff;
+}
+
+.app-dashboard fieldset,
+.app-dashboard .photo-preview-panel,
+.app-dashboard .id-demo-panel,
+.app-dashboard .post-save-actions {
+    border: 0;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.95);
+    color: #191919;
+    box-shadow: 0 1px 6px rgba(20, 34, 68, 0.08);
+}
+
+.app-dashboard legend {
+    border: 0;
+    border-radius: 8px;
+    background: #e6ecfb;
+    color: #285ff4;
+}
+
+.app-dashboard label,
+.app-dashboard .help-text,
+.app-dashboard .photo-preview-title,
+.app-dashboard .photo-preview-note,
+.app-dashboard .post-save-text {
+    color: #6f7481;
+}
+
+.app-dashboard input[type="text"],
+.app-dashboard input[type="date"],
+.app-dashboard input[type="file"],
+.app-dashboard select,
+.app-dashboard textarea {
+    border: 1px solid rgba(25, 25, 25, 0.12);
+    border-radius: 8px;
+    background: #f4f5fa;
+    color: #191919;
+}
+
+.app-dashboard input[type="text"]:focus,
+.app-dashboard input[type="date"]:focus,
+.app-dashboard input[type="file"]:focus,
+.app-dashboard select:focus,
+.app-dashboard textarea:focus {
+    border-color: rgba(40, 95, 244, 0.7);
+    box-shadow: 0 0 0 3px rgba(40, 95, 244, 0.12);
+}
+
+.app-dashboard #allinone-doc-list .allinone-doc-check {
+    background: #f4f5fa !important;
+    color: #191919;
+    border-radius: 8px !important;
+}
+
+.app-slide-panel {
+    position: fixed;
+    inset: 0;
+    z-index: 1800;
+    width: min(100%, 460px);
+    margin: 0 auto;
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    background: #f5f6fb url("/assets/img/bg_light.png") center / cover no-repeat;
+    transition: transform 0.3s ease;
+}
+
+.app-panel-header {
+    height: 58px;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: end;
+    gap: 8px;
+    padding: 0 16px 10px;
+}
+
+.app-panel-header h2 {
+    margin: 0;
+    color: #191919;
+    font-size: 18px;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+.app-panel-back {
+    justify-self: start;
+    border: 0;
+    background: transparent;
+    color: #285ff4;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.app-panel-list {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: grid;
+    align-content: start;
+    gap: 8px;
+    padding: 10px 16px 110px;
+    overflow-y: auto;
+}
+
+.app-panel-empty {
+    margin: 40px 0;
+    color: #6f7481;
+    text-align: center;
+    font-size: 14px;
+}
+
+.app-chat-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 8px 16px 0;
+}
+
+.app-chat-list {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+#chat-error {
+    display: none;
+    color: #c62828;
+    font-size: 12px;
+    padding: 0 6px 6px;
+}
+
+.app-bottom-dock {
+    position: fixed;
+    left: 50%;
+    bottom: 0;
+    z-index: 1300;
+    width: min(100%, 460px);
+    transform: translateX(-50%);
+    padding: 8px 16px max(10px, env(safe-area-inset-bottom));
+    background: rgba(245, 246, 251, 0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.app-main-action {
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    background: #285ff4;
+    color: #fff;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 800;
+}
+
+.app-bottom-nav {
+    height: 64px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(96px, 1fr));
+    justify-content: center;
+    align-items: center;
+    gap: 28px;
+    padding: 0 34px;
+}
+
+.app-bottom-nav a {
+    min-width: 82px;
+    height: 58px;
+    display: grid;
+    place-items: center;
+    gap: 3px;
+    color: #6f7481;
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.app-bottom-nav a.is-active {
+    color: #285ff4;
+}
+
+.app-bottom-nav img,
+.app-profile-icon {
+    width: 23px;
+    height: 23px;
+}
+
+.app-profile-icon {
+    position: relative;
+    display: block;
+    border: 2px solid currentColor;
+    border-radius: 999px;
+}
+
+.app-profile-icon::before {
+    content: "";
+    position: absolute;
+    top: 4px;
+    left: 50%;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+    transform: translateX(-50%);
+}
+
+.app-profile-icon::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 4px;
+    width: 13px;
+    height: 7px;
+    border: 2px solid currentColor;
+    border-bottom: 0;
+    border-radius: 9px 9px 0 0;
+    transform: translateX(-50%);
+}
+
+.emulator-choice-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 2300;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+    background: rgba(17, 23, 37, 0.48);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.emulator-choice-modal.is-visible {
+    display: flex;
+}
+
+.emulator-choice-card {
+    width: min(100%, 420px);
+    display: grid;
+    gap: 14px;
+    padding: 20px;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 18px 50px rgba(20, 34, 68, 0.24);
+}
+
+.emulator-choice-card h2 {
+    margin: 0;
+    color: #191919;
+    font-size: 22px;
+    line-height: 1.18;
+    font-weight: 800;
+}
+
+.emulator-choice-card p,
+.emulator-choice-check {
+    margin: 0;
+    color: #535b6b;
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+.emulator-choice-actions {
+    display: grid;
+    gap: 10px;
+}
+
+.emulator-choice-actions button {
+    min-height: 52px;
+    border: 0;
+    border-radius: 8px;
+    background: #e6ecfb;
+    color: #285ff4;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.emulator-choice-actions button:first-child {
+    background: #285ff4;
+    color: #fff;
+}
+
+.emulator-choice-check {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+}
+
+.emulator-choice-check input {
+    margin-top: 3px;
+    accent-color: #285ff4;
+}
+
+@media (max-width: 520px) {
+    .app-dashboard {
+        width: 100%;
+        padding-left: 14px;
+        padding-right: 14px;
+    }
+
+    .app-brand h1 {
+        font-size: 32px;
+    }
+
+    .app-dashboard .container > h1 {
+        font-size: 20px;
+    }
+
+    .app-bottom-nav {
+        gap: 16px;
+        padding: 0 24px;
+    }
+}
+
+/* Closer mObywatel document-list pass */
+body {
+    background: rgb(244, 245, 250) !important;
+    font-family: "Roboto", sans-serif;
+}
+
+body::before {
+    display: none;
+}
+
+.app-dashboard {
+    width: min(100%, 430px);
+    padding: max(0px, env(safe-area-inset-top)) 0 112px;
+}
+
+.app-content {
+    min-height: calc(100dvh - 112px);
+    padding-bottom: 8px;
+}
+
+.app-dashboard-header {
+    height: 60px;
+    min-height: 60px;
+    align-items: flex-end;
+    padding: 0 16px 8px;
+    margin: 0;
+}
+
+.app-header-logo {
+    width: 35px;
+    height: 35px;
+    display: block;
+}
+
+.app-header-actions {
+    gap: 4px;
+}
+
+.app-icon-button {
+    width: 35px;
+    height: 35px;
+    border-radius: 8px;
+    background: transparent;
+    box-shadow: none;
+}
+
+.app-icon-button img {
+    width: 25px;
+    height: 25px;
+    border-radius: 8px;
+}
+
+.app-title-row {
+    height: 42px;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    margin: 0 0 8px;
+}
+
+.app-title-row h1 {
+    margin: 0;
+    color: rgb(25, 25, 25);
+    font-family: "Inter", "Roboto", sans-serif;
+    font-size: 36px;
+    line-height: 1;
+    font-weight: 700;
+    letter-spacing: 0;
+}
+
+.app-dashboard .container > h1,
+.document-list-heading,
+.app-dashboard .version-desc {
+    display: none !important;
+}
+
+.emulator-mode-banner {
+    margin: 0 16px 12px;
+    border-radius: 16px;
+    background: rgb(230, 236, 251);
+    box-shadow: none;
+}
+
+.app-usage-strip {
+    min-height: 56px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 10px;
+    margin: -4px 16px 16px;
+    padding: 12px 15px;
+    border-radius: 17px;
+    background: rgb(255, 255, 255);
+    box-shadow: 0 10px 20px rgba(17, 24, 39, 0.055);
+}
+
+.app-usage-strip span {
+    color: rgb(40, 95, 244);
+    font-family: "Inter", "Roboto", sans-serif;
+    font-size: 22px;
+    line-height: 1;
+    font-weight: 700;
+}
+
+.app-usage-strip p {
+    margin: 0;
+    color: rgb(87, 92, 105);
+    font-size: 13px;
+    line-height: 1.25;
+    font-weight: 500;
+}
+
+.app-dashboard .container {
+    padding: 0;
+}
+
+.app-dashboard .version-selector {
+    padding: 0 16px 16px;
+    margin: 0;
+}
+
+.app-dashboard .version-cards {
+    border-radius: 17px;
+    background: rgb(255, 255, 255);
+    box-shadow: 0 10px 20px rgba(17, 24, 39, 0.075);
+}
+
+.app-dashboard .version-card-inner {
+    min-height: 77px;
+    grid-template-columns: 42px 1fr 18px;
+    gap: 14px;
+    padding: 0 15px;
+}
+
+.app-dashboard .version-card input:checked ~ .version-card-inner {
+    background: rgb(255, 255, 255);
+    box-shadow: none;
+}
+
+.app-dashboard .version-card:not(:last-child) .version-card-inner {
+    border-bottom: 1px solid rgba(25, 25, 25, 0.13);
+}
+
+.document-row-media {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    border-radius: 0;
+    background: transparent;
+}
+
+.document-row-media img {
+    width: 40px;
+    max-height: 40px;
+}
+
+.app-dashboard .version-label {
+    font-family: "Inter", "Roboto", sans-serif;
+    color: rgb(25, 25, 25);
+    font-size: 15.5px;
+    font-weight: 600;
+    letter-spacing: 0;
+}
+
+.document-row-chevron {
+    width: 18px;
+    height: 18px;
+    border: 0;
+    opacity: 0.38;
+    transform: none;
+    background: url("/assets/svg/documents/customize/ab006_chevron_right.svg") center / contain no-repeat;
+}
+
+.document-form-panel {
+    position: fixed;
+    inset: 0;
+    z-index: 1500;
+    width: min(100%, 430px);
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    background: rgb(244, 245, 250);
+    transform: translateX(100vw);
+    transition: transform 0.28s ease;
+}
+
+.app-slide-panel {
+    /* Center horizontally via margin auto so the JS-driven slide animation
+       (translateX(100%) ↔ translateX(0)) works relative to the centered
+       position. The previous "left: 50%" without translateX(-50%) put the
+       panel's left edge at viewport center, leaving it half-hidden. */
+    left: 0;
+    right: 0;
+    width: min(100%, 430px);
+    margin: 0 auto;
+    background: rgb(244, 245, 250);
+    /* Default state: off-screen to the right, matching the JS close handler
+       (translateX(100%)). The csp-s-95508af6 utility class on these panels
+       used translateX(50vw) which broke layout on wide viewports — the
+       panel ended up partially off-screen even when "closed". */
+    transform: translateX(100%);
+}
+
+body.form-panel-open .document-form-panel {
+    transform: translateX(0);
+}
+
+body.form-panel-open .app-bottom-dock {
+    display: none;
+}
+
+.document-form-panel-header {
+    height: 58px;
+    flex: 0 0 auto;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: end;
+    gap: 8px;
+    padding: 0 16px 10px;
+    background: rgb(244, 245, 250);
+}
+
+.document-form-panel-header h2 {
+    margin: 0;
+    color: rgb(25, 25, 25);
+    font-family: "Inter", "Roboto", sans-serif;
+    font-size: 18px;
+    line-height: 1.2;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.document-form-back {
+    justify-self: start;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    color: rgb(40, 95, 244);
+    font-size: 16px;
+    line-height: 1.2;
+    font-weight: 500;
+}
+
+.document-form-panel-scroll {
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: 0 16px max(28px, env(safe-area-inset-bottom));
+    overflow-y: auto;
+}
+
+.document-form-panel .description {
+    display: none !important;
+}
+
+.app-dashboard .example-data-section {
+    margin: 0 0 14px;
+}
+
+.app-dashboard .example-data-section .example-btn {
+    width: 100%;
+    min-height: 52px;
+    justify-content: center;
+    border-radius: 14px;
+    font-family: "Inter", "Roboto", sans-serif;
+    font-size: 15px;
+}
+
+.inline-form-message {
+    min-height: 0;
+    margin: 8px 0 0;
+    color: rgb(105, 105, 120);
+    font-size: 13px;
+    line-height: 1.35;
+    font-weight: 500;
+}
+
+.inline-form-message:empty {
+    display: none;
+}
+
+.inline-form-message.is-error {
+    color: rgb(198, 40, 40);
+}
+
+.inline-form-message.is-success {
+    color: rgb(17, 101, 49);
+}
+
+.inline-form-message.is-info {
+    color: rgb(40, 95, 244);
+}
+
+.app-dashboard input.field-error,
+.app-dashboard select.field-error {
+    border-color: rgba(198, 40, 40, 0.85) !important;
+    background: rgb(255, 247, 247) !important;
+    box-shadow: 0 0 0 3px rgba(198, 40, 40, 0.1) !important;
+}
+
+.app-dashboard .submit-section {
+    margin-top: 16px;
+    padding-top: 0;
+    padding-bottom: max(10px, env(safe-area-inset-bottom));
+    border-top: 0;
+}
+
+.app-dashboard fieldset,
+.app-dashboard .photo-preview-panel,
+.app-dashboard .id-demo-panel,
+.app-dashboard .post-save-actions {
+    border-radius: 17px;
+    box-shadow: 0 10px 20px rgba(17, 24, 39, 0.055);
+}
+
+.app-bottom-dock {
+    width: min(100%, 430px);
+    padding: 8px 16px max(8px, env(safe-area-inset-bottom));
+    background: rgba(249, 250, 251, 0.86);
+    box-shadow: 0 -0.5px 0 rgba(25, 25, 25, 0.12);
+}
+
+.app-main-action {
+    width: 100%;
+    border: 0;
+    min-height: 48px;
+    border-radius: 999px;
+    background: rgb(40, 95, 244);
+    color: #fff;
+    font-family: "Inter", "Roboto", sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.app-main-action:disabled {
+    opacity: 0.7;
+}
+
+.app-bottom-nav {
+    height: 58px;
+    padding: 0 46px;
+    gap: 34px;
+}
+
+.app-bottom-nav a {
+    height: 56px;
+    font-family: "Roboto", sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+}
+
+.document-choice-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 2400;
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 16px;
+    background: rgba(17, 23, 37, 0.42);
+    backdrop-filter: blur(9px);
+    -webkit-backdrop-filter: blur(9px);
+}
+
+.document-choice-modal.is-visible {
+    display: flex;
+}
+
+.document-choice-card {
+    width: min(100%, 398px);
+    display: grid;
+    gap: 10px;
+    padding: 18px;
+    border-radius: 17px;
+    background: #fff;
+    box-shadow: 0 18px 50px rgba(17, 24, 39, 0.22);
+}
+
+.document-choice-card h2 {
+    margin: 0;
+    color: rgb(25, 25, 25);
+    font-family: "Inter", "Roboto", sans-serif;
+    font-size: 20px;
+    line-height: 1.2;
+    font-weight: 700;
+}
+
+.document-choice-card p {
+    margin: 0;
+    color: rgb(105, 105, 120);
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.document-choice-list {
+    display: grid;
+    gap: 8px;
+}
+
+.document-choice-item,
+.document-choice-close {
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 999px;
+    text-decoration: none;
+    font-weight: 700;
+}
+
+.document-choice-item {
+    background: rgb(40, 95, 244);
+    color: #fff;
+}
+
+.document-choice-close {
+    background: rgb(230, 236, 251);
+    color: rgb(40, 95, 244);
+}
+
+.emulator-choice-card {
+    border-radius: 17px;
+    font-family: "Roboto", sans-serif;
+}
+
+.emulator-choice-actions button {
+    border-radius: 999px;
+}
+
+.app-dashboard .version-card-allinone .version-card-inner {
+    min-height: 84px;
+}
+
+.app-dashboard .version-card-allinone .version-desc {
+    display: block !important;
+    margin-top: 2px;
+    color: rgb(105, 105, 120);
+    font-size: 12px;
+    line-height: 1.28;
+}
+
+.document-row-media-allin span {
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    background: rgb(230, 247, 237);
+    color: rgb(17, 101, 49);
+    font-family: "Inter", "Roboto", sans-serif;
+    font-size: 12px;
+    line-height: 1;
+    font-weight: 800;
+}
+
+.emulator-mode-banner.is-split {
+    background: rgb(230, 236, 251);
+}
+
+.emulator-mode-banner.is-split strong {
+    color: rgb(40, 95, 244);
+}
+
+.emulator-choice-modal {
+    align-items: flex-end;
+    padding: 16px;
+    background: rgba(17, 23, 37, 0.2);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+.emulator-choice-card {
+    width: min(100%, 398px);
+    gap: 12px;
+    padding: 18px;
+    color: rgb(25, 25, 25);
+}
+
+.emulator-choice-kicker,
+.tutorial-step-counter {
+    width: max-content;
+    max-width: 100%;
+    display: inline-flex;
+    align-items: center;
+    min-height: 26px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgb(230, 236, 251);
+    color: rgb(40, 95, 244);
+    font-size: 12px;
+    line-height: 1;
+    font-weight: 800;
+}
+
+.emulator-choice-actions {
+    gap: 8px;
+}
+
+.emulator-choice-actions button {
+    min-height: 0;
+    display: grid;
+    gap: 4px;
+    padding: 13px 14px;
+    border: 1px solid rgba(40, 95, 244, 0.12);
+    border-radius: 14px;
+    background: rgb(247, 249, 254);
+    color: rgb(25, 25, 25);
+    text-align: left;
+}
+
+.emulator-choice-card .emulator-choice-actions button,
+.emulator-choice-card .emulator-choice-actions button:first-child {
+    background: rgb(247, 249, 254);
+    color: rgb(25, 25, 25);
+}
+
+.emulator-choice-actions button strong {
+    color: rgb(25, 25, 25);
+    font-size: 15px;
+    line-height: 1.2;
+}
+
+.emulator-choice-actions button span {
+    color: rgb(87, 92, 105);
+    font-size: 13px;
+    line-height: 1.35;
+    font-weight: 500;
+}
+
+.emulator-choice-actions button.is-active {
+    border-color: rgba(40, 95, 244, 0.55);
+    background: rgb(238, 243, 255);
+    color: rgb(25, 25, 25);
+    box-shadow: inset 3px 0 0 rgb(40, 95, 244);
+}
+
+.emulator-choice-check {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding-top: 2px;
+}
+
+.tutorial-modal {
+    z-index: 2500;
+    padding: 0;
+    overflow: visible;
+    background: transparent;
+    pointer-events: none;
+}
+
+.tutorial-content {
+    position: fixed;
+    top: var(--tutorial-card-top, 18px);
+    left: var(--tutorial-card-left, 18px);
+    width: min(318px, calc(100vw - 24px));
+    display: grid;
+    gap: 8px;
+    margin: 0;
+    padding: 13px;
+    border: 0;
+    border-radius: 14px;
+    background: #fff;
+    color: rgb(25, 25, 25);
+    text-align: left;
+    box-shadow: 0 14px 38px rgba(17, 24, 39, 0.2);
+    pointer-events: auto;
+}
+
+.tutorial-content::after {
+    content: "";
+    position: absolute;
+    top: -6px;
+    left: 18px;
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    background: #fff;
+    transform: rotate(45deg);
+    box-shadow: -3px -3px 10px rgba(17, 24, 39, 0.04);
+}
+
+.tutorial-content h2 {
+    margin: 0;
+    color: rgb(25, 25, 25);
+    font-family: "Inter", "Roboto", sans-serif;
+    font-size: 16px;
+    line-height: 1.18;
+    font-weight: 700;
+}
+
+.tutorial-content p {
+    margin: 0;
+    color: rgb(87, 92, 105);
+    font-size: 13px;
+    line-height: 1.38;
+}
+
+.tutorial-target-hint {
+    padding: 8px 10px;
+    border-radius: 12px;
+    background: rgb(247, 249, 254);
+    color: rgb(40, 95, 244) !important;
+    font-size: 12px !important;
+    font-weight: 700;
+}
+
+.tutorial-buttons {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: 8px;
+    margin-top: 2px;
+}
+
+.btn-tutorial,
+.btn-tutorial-skip {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    padding: 10px 14px;
+    font-family: "Inter", "Roboto", sans-serif;
+    font-size: 13px;
+    line-height: 1.2;
+}
+
+.btn-tutorial {
+    border-color: rgb(40, 95, 244);
+    background: rgb(40, 95, 244);
+}
+
+.btn-tutorial:hover {
+    border-color: rgb(31, 78, 210);
+    background: rgb(31, 78, 210);
+}
+
+.btn-tutorial-skip {
+    border-color: transparent;
+    background: rgb(230, 236, 251);
+    color: rgb(40, 95, 244);
+}
+
+.btn-tutorial-skip:hover {
+    border-color: transparent;
+    background: rgb(218, 227, 250);
+}
+
+.tutorial-footer {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-top: 2px;
+    color: rgb(105, 105, 120);
+    font-size: 12px;
+    line-height: 1.35;
+}
+
+.tutorial-footer input {
+    margin: 2px 0 0;
+}
+
+body.tutorial-active .document-form-panel {
+    z-index: 2450;
+}
+
+.tutorial-focus-target {
+    position: relative;
+    z-index: 3;
+    outline: 3px solid rgb(40, 95, 244);
+    outline-offset: 4px;
+    border-radius: 16px;
+    scroll-margin-top: 76px;
+    scroll-margin-bottom: 190px;
+    box-shadow: 0 0 0 8px rgba(40, 95, 244, 0.13);
+}
+
+.document-choice-modal,
+.allinone-choice-modal {
+    background: rgba(17, 23, 37, 0.2);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+.allinone-choice-card {
+    gap: 12px;
+}
+
+.allinone-doc-list {
+    display: grid;
+    gap: 8px;
+}
+
+.allinone-doc-check {
+    min-height: 48px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 14px;
+    background: rgb(247, 249, 254);
+    color: rgb(25, 25, 25);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.allinone-doc-check input {
+    width: 18px;
+    height: 18px;
+    accent-color: rgb(40, 95, 244);
+}
+
+.allinone-doc-status {
+    color: rgb(105, 105, 120);
+    font-size: 12px;
+    line-height: 1.2;
+    font-weight: 700;
+}
+
+.allinone-doc-check:has(input:disabled) {
+    opacity: 0.62;
+}
+
+.notification-modal {
+    z-index: 2600;
+    background: rgba(17, 23, 37, 0.2);
+}
+
+.notification-modal[style*="block"] {
+    display: flex !important;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 16px;
+}
+
+.notification-modal-content {
+    width: min(100%, 398px);
+    margin: 0;
+    display: grid;
+    gap: 10px;
+    padding: 18px;
+    border: 0;
+    border-radius: 17px;
+    background: #fff;
+    color: rgb(25, 25, 25);
+    text-align: left;
+    box-shadow: 0 18px 50px rgba(17, 24, 39, 0.22);
+}
+
+.notification-modal-content h2 {
+    margin: 0;
+    color: rgb(25, 25, 25);
+    font-family: "Inter", "Roboto", sans-serif;
+    font-size: 20px;
+    line-height: 1.2;
+    font-weight: 700;
+}
+
+.notification-modal-content p {
+    margin: 0;
+    color: rgb(87, 92, 105);
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+.notification-modal-content button {
+    min-height: 46px;
+    width: 100%;
+    border: 0;
+    border-radius: 999px;
+    background: rgb(40, 95, 244);
+    color: #fff;
+    font-family: "Inter", "Roboto", sans-serif;
+    font-weight: 700;
+}
+
+.notification-modal-content button:hover {
+    background: rgb(31, 78, 210);
+}
+
+@media (max-width: 460px) {
+    .tutorial-modal,
+    .emulator-choice-modal {
+        padding: 10px;
+    }
+
+    .tutorial-content,
+    .emulator-choice-card {
+        width: 100%;
     }
 }

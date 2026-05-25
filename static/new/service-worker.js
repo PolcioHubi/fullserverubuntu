@@ -1,5 +1,15 @@
-const CACHE_NAME = 'mobywatel-v30';
+// Single source of truth for app version lives in worker-starter.js
+// (APP_VERSION constant). When the client detects a mismatch it unregisters
+// this SW and wipes all caches before reloading — so this CACHE_NAME can
+// stay constant without risking stale data after a version bump.
+const CACHE_NAME = 'mobywatel-runtime';
 const HTML_ROUTE_PATTERN = /^\/(services|more|qr_code)(\/|$)/;
+
+// Normalize HTML route paths so /more and /more/ share one cache entry —
+// matches the canonical form used in PRECACHE_ASSETS.
+function getHtmlCacheKey(path) {
+    return path.replace(/\/$/, '') || '/';
+}
 
 // Core assets to precache on install — everything needed for instant PWA load
 const PRECACHE_ASSETS = [
@@ -99,11 +109,16 @@ const PRECACHE_ASSETS = [
 self.addEventListener('install', (e) => {
     e.waitUntil(
         caches.open(CACHE_NAME).then(cache => {
-            // Use individual add() calls — don't fail all if one 404s
+            // Use cache: 'reload' on each Request so the precache pulls fresh
+            // bytes from the network instead of the browser's HTTP cache —
+            // critical after APP_VERSION bumps so we never re-cache stale JS.
             return Promise.allSettled(
-                PRECACHE_ASSETS.map(url => cache.add(url).catch(() => {
-                    console.warn('[SW] precache skip:', url);
-                }))
+                PRECACHE_ASSETS.map(url => {
+                    const req = new Request(url, { cache: 'reload' });
+                    return cache.add(req).catch(() => {
+                        console.warn('[SW] precache skip:', url);
+                    });
+                })
             );
         }).then(() => self.skipWaiting())
     );
@@ -146,7 +161,11 @@ self.addEventListener('fetch', (e) => {
     // Always fetch live UI scripts from network (never cache)
     if (
         path === '/assets/js/global/notifications-bell.js' ||
-        path === '/assets/js/global/chat-feed.js'
+        path === '/assets/js/global/chat-feed.js' ||
+        path === '/assets/js/pages/documents.js' ||
+        path === '/assets/js/pages/qr_code.js' ||
+        path === '/assets/js/pages/more.js' ||
+        path === '/assets/js/pages/services.js'
     ) {
         e.respondWith(fetch(e.request));
         return;
@@ -215,10 +234,20 @@ self.addEventListener('fetch', (e) => {
         return;
     }
 
-    // Network-first for API and dynamic content
+    // Network-only for API + dynamic content. Don't try cache fallback —
+    // APIs return live data, and a missing cache match here would resolve
+    // to `undefined`, which the browser then rejects with
+    // "Failed to convert value to 'Response'". If the network fails,
+    // surface a clean 503 so the page can handle it.
     if (/^\/(api|my-document)/.test(path)) {
         e.respondWith(
-            fetch(e.request).catch(() => caches.match(e.request))
+            fetch(e.request).catch(() =>
+                new Response(JSON.stringify({ success: false, offline: true }), {
+                    status: 503,
+                    headers: { 'Content-Type': 'application/json' }
+                })
+            )
         );
+        return;
     }
 });

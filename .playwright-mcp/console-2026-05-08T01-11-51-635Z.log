@@ -1,0 +1,175 @@
+[    2546ms] [ERROR] Failed to load resource: the server responded with a status of 403 () @ https://googleads.g.doubleclick.net/pagead/ads?gdpr=1&gdpr_consent=CQj44sAQj44sAEsACBPLCdFoAP_gAEPgAARoK3oB_C7EbCFCiDJ3IKMEMAhHABBAYsAwAAYBAwAADBIQIAQCgkEYBASAFCACCAAAKASBAAAgCAAAAUAAIAAFAABAAAwAIBAIIAAAgAAAAEAAAAAACIAAEQCAAAAEAEAAkAgAAAIASEAAAAAAAACBAAAAAAAAAAAAAAAABAEAAQAAQAAAAAAAiAAAAAAAABAIAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAABAAAAAAAQgsIgH8LsRsIUKIMFcgowQwCFcAEABiwDAABgEDAAAMEhAgBAKSQRIEAIAQIAAIAAAgBAEAACgICAAAQAAAABUAAEAADAAgEAgAQACAAABAQAAAAAAIgAARAIAAAAQAQACACAAAAgBIQAAAAAAAAIEAAAAAAAAAAAAAAAAAAQAAIADAAAAAAACIAAAAAAAAEAgQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAQAA.ILCIB_C7EbCFCiDJ3IKMEMAhXABBAYsAwAAYBAwAADBIQIAQCkkEaBASAFCACCAAAKASBAAAoCAgAAUAAIAAVAABAAAwAIBAIIEAAgAAAQEAAAAAACIAAEQCAAAAEAEAAkAgAAAIASEAAAAAAAACBAAAAAAAAAAAAAAAABAEAASAAwAAAAAAAiAAAAAAAABAIEAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAABAAAAAAAQgAAE&addtl_consent=2~61.89.122.161.184.196.230.314.340.442.445.494.550.576.827.1029.1033.1046.1047.1051.1097.1126.1166.1301.1342.1415.1725.1765.1942.1958.1987.2068.2072.2074.2107.2213.2219.2223.2224.2328.2331.2416.2501.2567.2568.2575.2657.2686.2778.2869.2878.2908.2920.2963.3005.3023.3126.3234.3235.3253.3309.3731.6931.8931.13731.15731.33931~dv.&client=ca-pub-6032542795313678&output=html&adk=1812271804&adf=3025194257&lmt=1778202714&plat=1%3A16777216%2C2%3A16777216%2C3%3A16%2C4%3A16%2C9%3A32776%2C16%3A8388608%2C17%3A32%2C24%3A32%2C25%3A32%2C30%3A1081344%2C32%3A32%2C41%3A32%2C42%3A32%2C43%3A32&format=0x0&url=https%3A%2F%2Fomogglegame.com%2F&pra=5&asro=0&aiactd=0&aicctd=0&ailctd=0&aimartd=4&aieuf=1&aicrs=1&uach=WyJXaW5kb3dzIiwiMTkuMC4wIiwieDg2IiwiIiwiMTQ3LjAuNzcyNy4xMzgiLG51bGwsMCxudWxsLCI2NCIsW1siR29vZ2xlIENocm9tZSIsIjE0Ny4wLjc3MjcuMTM4Il0sWyJOb3QuQS9CcmFuZCIsIjguMC4wLjAiXSxbIkNocm9taXVtIiwiMTQ3LjAuNzcyNy4xMzgiXV0sMF0.&abgtt=6&dt=1778202713894&bpp=1&bdt=161&idt=83&shv=r20260506&mjsv=m202605010101&ptt=9&saldr=aa&abxe=1&cookie_enabled=1&eoidce=1&nras=1&correlator=1407556355002&frm=20&pv=2&u_tz=120&u_his=2&u_h=1080&u_w=1920&u_ah=1032&u_aw=1920&u_cd=32&u_sd=1&dmc=16&adx=-12245933&ady=-12245933&biw=1920&bih=945&scr_x=0&scr_y=0&eid=95387509%2C31098258%2C95386195&oid=2&pvsid=1488086160310457&tmod=1475667791&uas=0&nvt=1&fsapi=1&fc=1920&brdim=0%2C0%2C0%2C0%2C1920%2C0%2C1920%2C1032%2C1920%2C945&vis=1&rsz=%7C%7Cs%7C&abl=NS&fu=32768&bc=31&bz=1&ifi=1&uci=a!1&fsb=1&dtd=214:0
+[    2618ms] [WARNING] <meta name="apple-mobile-web-app-capable" content="yes"> is deprecated. Please include <meta name="mobile-web-app-capable" content="yes"> @ https://omogglegame.com/:0
+[   26392ms] Error: Minified React error #418; visit https://react.dev/errors/418?args[]=HTML&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings.
+    at rD (https://omoggle.com/_next/static/chunks/4bd1b696-100b9d70ed4e49c1.js:1:35062)
+    at oq (https://omoggle.com/_next/static/chunks/4bd1b696-100b9d70ed4e49c1.js:1:84566)
+    at ik (https://omoggle.com/_next/static/chunks/4bd1b696-100b9d70ed4e49c1.js:1:114682)
+    at https://omoggle.com/_next/static/chunks/4bd1b696-100b9d70ed4e49c1.js:1:110730
+    at iu (https://omoggle.com/_next/static/chunks/4bd1b696-100b9d70ed4e49c1.js:1:110831)
+    at iX (https://omoggle.com/_next/static/chunks/4bd1b696-100b9d70ed4e49c1.js:1:132934)
+    at MessagePort.w (https://omoggle.com/_next/static/chunks/1255-55f5611cfd370a3f.js:1:64169)
+[   26415ms] [INFO] [browserAuth] browser_auth_request_start {operation: getSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[   26418ms] [INFO] [browserAuth] browser_auth_request_deduped {operation: getSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[   26419ms] [INFO] [browserAuth] browser_auth_request_start {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[   26420ms] [INFO] [browserAuth] browser_auth_request_deduped {operation: getSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[   28197ms] [INFO] [browserAuth] browser_auth_request_start {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[   78531ms] [INFO] [browserAuth] browser_auth_request_start {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  108549ms] [LOG] %c[MOG v24] FULL CONTROL color: lime; font-size: 16px; font-weight: bold; @ :337
+[  108549ms] [LOG] %c Twój live + Opponent live (data channel) color: cyan; @ :338
+[  108549ms] [LOG] %c Twój final + Opponent final (request+response) color: cyan; @ :339
+[  108549ms] [LOG] %c LOGI: L=live hooks, DC=data channel intercepts, F=finalize calls color: gray; @ :340
+[  109048ms] [LOG] %c[MOG] User ID found: 7a0f5a86-9c44-4b23-a8e7-746d859a88f0 color: lime; @ :171
+[  109338ms] [INFO] [browserAuth] browser_auth_request_start {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  109419ms] [INFO] [browserAuth] browser_auth_request_start {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  110428ms] [INFO] [browserAuth] browser_auth_request_start {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  110751ms] [INFO] [browserAuth] browser_auth_request_start {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  111521ms] [INFO] [browserAuth] browser_auth_request_start {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  111522ms] [INFO] [matchmaking] find_new_match_start_request {retrying: false, searchNonce: 1} @ https://omoggle.com/_next/static/chunks/app/page-d709aa70ac46c811.js:0
+[  111735ms] [INFO] [browserAuth] browser_auth_request_start {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  116816ms] [INFO] [matchmaking] find_new_match_poll_started {queue_id: 5c84ebc7-2580-42e1-b71f-13e59c7701bb, search_elapsed_ms: 0} @ https://omoggle.com/_next/static/chunks/app/page-d709aa70ac46c811.js:0
+[  118028ms] [INFO] [matchmaking] find_new_match_cleanup_start {had_queue: false, had_poll: true, had_channel: true} @ https://omoggle.com/_next/static/chunks/app/page-d709aa70ac46c811.js:0
+[  118028ms] [WARNING] [matchmaking] realtime_subscription_unhealthy {status: CLOSED, queue_id: 5c84ebc7-2580-42e1-b71f-13e59c7701bb} @ https://omoggle.com/_next/static/chunks/app/page-d709aa70ac46c811.js:0
+[  118029ms] [INFO] [matchmaking] find_new_match_cleanup_done @ https://omoggle.com/_next/static/chunks/app/page-d709aa70ac46c811.js:0
+[  118032ms] [INFO] [browserAuth] browser_auth_request_start {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  120347ms] [INFO] [browserAuth] browser_auth_request_start {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  120349ms] [INFO] [browserAuth] browser_auth_request_deduped {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  120493ms] [INFO] publishing track {room: undefined, roomID: undefined, participant: undefined, pID: undefined, trackID: undefined} @ https://omoggle.com/_next/static/chunks/144d3bae.4bc9327c7a72a163.js:0
+[  120741ms] [WARNING] W0508 01:13:52.374000 2225904 face_landmarker_graph.cc:180] Sets FaceBlendshapesGraph acceleration to xnnpack by default. @ https://omoggle.com/vendor/mediapipe/wasm/vision_wasm_internal.js:0
+[  120822ms] [LOG] I0508 01:13:52.455000 2225904 gl_context.cc:407] GL version: 3.0 (OpenGL ES 3.0 (WebGL 2.0 (OpenGL ES 3.0 Chromium))), renderer: WebKit WebGL @ https://omoggle.com/vendor/mediapipe/wasm/vision_wasm_internal.js:0
+[  120823ms] [WARNING] W0508 01:13:52.456999 2225904 gl_context.cc:1118] OpenGL error checking is disabled @ https://omoggle.com/vendor/mediapipe/wasm/vision_wasm_internal.js:0
+[  120829ms] [LOG] Graph successfully started running. @ https://omoggle.com/vendor/mediapipe/wasm/vision_wasm_internal.js:0
+[  121254ms] [ERROR] INFO: Created TensorFlow Lite XNNPACK delegate for CPU. @ https://omoggle.com/vendor/mediapipe/wasm/vision_wasm_internal.js:0
+[  124547ms] [INFO] [browserAuth] browser_auth_request_start {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  125047ms] [LOG] %c[MOG] DC: opponent real = 6.0 color: gray; @ :51
+[  137476ms] [LOG] %c[MOG] DC: opp 6.1 → 2.8 color: orange; @ :47
+[  146788ms] [LOG] %c[MOG] FINALIZE REQUEST: color: lime; font-size: 12px; @ :91
+[  146789ms] [LOG] %c  selfScore: 10 (HOOKED) color: lime; @ :92
+[  146789ms] [LOG] %c  opponentScore: 2 (HOOKED) color: orange; @ :93
+[  148991ms] [LOG] %c[MOG] DC: opp 6.7 → 3.8 color: orange; @ :47
+[  151328ms] [LOG] %c[MOG] Detection: myUserId=7a0f5a86-9c44-4b23-a8e7-746d859a88f0, p1_id=undefined, iAmPlayer1=true color: gray; @ :123
+[  151328ms] [LOG] %c[MOG] FINALIZE RESPONSE (from server): color: cyan; font-size: 12px; @ :138
+[  151328ms] [LOG] %c  player_1_final_score: 10 color: cyan; @ :139
+[  151328ms] [LOG] %c  player_2_final_score: 2 color: cyan; @ :140
+[  151328ms] [LOG] %c  Ja = player1 → patched to 10 color: lime; @ :141
+[  151328ms] [LOG] %c  Opp patched to 2 color: orange; @ :142
+[  152720ms] [INFO] [browserAuth] browser_auth_request_start {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  160105ms] [LOG] %c[MOG] DC: opp 5.6 → 4.0 color: orange; @ :47
+[  163458ms] [INFO] [browserAuth] browser_auth_request_start {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  171419ms] [LOG] %c[MOG] DC: opp 5.2 → 4.3 color: orange; @ :47
+[  182756ms] [LOG] %c[MOG] DC: opp 5.9 → 4.5 color: orange; @ :47
+[  187410ms] [INFO] [browserAuth] browser_auth_request_start {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  194365ms] [LOG] %c[MOG] DC: opp 5.5 → 10.0 color: orange; @ :47
+[  205693ms] [LOG] %c[MOG] DC: opp 5.3 → 10.0 color: orange; @ :47
+[  216794ms] [LOG] %c[MOG] DC: opp 5.6 → 10.0 color: orange; @ :47
+[  228016ms] [LOG] %c[MOG] DC: opp 5.2 → 10.0 color: orange; @ :47
+[  234574ms] [INFO] [browserAuth] browser_auth_request_start {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  246213ms] [INFO] Page leave detected, disconnecting {room: 5c84ebc7-2580-42e1-b71f-13e59c7701bb, roomID: RM_4AQd5g2CATFU, participant: 7a0f5a86-9c44-4b23-a8e7-746d859a88f0, pID: PA_soqgfjtuVwZ9} @ https://omoggle.com/_next/static/chunks/144d3bae.4bc9327c7a72a163.js:0
+[  246214ms] [INFO] disconnect from room {room: 5c84ebc7-2580-42e1-b71f-13e59c7701bb, roomID: RM_4AQd5g2CATFU, participant: 7a0f5a86-9c44-4b23-a8e7-746d859a88f0, pID: PA_soqgfjtuVwZ9} @ https://omoggle.com/_next/static/chunks/144d3bae.4bc9327c7a72a163.js:0
+[  247957ms] Error: Minified React error #418; visit https://react.dev/errors/418?args[]=HTML&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings.
+    at rD (https://omoggle.com/_next/static/chunks/4bd1b696-100b9d70ed4e49c1.js:1:35062)
+    at oq (https://omoggle.com/_next/static/chunks/4bd1b696-100b9d70ed4e49c1.js:1:84566)
+    at ik (https://omoggle.com/_next/static/chunks/4bd1b696-100b9d70ed4e49c1.js:1:114682)
+    at https://omoggle.com/_next/static/chunks/4bd1b696-100b9d70ed4e49c1.js:1:110730
+    at iu (https://omoggle.com/_next/static/chunks/4bd1b696-100b9d70ed4e49c1.js:1:110831)
+    at iX (https://omoggle.com/_next/static/chunks/4bd1b696-100b9d70ed4e49c1.js:1:132934)
+    at MessagePort.w (https://omoggle.com/_next/static/chunks/1255-55f5611cfd370a3f.js:1:64169)
+[  248002ms] [INFO] [browserAuth] browser_auth_request_start {operation: getSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  248005ms] [INFO] [browserAuth] browser_auth_request_deduped {operation: getSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  248006ms] [INFO] [browserAuth] browser_auth_request_start {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  248006ms] [INFO] [browserAuth] browser_auth_request_deduped {operation: getSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  249732ms] [INFO] [browserAuth] browser_auth_request_start {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  251961ms] [LOG] %c[MOG v24] FULL CONTROL color: lime; font-size: 16px; font-weight: bold; @ :337
+[  251961ms] [LOG] %c Twój live + Opponent live (data channel) color: cyan; @ :338
+[  251961ms] [LOG] %c Twój final + Opponent final (request+response) color: cyan; @ :339
+[  251961ms] [LOG] %c LOGI: L=live hooks, DC=data channel intercepts, F=finalize calls color: gray; @ :340
+[  252464ms] [LOG] %c[MOG] User ID found: 7a0f5a86-9c44-4b23-a8e7-746d859a88f0 color: lime; @ :171
+[  253352ms] [INFO] [browserAuth] browser_auth_request_start {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  254396ms] [INFO] [browserAuth] browser_auth_request_start {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  254956ms] [INFO] [browserAuth] browser_auth_request_start {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  272872ms] [INFO] [browserAuth] browser_auth_request_start {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  343261ms] [INFO] [browserAuth] browser_auth_request_start {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  349381ms] [INFO] [browserAuth] browser_auth_request_start {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  351980ms] [INFO] [browserAuth] browser_auth_request_start {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  351981ms] [INFO] [browserAuth] browser_auth_request_deduped {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  352240ms] [INFO] publishing track {room: f7d35130-4aee-4ca1-9191-a6bc376cd74b, roomID: , participant: 7a0f5a86-9c44-4b23-a8e7-746d859a88f0, pID: PA_JBkz2WBB6nNg, trackID: undefined} @ https://omoggle.com/_next/static/chunks/144d3bae.4bc9327c7a72a163.js:0
+[  352313ms] [WARNING] W0508 01:17:43.945999 2225904 face_landmarker_graph.cc:180] Sets FaceBlendshapesGraph acceleration to xnnpack by default. @ https://omoggle.com/vendor/mediapipe/wasm/vision_wasm_internal.js:0
+[  352383ms] [LOG] I0508 01:17:44.016999 2225904 gl_context.cc:407] GL version: 3.0 (OpenGL ES 3.0 (WebGL 2.0 (OpenGL ES 3.0 Chromium))), renderer: WebKit WebGL @ https://omoggle.com/vendor/mediapipe/wasm/vision_wasm_internal.js:0
+[  352384ms] [WARNING] W0508 01:17:44.019000 2225904 gl_context.cc:1118] OpenGL error checking is disabled @ https://omoggle.com/vendor/mediapipe/wasm/vision_wasm_internal.js:0
+[  352388ms] [LOG] Graph successfully started running. @ https://omoggle.com/vendor/mediapipe/wasm/vision_wasm_internal.js:0
+[  353414ms] [ERROR] INFO: Created TensorFlow Lite XNNPACK delegate for CPU. @ https://omoggle.com/vendor/mediapipe/wasm/vision_wasm_internal.js:0
+[  358124ms] [LOG] %c[MOG] DC: opponent real = 4.9 color: gray; @ :51
+[  360842ms] [INFO] [browserAuth] browser_auth_request_start {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  370610ms] [LOG] %c[MOG] DC: opp 4.7 → 1.0 color: orange; @ :47
+[  379623ms] [LOG] %c[MOG] FINALIZE REQUEST: color: lime; font-size: 12px; @ :91
+[  379623ms] [LOG] %c  selfScore: 10 (HOOKED) color: lime; @ :92
+[  379624ms] [LOG] %c  opponentScore: 5.3 (original) color: orange; @ :93
+[  381174ms] [LOG] %c[MOG] DC: opp 3.5 → 1.0 color: orange; @ :47
+[  384380ms] [LOG] %c[MOG] Detection: myUserId=7a0f5a86-9c44-4b23-a8e7-746d859a88f0, p1_id=undefined, iAmPlayer1=true color: gray; @ :123
+[  384381ms] [LOG] %c[MOG] FINALIZE RESPONSE (from server): color: cyan; font-size: 12px; @ :138
+[  384381ms] [LOG] %c  player_1_final_score: 10 color: cyan; @ :139
+[  384381ms] [LOG] %c  player_2_final_score: 4.3 color: cyan; @ :140
+[  384381ms] [LOG] %c  Ja = player1 → patched to 10 color: lime; @ :141
+[  386154ms] [INFO] [browserAuth] browser_auth_request_start {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  390948ms] [INFO] [browserAuth] browser_auth_request_start {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  391033ms] [INFO] [browserAuth] browser_auth_request_start {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  391592ms] [LOG] %c[MOG] DC: opp 3.7 → 1.0 color: orange; @ :47
+[  391595ms] [INFO] [browserAuth] browser_auth_request_start {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  392113ms] [INFO] [browserAuth] browser_auth_request_start {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  392175ms] [INFO] [browserAuth] browser_auth_request_start {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  392687ms] [INFO] [browserAuth] browser_auth_request_start {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  402250ms] [LOG] %c[MOG] DC: opp 5.2 → 9.1 color: orange; @ :47
+[  412808ms] [LOG] %c[MOG] DC: opp 4.7 → 2.6 color: orange; @ :47
+[  423334ms] [LOG] %c[MOG] DC: opp 4.6 → 2.1 color: orange; @ :47
+[  427343ms] [INFO] [browserAuth] browser_auth_request_start {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  433942ms] [LOG] %c[MOG] DC: opp 3.6 → 2.5 color: orange; @ :47
+[  443557ms] [INFO] [browserAuth] browser_auth_request_start {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  446125ms] [LOG] %c[MOG] DC: opp 4.4 → 2.1 color: orange; @ :47
+[  447696ms] [INFO] [browserAuth] browser_auth_request_start {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  450442ms] [INFO] [browserAuth] browser_auth_request_start {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  450443ms] [INFO] [browserAuth] browser_auth_request_deduped {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  450447ms] [INFO] disconnect from room {room: f7d35130-4aee-4ca1-9191-a6bc376cd74b, roomID: RM_qswu4iCjkNQE, participant: 7a0f5a86-9c44-4b23-a8e7-746d859a88f0, pID: PA_JBkz2WBB6nNg} @ https://omoggle.com/_next/static/chunks/144d3bae.4bc9327c7a72a163.js:0
+[  450502ms] [INFO] publishing track {room: undefined, roomID: undefined, participant: undefined, pID: undefined, trackID: undefined} @ https://omoggle.com/_next/static/chunks/144d3bae.4bc9327c7a72a163.js:0
+[  459408ms] [INFO] [browserAuth] browser_auth_request_start {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  466348ms] [LOG] %c[MOG] DC: opp 4.8 → 2.5 color: orange; @ :47
+[  476930ms] [LOG] %c[MOG] DC: opp 5.0 → 2.9 color: orange; @ :47
+[  477804ms] [LOG] %c[MOG] FINALIZE REQUEST: color: lime; font-size: 12px; @ :91
+[  477805ms] [LOG] %c  selfScore: 10 (HOOKED) color: lime; @ :92
+[  477805ms] [LOG] %c  opponentScore: 4.5 (HOOKED) color: orange; @ :93
+[  482635ms] [LOG] %c[MOG] Detection: myUserId=7a0f5a86-9c44-4b23-a8e7-746d859a88f0, p1_id=undefined, iAmPlayer1=true color: gray; @ :123
+[  482635ms] [LOG] %c[MOG] FINALIZE RESPONSE (from server): color: cyan; font-size: 12px; @ :138
+[  482635ms] [LOG] %c  player_1_final_score: 10 color: cyan; @ :139
+[  482635ms] [LOG] %c  player_2_final_score: 4.5 color: cyan; @ :140
+[  482635ms] [LOG] %c  Ja = player1 → patched to 10 color: lime; @ :141
+[  482635ms] [LOG] %c  Opp patched to 4.5 color: orange; @ :142
+[  483748ms] [INFO] [browserAuth] browser_auth_request_start {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  487455ms] [LOG] %c[MOG] DC: opp 4.4 → 2.8 color: orange; @ :47
+[  492281ms] [INFO] [browserAuth] browser_auth_request_start {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  492697ms] [INFO] [browserAuth] browser_auth_request_start {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  492793ms] [INFO] [browserAuth] browser_auth_request_start {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  503204ms] [INFO] [browserAuth] browser_auth_request_start {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  522475ms] [INFO] [browserAuth] browser_auth_request_start {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  523894ms] [LOG] %c[MOG] DC: opp 4.8 → 2.1 color: orange; @ :47
+[  534462ms] [LOG] %c[MOG] DC: opp 4.9 → 2.6 color: orange; @ :47
+[  538067ms] [INFO] [browserAuth] browser_auth_request_start {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  540471ms] [INFO] [browserAuth] browser_auth_request_start {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  540472ms] [INFO] [browserAuth] browser_auth_request_deduped {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  540476ms] [INFO] disconnect from room {room: 6fd38cc6-8c83-45d1-9cb6-2d626065f6f1, roomID: RM_PbqECYQfh7LM, participant: 7a0f5a86-9c44-4b23-a8e7-746d859a88f0, pID: PA_gb5AdZyaMtpy} @ https://omoggle.com/_next/static/chunks/144d3bae.4bc9327c7a72a163.js:0
+[  540532ms] [INFO] publishing track {room: undefined, roomID: undefined, participant: undefined, pID: undefined, trackID: undefined} @ https://omoggle.com/_next/static/chunks/144d3bae.4bc9327c7a72a163.js:0
+[  548191ms] [LOG] %c[MOG] DC: opp 5.1 → 4.7 color: orange; @ :47
+[  558700ms] [LOG] %c[MOG] DC: opp 5.5 → 6.9 color: orange; @ :47
+[  558822ms] [INFO] [browserAuth] browser_auth_request_start {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  567845ms] [LOG] %c[MOG] FINALIZE REQUEST: color: lime; font-size: 12px; @ :91
+[  567845ms] [LOG] %c  selfScore: 10 (HOOKED) color: lime; @ :92
+[  567846ms] [LOG] %c  opponentScore: 9.5 (HOOKED) color: orange; @ :93
+[  569745ms] [LOG] %c[MOG] DC: opp 2.6 → 6.1 color: orange; @ :47
+[  572680ms] [LOG] %c[MOG] Detection: myUserId=7a0f5a86-9c44-4b23-a8e7-746d859a88f0, p1_id=undefined, iAmPlayer1=true color: gray; @ :123
+[  572680ms] [LOG] %c[MOG] FINALIZE RESPONSE (from server): color: cyan; font-size: 12px; @ :138
+[  572680ms] [LOG] %c  player_1_final_score: 10 color: cyan; @ :139
+[  572680ms] [LOG] %c  player_2_final_score: 9.5 color: cyan; @ :140
+[  572680ms] [LOG] %c  Ja = player1 → patched to 10 color: lime; @ :141
+[  572680ms] [LOG] %c  Opp patched to 9.5 color: orange; @ :142
+[  573658ms] [INFO] [browserAuth] browser_auth_request_start {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  599719ms] [INFO] [browserAuth] browser_auth_request_start {operation: ensureSession} @ https://omoggle.com/_next/static/chunks/750-222d761bc6b73c29.js:0
+[  691061ms] [INFO] Page leave detected, disconnecting {room: e3c8f1f9-e310-47ac-a66e-c5f99bede6c5, roomID: RM_HfSG4mGr8CQd, participant: 7a0f5a86-9c44-4b23-a8e7-746d859a88f0, pID: PA_SkJPpfzQa8DU} @ https://omoggle.com/_next/static/chunks/144d3bae.4bc9327c7a72a163.js:0
+[  691062ms] [INFO] disconnect from room {room: e3c8f1f9-e310-47ac-a66e-c5f99bede6c5, roomID: RM_HfSG4mGr8CQd, participant: 7a0f5a86-9c44-4b23-a8e7-746d859a88f0, pID: PA_SkJPpfzQa8DU} @ https://omoggle.com/_next/static/chunks/144d3bae.4bc9327c7a72a163.js:0
+[  691080ms] [INFO] Page leave detected, disconnecting {room: e3c8f1f9-e310-47ac-a66e-c5f99bede6c5, roomID: RM_HfSG4mGr8CQd, participant: 7a0f5a86-9c44-4b23-a8e7-746d859a88f0, pID: PA_SkJPpfzQa8DU} @ https://omoggle.com/_next/static/chunks/144d3bae.4bc9327c7a72a163.js:0

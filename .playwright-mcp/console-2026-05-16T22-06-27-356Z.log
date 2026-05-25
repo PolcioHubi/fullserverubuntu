@@ -1,0 +1,40 @@
+[    1560ms] [LOG] [All-in-One] Nadpisanie danych aktywne — osadzone dane @ http://127.0.0.1:5000/user_files/allinone.html:28928
+[    1562ms] [LOG] [SPA] initPageManager: login @ http://127.0.0.1:5000/user_files/allinone.html:28077
+[    1565ms] [LOG] [SPA Router] Przełączono na: login @ http://127.0.0.1:5000/user_files/allinone.html:27993
+[    1629ms] [VERBOSE] [DOM] Password field is not contained in a form: (More info: https://goo.gl/9p2vKq) %o @ http://127.0.0.1:5000/user_files/allinone.html:0
+[    1658ms] [LOG] [SPA Patches] jQuery handlery przechwycone @ http://127.0.0.1:5000/user_files/allinone.html:28344
+[    1749ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://127.0.0.1:5000/api/notifications:0
+[    1750ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://127.0.0.1:5000/api/announcements:0
+[    1750ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://127.0.0.1:5000/api/chat/unread?_=1778969188903:0
+[    1753ms] [LOG] [AIO-SW] registered, scope: http://127.0.0.1:5000/user_files/ @ http://127.0.0.1:5000/user_files/allinone.html:26
+[   11771ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://127.0.0.1:5000/api/chat/unread?_=1778969188904:0
+[   21787ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://127.0.0.1:5000/api/chat/unread?_=1778969188905:0
+[   31812ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://127.0.0.1:5000/api/chat/unread?_=1778969188906:0
+[   41832ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://127.0.0.1:5000/api/chat/unread?_=1778969188907:0
+[   51850ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://127.0.0.1:5000/api/chat/unread?_=1778969188908:0
+[   61876ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://127.0.0.1:5000/api/chat/unread?_=1778969188909:0
+[   71889ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://127.0.0.1:5000/api/chat/unread?_=1778969188910:0
+[   81908ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://127.0.0.1:5000/api/chat/unread?_=1778969188911:0
+[   91921ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://127.0.0.1:5000/api/chat/unread?_=1778969188912:0
+[  101934ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://127.0.0.1:5000/api/chat/unread?_=1778969188913:0
+[  104504ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://127.0.0.1:5000/api/announcements:0
+[  111961ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://127.0.0.1:5000/api/chat/unread?_=1778969188914:0
+[  121980ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://127.0.0.1:5000/api/chat/unread?_=1778969188915:0
+[  131996ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://127.0.0.1:5000/api/chat/unread?_=1778969188916:0
+[  142021ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://127.0.0.1:5000/api/chat/unread?_=1778969188917:0
+[  152038ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://127.0.0.1:5000/api/chat/unread?_=1778969188918:0
+[  162053ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://127.0.0.1:5000/api/chat/unread?_=1778969188919:0
+[  163686ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://127.0.0.1:5000/api/notifications:0
+[  163699ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://127.0.0.1:5000/api/notifications:0
+[  172078ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://127.0.0.1:5000/api/chat/unread?_=1778969188920:0
+[  182104ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://127.0.0.1:5000/api/chat/unread?_=1778969188921:0
+[  192124ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://127.0.0.1:5000/api/chat/unread?_=1778969188922:0
+[  202141ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://127.0.0.1:5000/api/chat/unread?_=1778969188923:0
+[  212155ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://127.0.0.1:5000/api/chat/unread?_=1778969188924:0
+[  222181ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://127.0.0.1:5000/api/chat/unread?_=1778969188925:0
+[  232203ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://127.0.0.1:5000/api/chat/unread?_=1778969188926:0
+[  242233ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://127.0.0.1:5000/api/chat/unread?_=1778969188927:0
+[  252258ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://127.0.0.1:5000/api/chat/unread?_=1778969188928:0
+[  262274ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://127.0.0.1:5000/api/chat/unread?_=1778969188929:0
+[  272291ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://127.0.0.1:5000/api/chat/unread?_=1778969188930:0
+[  282315ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://127.0.0.1:5000/api/chat/unread?_=1778969188931:0

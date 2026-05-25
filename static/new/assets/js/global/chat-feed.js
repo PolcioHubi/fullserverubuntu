@@ -43,15 +43,15 @@ var chatFeed = {
         if (!document.getElementById('chat-button')) return;
 
         var self = this;
-        $('#chat-button').on('click', function () { self.openPanel(); });
-        $('#chat-back').on('click', function () { self.closePanel(); });
-        $('#chat-send').on('click', function () { self.sendMessage(); });
-        $('#chat-input').on('input', function () {
+        $('#chat-button').off('click.chatFeed').on('click.chatFeed', function () { self.openPanel(); });
+        $('#chat-back').off('click.chatFeed').on('click.chatFeed', function () { self.closePanel(); });
+        $('#chat-send').off('click.chatFeed').on('click.chatFeed', function () { self.sendMessage(); });
+        $('#chat-input').off('input.chatFeed').on('input.chatFeed', function () {
             self._clearError();
             self._resizeInput();
             self._updateComposerState();
         });
-        $('#chat-input').on('keydown', function (event) {
+        $('#chat-input').off('keydown.chatFeed').on('keydown.chatFeed', function (event) {
             if (event.key === 'Enter' && !event.shiftKey) {
                 event.preventDefault();
                 self.sendMessage();
@@ -138,7 +138,7 @@ var chatFeed = {
         $wrapper.addClass('scale[0.9]');
         $standalone.addClass('overflow[x-hidden] overflow[y-auto]').removeClass('overflow[hidden]');
         $('[data-group="navigation"]').addClass('display-none');
-        $('#chat-panel').css('transform', '');
+        $('#chat-panel').css('transform', 'translateX(0)');
         this.loadHistory();
     },
 

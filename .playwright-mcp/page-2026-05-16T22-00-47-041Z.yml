@@ -1,0 +1,221 @@
+- generic [active] [ref=e1]:
+  - text:   
+  - generic [ref=e48]:
+    - generic [ref=e49]:
+      - generic [ref=e54] [cursor=pointer]: "1"
+      - generic [ref=e55]:
+        - generic [ref=e56]:
+          - heading "Dokumenty" [level=1] [ref=e59] [cursor=pointer]
+          - generic [ref=e61] [cursor=pointer]:
+            - generic [ref=e62]: Dostosuj
+            - generic [ref=e63]: Dodaj
+        - generic [ref=e66]:
+          - paragraph [ref=e67]: mDowód
+          - generic [ref=e68]:
+            - img
+      - generic [ref=e69]:
+        - generic [ref=e70]:
+          - generic [ref=e71]:
+            - generic [ref=e72]: 
+            - text: Wróć
+          - heading "Wybierz dokumenty" [level=1] [ref=e74]
+        - generic [ref=e77]:
+          - generic [ref=e78]:
+            - generic [ref=e80]: 
+            - textbox "Szukaj" [ref=e81]
+          - paragraph [ref=e84] [cursor=pointer]: Zaznacz, które dokumenty chcesz dodać.
+        - generic [ref=e86]:
+          - generic [ref=e88]:
+            - checkbox [ref=e90] [cursor=pointer]
+            - generic [ref=e91]:
+              - img
+            - heading "Karta Dużej Rodziny" [level=1] [ref=e92]
+          - generic [ref=e95]:
+            - checkbox [ref=e97] [cursor=pointer]
+            - generic [ref=e98]:
+              - img
+            - heading "Legitymacja emeryta-rencisty" [level=1] [ref=e99]
+          - generic [ref=e102]:
+            - checkbox [ref=e104] [cursor=pointer]
+            - generic [ref=e105]:
+              - img
+            - heading "Legitymacja studencka" [level=1] [ref=e106]
+          - generic [ref=e109]:
+            - checkbox [ref=e111] [cursor=pointer]
+            - generic [ref=e112]:
+              - img
+            - heading "Legitymacja szkolna" [level=1] [ref=e113]
+          - generic [ref=e116]:
+            - checkbox [ref=e118] [cursor=pointer]
+            - generic [ref=e119]:
+              - img
+            - heading "Legitymacja Ulgowych Usług Transportowych" [level=1] [ref=e120]
+          - generic [ref=e123]:
+            - checkbox [ref=e125] [cursor=pointer]
+            - generic [ref=e126]:
+              - img
+            - heading "Legitymacja adwokacka" [level=1] [ref=e127]
+          - generic [ref=e130]:
+            - checkbox [ref=e132] [cursor=pointer]
+            - generic [ref=e133]:
+              - img
+            - heading "Legitymacja aplikanta radcowskiego" [level=1] [ref=e134]
+          - generic [ref=e137]:
+            - checkbox [ref=e139] [cursor=pointer]
+            - generic [ref=e140]:
+              - img
+            - heading "Legitymacja radcy prawnego" [level=1] [ref=e141]
+          - generic [ref=e144]:
+            - checkbox [ref=e146] [cursor=pointer]
+            - generic [ref=e147]:
+              - img
+            - heading "Legitymacja poselska" [level=1] [ref=e148]
+          - generic [ref=e151]:
+            - checkbox [ref=e153] [cursor=pointer]
+            - generic [ref=e154]:
+              - img
+            - heading "Legitymacja senatorska" [level=1] [ref=e155]
+          - generic [ref=e157]:
+            - checkbox [ref=e159] [cursor=pointer]
+            - generic [ref=e160]:
+              - img
+            - heading "Wózek widłowy" [level=1] [ref=e161]
+          - generic [ref=e164]:
+            - checkbox [ref=e166] [cursor=pointer]
+            - generic [ref=e167]:
+              - img
+            - heading "mPrawo jazdy" [level=1] [ref=e168]
+          - generic [ref=e171]:
+            - checkbox [ref=e173] [cursor=pointer]
+            - generic [ref=e174]:
+              - img
+            - heading "Moje pojazdy" [level=1] [ref=e175]
+          - generic [ref=e178]:
+            - checkbox [ref=e180] [cursor=pointer]
+            - generic [ref=e181]:
+              - img
+            - heading "PWZ Pielęgniarki" [level=1] [ref=e182]
+          - generic [ref=e185]:
+            - checkbox [ref=e187] [cursor=pointer]
+            - generic [ref=e188]:
+              - img
+            - heading "PWZ Położnej" [level=1] [ref=e189]
+          - generic [ref=e192]:
+            - checkbox [ref=e194] [cursor=pointer]
+            - generic [ref=e195]:
+              - img
+            - heading "PWZ lekarza" [level=1] [ref=e196]
+          - generic [ref=e199]:
+            - checkbox [ref=e201] [cursor=pointer]
+            - generic [ref=e202]:
+              - img
+            - heading "PWZ lekarza dentysty" [level=1] [ref=e203]
+          - generic [ref=e206]:
+            - checkbox [ref=e208] [cursor=pointer]
+            - generic [ref=e209]:
+              - img
+            - heading "Legitymacja inżyniera budownictwa" [level=1] [ref=e210]
+        - button "Dodaj" [disabled] [ref=e212]
+      - generic [ref=e213]:
+        - generic [ref=e215]:
+          - generic [ref=e217]:
+            - generic [ref=e218]: 
+            - text: Dokumenty
+          - generic [ref=e219]:
+            - heading "Dostosuj widok" [level=1] [ref=e220]
+            - paragraph [ref=e221]: Tu zmienisz kolejność i układ dokumentów.
+          - button "Ustaw kolejność" [ref=e222]:
+            - generic [ref=e223]: Ustaw kolejność
+          - generic [ref=e224]:
+            - paragraph [ref=e225]: Wybierz układ
+            - generic [ref=e227]:
+              - button "Duże karty" [pressed] [ref=e228]:
+                - generic [ref=e229]: Duże karty
+              - button "Małe karty" [ref=e231]:
+                - generic [ref=e232]: Małe karty
+              - button "Lista" [ref=e234]:
+                - generic [ref=e235]: Lista
+        - generic [ref=e238]:
+          - generic [ref=e240]:
+            - generic [ref=e241]: 
+            - text: Dostosuj widok
+          - generic [ref=e242]:
+            - heading "Ustaw kolejność" [level=1] [ref=e243]
+            - paragraph [ref=e244]: Wybierz dokumenty do wyświetlenia.
+          - generic [ref=e245]:
+            - generic [ref=e246]:
+              - generic [ref=e247]:
+                - generic [ref=e248]:
+                  - img
+                - heading "mDowód" [level=1] [ref=e249]
+              - checkbox [checked] [ref=e251] [cursor=pointer]
+            - generic [ref=e254]:
+              - generic [ref=e255]:
+                - generic [ref=e256]:
+                  - img
+                - heading "mPrawo jazdy" [level=1] [ref=e257]
+              - checkbox [checked] [ref=e259] [cursor=pointer]
+            - generic [ref=e262]:
+              - generic [ref=e263]:
+                - generic [ref=e264]:
+                  - img
+                - heading "Wózek widłowy" [level=1] [ref=e265]
+              - checkbox [checked] [ref=e267] [cursor=pointer]
+            - generic [ref=e270]:
+              - generic [ref=e271]:
+                - generic [ref=e272]:
+                  - img
+                - heading "Legitymacja szkolna" [level=1] [ref=e273]
+              - checkbox [checked] [ref=e275] [cursor=pointer]
+            - generic [ref=e278]:
+              - generic [ref=e279]:
+                - generic [ref=e280]:
+                  - img
+                - heading "Legitymacja studencka" [level=1] [ref=e281]
+              - checkbox [checked] [ref=e283] [cursor=pointer]
+    - generic [ref=e285]:
+      - generic [ref=e286]:
+        - generic [ref=e287]:
+          - generic [ref=e288]: 
+          - text: Wróć
+        - heading "Powiadomienia" [level=1] [ref=e290]
+      - generic [ref=e294]:
+        - generic [ref=e295]:
+          - generic [ref=e296]: Info · Powiadomienie
+          - button "×" [ref=e297] [cursor=pointer]
+        - generic [ref=e298]: Powiadomienie
+        - generic [ref=e299]: Witaj w mObywatel! Dziękujemy za rejestrację.
+        - generic [ref=e300]: 52 min temu
+    - generic [ref=e301]:
+      - generic [ref=e302]:
+        - generic [ref=e303]:
+          - generic [ref=e304]: 
+          - text: Wróć
+        - heading "Globalny chat" [level=1] [ref=e306]
+      - generic [ref=e309]:
+        - generic [ref=e311]:
+          - img [ref=e312]
+          - paragraph [ref=e314]: Brak wiadomości
+          - paragraph [ref=e315]: Napisz pierwszą wiadomość!
+        - generic [ref=e317]:
+          - textbox "Wpisz pytanie" [ref=e318]
+          - button "Wyślij" [disabled] [ref=e319]:
+            - img [ref=e320]
+    - generic [ref=e323]:
+      - link "documents" [ref=e324] [cursor=pointer]:
+        - /url: "#documents"
+        - img "documents"
+        - generic [ref=e325]: Dokumenty
+      - link "services" [ref=e326] [cursor=pointer]:
+        - /url: "#services"
+        - img "services"
+        - generic [ref=e327]: Usługi
+      - link "qr_code" [ref=e328] [cursor=pointer]:
+        - /url: "#qr_code"
+        - img "qr_code"
+        - generic [ref=e329]: Kod QR
+      - link "more" [ref=e330] [cursor=pointer]:
+        - /url: "#more"
+        - img "more"
+        - generic [ref=e331]: Więcej
+  - text:                                                                       

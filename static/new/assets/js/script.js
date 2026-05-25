@@ -1,10 +1,60 @@
+// Auto-inject X-CSRFToken for non-safe AJAX methods. Without this,
+// POST/PUT/DELETE calls (e.g. /api/theme/set from the More page) come back
+// with 400 "CSRF session token is missing" and the UI silently breaks.
+//
+// In standalone PWA pages the token is rendered into <meta name="csrf-token">
+// by Jinja. In the All-in-One HTML (compiled, no server templating) we
+// bootstrap it from /api/csrf-token below and inject the meta tag at runtime.
+$.ajaxSetup({
+    beforeSend: function (xhr, settings) {
+        const method = (settings.type || settings.method || 'GET').toUpperCase();
+        if (method === 'GET' || method === 'HEAD' || method === 'OPTIONS' || method === 'TRACE') {
+            return;
+        }
+        // Cross-origin requests don't need (and shouldn't get) our CSRF token.
+        const url = settings.url || '';
+        if (/^https?:\/\//i.test(url) && url.indexOf(window.location.origin) !== 0) {
+            return;
+        }
+        const meta = document.querySelector('meta[name="csrf-token"]');
+        if (meta) {
+            xhr.setRequestHeader('X-CSRFToken', meta.getAttribute('content') || '');
+        }
+    }
+});
+
+// All-in-One bootstrap: fetch CSRF token from the server and inject it into
+// <meta name="csrf-token"> so the ajaxSetup beforeSend above can attach it
+// to subsequent POST/PUT/DELETE calls. No-op in standalone PWA pages where
+// the meta tag is already present.
+(function bootstrapCsrfToken() {
+    if (document.querySelector('meta[name="csrf-token"]')) {
+        return;
+    }
+    fetch('/api/csrf-token', { credentials: 'same-origin' })
+        .then(r => (r.ok ? r.json() : null))
+        .then(data => {
+            if (!data || !data.csrf_token) return;
+            let meta = document.querySelector('meta[name="csrf-token"]');
+            if (!meta) {
+                meta = document.createElement('meta');
+                meta.setAttribute('name', 'csrf-token');
+                document.head.appendChild(meta);
+            }
+            meta.setAttribute('content', data.csrf_token);
+        })
+        .catch(() => {});
+})();
+
 const requests = {
     request(url, method = 'GET', data = {}, params = {}) {
         return new Promise((resolve, reject) => {
+            const isJsonBody = method !== 'GET' && data && typeof data === 'object';
             $.ajax({
                 url: url,
                 method: method,
-                data: method === 'GET' ? params : data,
+                data: isJsonBody ? JSON.stringify(data) : (method === 'GET' ? params : data),
+                contentType: isJsonBody ? 'application/json' : undefined,
                 dataType: 'json',
                 cache: true,
                 success: (response) => {

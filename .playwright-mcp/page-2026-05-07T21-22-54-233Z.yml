@@ -1,0 +1,15 @@
+- main [ref=e2]:
+  - region "Dzień dobry!" [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5]:
+        - img "e-mobywatel"
+      - strong [ref=e6]: e-mobywatel
+    - generic [ref=e7]:
+      - heading "Dzień dobry!" [level=1] [ref=e8]
+      - paragraph [ref=e9]: Utwórz konto w e-mobywatelu
+    - navigation "Wybierz akcję" [ref=e10]:
+      - link "Zaloguj się" [ref=e11] [cursor=pointer]:
+        - /url: /login
+      - link "Zarejestruj się" [ref=e12] [cursor=pointer]:
+        - /url: /register
+    - paragraph [ref=e15]: wersja 1.0.0

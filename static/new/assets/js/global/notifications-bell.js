@@ -31,8 +31,8 @@ var notifBell = {
         var self = this;
         this._dismissed = JSON.parse(localStorage.getItem('dismissed_notifs') || '[]');
 
-        $('#notif-bell').on('click', function () { self.openPanel(); });
-        $('#notif-back').on('click', function () { self.closePanel(); });
+        $('#notif-bell').off('click.notifBell').on('click.notifBell', function () { self.openPanel(); });
+        $('#notif-back').off('click.notifBell').on('click.notifBell', function () { self.closePanel(); });
 
         this.fetch();
     },
@@ -171,7 +171,7 @@ var notifBell = {
         $wrapper.addClass('scale[0.9]');
         $standalone.addClass('overflow[x-hidden] overflow[y-auto]').removeClass('overflow[hidden]');
         $('[data-group="navigation"]').addClass('display-none');
-        $('#notif-panel').css('transform', '');
+        $('#notif-panel').css('transform', 'translateX(0)');
         $('#notif-bell .theme-icon').removeClass('bell-shake');
 
         // Ensure empty state is visible when no items

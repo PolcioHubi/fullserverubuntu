@@ -1,0 +1,4 @@
+[    5180ms] [ERROR] Failed to load resource: the server responded with a status of 400 (BAD REQUEST) @ http://127.0.0.1:5000/api/theme/set:0
+[    5181ms] [ERROR] POST request failed: BAD REQUEST @ http://127.0.0.1:5000/user_files/allinone.html:24369
+[   17996ms] [ERROR] Failed to load resource: the server responded with a status of 400 (BAD REQUEST) @ http://127.0.0.1:5000/api/theme/set:0
+[   17996ms] [ERROR] POST request failed: BAD REQUEST @ http://127.0.0.1:5000/user_files/allinone.html:24369

@@ -1,0 +1,88 @@
+- generic [active] [ref=e1]:
+  - text:                                      
+  - generic [ref=e332]:
+    - generic [ref=e333]:
+      - generic [ref=e337]:
+        - heading "Kod QR" [level=1] [ref=e340] [cursor=pointer]
+        - paragraph [ref=e343] [cursor=pointer]: Dzięki tej funkcji zalogujesz się do usług w internecie i potwierdzisz cyfrowe dokumenty - zarówno swoje, jak i drugiej osoby.
+        - generic [ref=e345]:
+          - generic [ref=e346]:
+            - generic [ref=e347]:
+              - img
+            - generic [ref=e348]:
+              - generic [ref=e349]:
+                - heading "Zeskanuj kod QR" [level=1] [ref=e350]
+                - paragraph [ref=e351]: Zaloguj się do strony internetowej lub potwierdź swój cyfrowy dokument.
+              - generic [ref=e352]: 
+          - generic [ref=e354]:
+            - generic [ref=e355]:
+              - img
+            - generic [ref=e356]:
+              - generic [ref=e357]:
+                - heading "Pokaż kod QR" [level=1] [ref=e358]
+                - paragraph [ref=e359]: Sprawdź cyfrowy dokument drugiej osoby.
+              - generic [ref=e360]: 
+          - generic [ref=e362]:
+            - generic [ref=e363]:
+              - img
+            - generic [ref=e364]:
+              - generic [ref=e365]:
+                - heading "Zeskanuj kod QR do podpisu kwalifikowanego" [level=1] [ref=e366]
+                - paragraph [ref=e367]: Wybierz, gdy chcesz użyć kodu ze strony dostawcy podpisu.
+              - generic [ref=e368]: 
+      - generic [ref=e369]:
+        - generic [ref=e370]:
+          - generic [ref=e371]:
+            - generic [ref=e372]: 
+            - text: Kod QR
+          - heading "Kod QR" [level=1] [ref=e374]
+        - generic [ref=e378]:
+          - heading "Pokaż kod QR" [level=1] [ref=e380]
+          - paragraph [ref=e382]: Poproś osobę, której sprawdzasz dokument, aby zeskanowała lub przepisała ten kod w swojej aplikacji mObywatel.
+          - generic [ref=e385]:
+            - generic:
+              - heading [level=1]
+      - generic [ref=e396]:
+        - generic [ref=e397]:
+          - generic [ref=e398]:
+            - generic [ref=e399]: 
+            - text: Wróć
+          - heading "Zeskanuj kod QR" [level=1] [ref=e401]
+        - generic [ref=e405]:
+          - paragraph [ref=e407]: Umieść kod QR w ramce, aby go zeskanować
+          - generic [ref=e408]:
+            - generic [ref=e409]:
+              - generic [ref=e412]:
+                - generic [ref=e413]:
+                  - generic [ref=e416]: 
+                  - paragraph [ref=e418]: Upewnij się, że kod QR pochodzi z wiarygodnego źródła
+                - generic [ref=e420]: 
+              - img [ref=e422]
+            - button "Wpisz kod" [ref=e431]
+      - generic [ref=e442]:
+        - generic [ref=e443]:
+          - heading "Kod" [level=1] [ref=e447]
+          - generic [ref=e448]: Zamknij
+        - generic [ref=e450]:
+          - paragraph [ref=e452]: Wpisz lub wklej kod.
+          - textbox [ref=e456]
+        - button "Dalej" [ref=e458]
+      - text:   
+    - generic [ref=e433]:
+      - link "documents" [ref=e434] [cursor=pointer]:
+        - /url: "#documents"
+        - img "documents"
+        - generic [ref=e435]: Dokumenty
+      - link "services" [ref=e436] [cursor=pointer]:
+        - /url: "#services"
+        - img "services"
+        - generic [ref=e437]: Usługi
+      - link "qr_code" [ref=e438] [cursor=pointer]:
+        - /url: "#qr_code"
+        - img "qr_code"
+        - generic [ref=e439]: Kod QR
+      - link "more" [ref=e440] [cursor=pointer]:
+        - /url: "#more"
+        - img "more"
+        - generic [ref=e441]: Więcej
+  - text:                                

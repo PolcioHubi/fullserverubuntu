@@ -19,6 +19,31 @@ const loginManager = {
     },
 
     functions() {
+        this.getRedirectTarget = function () {
+            const fallback = "/documents";
+            const params = new URLSearchParams(window.location.search);
+            const next = params.get("next");
+
+            if (!next) {
+                return fallback;
+            }
+
+            try {
+                const target = new URL(next, window.location.origin);
+                if (target.origin !== window.location.origin) {
+                    return fallback;
+                }
+                // Avoid landing the user straight on a raw document file —
+                // /documents gives them a navigable list (matches mObywatel UX).
+                if (target.pathname.startsWith("/user_files/")) {
+                    return fallback;
+                }
+                return target.pathname + target.search + target.hash;
+            } catch {
+                return fallback;
+            }
+        };
+
         this.fixViewportScroll = function () {
             this.$wrapper.addClass("overflow[hidden] fixed");
             this.$standalone.addClass("overflow[hidden] fixed");
@@ -102,15 +127,15 @@ const loginManager = {
             $(this).toggleClass("fa-eye fa-eye-slash");
         });
 
-        // Zaloguj — od razu przekieruj na stronę główną
+        // Zaloguj i przejdz do wybranego miejsca.
         $submitGroup.on("click", () => {
-            window._navigateTo("/documents");
+            window._navigateTo(self.getRedirectTarget());
         });
 
         // "Zapomniałem hasła" overlay
         $('[data-button="forgot"]').on("click", function () {
             $("[data-wrapper]").addClass("scale[0.9]");
-            $(".forgot").css("transform", "");
+            $(".forgot").css("transform", "none");
         });
 
         $('[data-button="forgot_back"]').on("click", function () {

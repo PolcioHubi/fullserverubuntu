@@ -8,6 +8,9 @@ const moreManager = {
     setupLayout() {
         this.$standalone = $("[data-standalone]");
         this.$wrapper = $("[data-wrapper]");
+        this.$wrapper.removeClass("scale[0.9]");
+        $(".language, .theme, .contact").css("transform", "translateX(100%)").removeClass("overflow[hidden]");
+        $(".dashboard-navigation").removeClass("scrolled background[backdrop]");
         this.$standalone.removeClass("overflow[hidden]").addClass("overflow[hidden] fixed");
         if ($(window).height() < 680) {
             this.$standalone.removeClass("overflow[hidden]").addClass("overflow[x-hidden]");
@@ -25,6 +28,44 @@ const moreManager = {
             const url = new URL(window.location.href);
             url.searchParams.delete("tabOpen");
             window.history.replaceState({}, "", url.toString());
+        };
+
+        this.showInfoToast = function (message) {
+            // Lightweight toast that doesn't depend on any external lib.
+            // Auto-removes after 2.6s. Stacks if called multiple times.
+            const $existing = $('.moreManager-toast');
+            $existing.each(function () {
+                clearTimeout($(this).data('toastTimer'));
+                $(this).remove();
+            });
+            const $toast = $('<div class="moreManager-toast"></div>')
+                .text(message)
+                .css({
+                    position: 'fixed',
+                    left: '50%',
+                    bottom: '92px',
+                    transform: 'translateX(-50%)',
+                    'max-width': '88%',
+                    background: 'rgba(20, 25, 36, 0.92)',
+                    color: '#fff',
+                    'font-family': 'Inter, sans-serif',
+                    'font-size': '14px',
+                    'line-height': '1.35',
+                    padding: '10px 16px',
+                    'border-radius': '999px',
+                    'z-index': '9999',
+                    'box-shadow': '0 10px 30px rgba(0,0,0,.35)',
+                    'pointer-events': 'none',
+                    opacity: '0',
+                    transition: 'opacity .18s ease'
+                });
+            $('body').append($toast);
+            requestAnimationFrame(() => $toast.css('opacity', '1'));
+            const timer = setTimeout(() => {
+                $toast.css('opacity', '0');
+                setTimeout(() => $toast.remove(), 200);
+            }, 2600);
+            $toast.data('toastTimer', timer);
         };
 
         this.postPurge = function (params = {}) {
@@ -45,76 +86,94 @@ const moreManager = {
 
     listeners() {
         const self = this;
+        // Expose for the All-in-One SPA router (parallel to qrCodeManager) so
+        // future cleanup paths can reach this manager without relying on
+        // module-scope lookups.
+        window.moreManager = moreManager;
         const $wrapper = $("[data-wrapper]");
         const $standalone = $("[data-standalone]");
 
+        $('[data-button="language"]').off("click.moreManager");
+        $('[data-button="language_back"]').off("click.moreManager");
+        $('[data-button="polish"]').off("click.moreManager");
+        $('[data-button="english"]').off("click.moreManager");
+        $('[data-button="ukrainian"]').off("click.moreManager");
+        $('[data-button="theme"]').off("click.moreManager");
+        $('[data-button="theme_back"]').off("click.moreManager");
+        $('[data-button="light"]').off("click.moreManager");
+        $('[data-button="dark"]').off("click.moreManager");
+        $('[data-button="contact"]').off("click.moreManager");
+        $('[data-button="contact_back"]').off("click.moreManager");
+        $('[data-button="refreshCache"]').off("click.moreManager");
+        $("[data-standalone]").off("scroll.moreManager");
+
         // --- Język ---
-        $('[data-button="language"]').on("click", function () {
+        $('[data-button="language"]').on("click.moreManager", function () {
             if (!navigator.onLine) return;
             self.setTabOpen("language");
             $wrapper.addClass("scale[0.9]");
             $standalone.removeClass("overflow[x-hidden] overflow[y-auto] fixed").addClass("overflow[hidden]");
-            $(".language").css("transform", "").addClass("overflow[hidden]");
+            $(".language").css("transform", "none").addClass("overflow[hidden]");
         });
 
-        $('[data-button="language_back"]').on("click", function () {
+        $('[data-button="language_back"]').on("click.moreManager", function () {
             self.removeTabOpen();
             $(".language").css("transform", "translateX(100%)").removeClass("overflow[hidden]");
             $standalone.addClass("overflow[x-hidden] overflow[y-auto] fixed");
             $wrapper.removeClass("scale[0.9]");
         });
 
-        $('[data-button="polish"]').on("click", async function () {
+        $('[data-button="polish"]').on("click.moreManager", async function () {
             await requests.post("/api/language/set", { language: "pl" });
             self.postPurge({ tabOpen: "language", lang: "pl" });
         });
 
-        $('[data-button="english"]').on("click", async function () {
+        $('[data-button="english"]').on("click.moreManager", async function () {
             await requests.post("/api/language/set", { language: "en" });
             self.postPurge({ tabOpen: "language", lang: "en" });
         });
 
-        $('[data-button="ukrainian"]').on("click", async function () {
+        $('[data-button="ukrainian"]').on("click.moreManager", async function () {
             await requests.post("/api/language/set", { language: "ua" });
             self.postPurge({ tabOpen: "language", lang: "ua" });
         });
 
         // --- Motyw ---
-        $('[data-button="theme"]').on("click", function () {
+        $('[data-button="theme"]').on("click.moreManager", function () {
             if (!navigator.onLine) return;
             self.setTabOpen("theme");
             $wrapper.addClass("scale[0.9]");
             $standalone.removeClass("overflow[x-hidden] overflow[y-auto] fixed").addClass("overflow[hidden]");
-            $(".theme").css("transform", "").addClass("overflow[hidden]");
+            $(".theme").css("transform", "none").addClass("overflow[hidden]");
         });
 
-        $('[data-button="theme_back"]').on("click", function () {
+        $('[data-button="theme_back"]').on("click.moreManager", function () {
             self.removeTabOpen();
             $(".theme").css("transform", "translateX(100%)").removeClass("overflow[hidden]");
             $standalone.addClass("overflow[x-hidden] overflow[y-auto] fixed");
             $wrapper.removeClass("scale[0.9]");
         });
 
-        $('[data-button="light"]').on("click", async function () {
+        $('[data-button="light"]').on("click.moreManager", async function () {
             await requests.post("/api/theme/set", { theme: "light" });
             self.postPurge({ tabOpen: "themes", theme: "light" });
         });
 
-        $('[data-button="dark"]').on("click", async function () {
+        $('[data-button="dark"]').on("click.moreManager", async function () {
             await requests.post("/api/theme/set", { theme: "dark" });
             self.postPurge({ tabOpen: "themes", theme: "dark" });
         });
 
         // --- Kontakt ---
-        $('[data-button="contact"]').on("click", function () {
+        $('[data-button="contact"]').on("click.moreManager", function () {
             if (!navigator.onLine) return;
             self.setTabOpen("contact");
             $wrapper.addClass("scale[0.9]");
             $standalone.removeClass("overflow[x-hidden] overflow[y-auto] fixed").addClass("overflow[hidden]");
-            $(".contact").css("transform", "").addClass("overflow[hidden]");
+            $(".contact").css("transform", "none").addClass("overflow[hidden]");
         });
 
-        $('[data-button="contact_back"]').on("click", function () {
+        $('[data-button="contact_back"]').on("click.moreManager", function () {
             self.removeTabOpen();
             $(".contact").css("transform", "translateX(100%)").removeClass("overflow[hidden]");
             $standalone.addClass("overflow[x-hidden] overflow[y-auto] fixed");
@@ -122,7 +181,7 @@ const moreManager = {
         });
 
         // --- Wyczyść cache ---
-        $('[data-button="refreshCache"]').on("click", async function () {
+        $('[data-button="refreshCache"]').on("click.moreManager", async function () {
             const keys = await caches.keys();
             await Promise.all(keys.map(k => caches.delete(k)));
             if ("serviceWorker" in navigator) {
@@ -131,6 +190,12 @@ const moreManager = {
             }
             location.reload();
         });
+
+        // (Wcześniej był tutaj delegated handler pokazujący toast
+        // "funkcja w przygotowaniu" dla pozycji menu bez data-button —
+        // user wolał ciche kliknięcia dla niedostępnych funkcji.
+        // Aktywne pozycje (Dane kontaktowe, Język, Wygląd, Wyczyść cache)
+        // mają własne handlery powyżej.)
 
         // --- Collapsible navigation header ---
         const $scrollable = $("[data-standalone]");
@@ -198,7 +263,7 @@ const moreManager = {
 
         const snapRange = $largeTitle.outerHeight() * 0.1;
 
-        $scrollable.on("scroll", function () {
+        $scrollable.on("scroll.moreManager", function () {
             if (animating) return;
 
             const state = getScrollState();

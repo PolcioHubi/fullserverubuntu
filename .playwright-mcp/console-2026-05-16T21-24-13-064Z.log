@@ -1,0 +1,145 @@
+[   81634ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://127.0.0.1:5000/api/chat/unread?_=1778966734636:0
+[  102014ms] [ERROR] Executing inline script violates the following Content Security Policy directive 'script-src 'self' 'nonce-MOS1GaVRCCyYiN3eW4-4eg' https://cdn.jsdelivr.net'. Either the 'unsafe-inline' keyword, a hash ('sha256-0M6/YCNFxcLSjJMJnE3fO5Bj1g8ZqBpwD0FPnt0x6QU='), or a nonce ('nonce-...') is required to enable inline execution. The action has been blocked. @ http://127.0.0.1:5000/user_files/dowodnowy_new.html#login:48
+[  102014ms] [INFO] Executing inline script violates the following Content Security Policy directive 'script-src 'self' 'nonce-MOS1GaVRCCyYiN3eW4-4eg' https://cdn.jsdelivr.net'. Either the 'unsafe-inline' keyword, a hash ('sha256-0M6/YCNFxcLSjJMJnE3fO5Bj1g8ZqBpwD0FPnt0x6QU='), or a nonce ('nonce-...') is required to enable inline execution. The policy is report-only, so the violation has been logged but no further action has been taken. @ http://127.0.0.1:5000/user_files/dowodnowy_new.html#login:48
+[  102181ms] [LOG] [SW] registered: http://127.0.0.1:5000/ @ http://127.0.0.1:5000/assets/js/global/worker-starter.js:6
+[  115354ms] [LOG] [SW] registered: http://127.0.0.1:5000/ @ http://127.0.0.1:5000/assets/js/global/worker-starter.js:6
+[  115362ms] [WARNING] <meta name="apple-mobile-web-app-capable" content="yes"> is deprecated. Please include <meta name="mobile-web-app-capable" content="yes"> @ http://127.0.0.1:5000/documents:0
+[  116502ms] [LOG] [SW] registered: http://127.0.0.1:5000/ @ http://127.0.0.1:5000/assets/js/global/worker-starter.js:6
+[  116503ms] [WARNING] <meta name="apple-mobile-web-app-capable" content="yes"> is deprecated. Please include <meta name="mobile-web-app-capable" content="yes"> @ http://127.0.0.1:5000/services:0
+[  117664ms] [LOG] [SW] registered: http://127.0.0.1:5000/ @ http://127.0.0.1:5000/assets/js/global/worker-starter.js:6
+[  117668ms] [WARNING] <meta name="apple-mobile-web-app-capable" content="yes"> is deprecated. Please include <meta name="mobile-web-app-capable" content="yes"> @ http://127.0.0.1:5000/qr_code:0
+[  118747ms] [LOG] [SW] registered: http://127.0.0.1:5000/ @ http://127.0.0.1:5000/assets/js/global/worker-starter.js:6
+[  118748ms] [WARNING] <meta name="apple-mobile-web-app-capable" content="yes"> is deprecated. Please include <meta name="mobile-web-app-capable" content="yes"> @ http://127.0.0.1:5000/more:0
+[  924630ms] [LOG] [SW] registered: http://127.0.0.1:5000/ @ http://127.0.0.1:5000/assets/js/global/worker-starter.js:6
+[  924637ms] [WARNING] <meta name="apple-mobile-web-app-capable" content="yes"> is deprecated. Please include <meta name="mobile-web-app-capable" content="yes"> @ http://127.0.0.1:5000/services:0
+[  925945ms] [LOG] [SW] registered: http://127.0.0.1:5000/ @ http://127.0.0.1:5000/assets/js/global/worker-starter.js:6
+[  925953ms] [WARNING] <meta name="apple-mobile-web-app-capable" content="yes"> is deprecated. Please include <meta name="mobile-web-app-capable" content="yes"> @ http://127.0.0.1:5000/documents:0
+[  932082ms] [VERBOSE] [DOM] Password field is not contained in a form: (More info: https://goo.gl/9p2vKq) %o @ http://127.0.0.1:5000/static/new/login.html?next=/my-document/mdowod:0
+[  932099ms] [LOG] [SW] registered: http://127.0.0.1:5000/ @ http://127.0.0.1:5000/assets/js/global/worker-starter.js:6
+[  932122ms] [WARNING] <meta name="apple-mobile-web-app-capable" content="yes"> is deprecated. Please include <meta name="mobile-web-app-capable" content="yes"> @ http://127.0.0.1:5000/static/new/login.html?next=/my-document/mdowod:0
+[  933404ms] [LOG] [SW] registered: http://127.0.0.1:5000/ @ http://127.0.0.1:5000/assets/js/global/worker-starter.js:6
+[  933413ms] [WARNING] <meta name="apple-mobile-web-app-capable" content="yes"> is deprecated. Please include <meta name="mobile-web-app-capable" content="yes"> @ http://127.0.0.1:5000/documents:0
+[  934780ms] [LOG] [SW] registered: http://127.0.0.1:5000/ @ http://127.0.0.1:5000/assets/js/global/worker-starter.js:6
+[  935480ms] [LOG] [SW] registered: http://127.0.0.1:5000/ @ http://127.0.0.1:5000/assets/js/global/worker-starter.js:6
+[  935486ms] [WARNING] <meta name="apple-mobile-web-app-capable" content="yes"> is deprecated. Please include <meta name="mobile-web-app-capable" content="yes"> @ http://127.0.0.1:5000/documents:0
+[  939455ms] [LOG] [SW] registered: http://127.0.0.1:5000/ @ http://127.0.0.1:5000/assets/js/global/worker-starter.js:6
+[  939458ms] [WARNING] <meta name="apple-mobile-web-app-capable" content="yes"> is deprecated. Please include <meta name="mobile-web-app-capable" content="yes"> @ http://127.0.0.1:5000/documents:0
+[  948342ms] [LOG] [SW] registered: http://127.0.0.1:5000/ @ http://127.0.0.1:5000/assets/js/global/worker-starter.js:6
+[  948342ms] [WARNING] <meta name="apple-mobile-web-app-capable" content="yes"> is deprecated. Please include <meta name="mobile-web-app-capable" content="yes"> @ http://127.0.0.1:5000/documents:0
+[  975952ms] [WARNING] <meta name="apple-mobile-web-app-capable" content="yes"> is deprecated. Please include <meta name="mobile-web-app-capable" content="yes"> @ http://127.0.0.1:5000/services:0
+[  975953ms] [LOG] [SW] registered: http://127.0.0.1:5000/ @ http://127.0.0.1:5000/assets/js/global/worker-starter.js:6
+[  976863ms] [LOG] [SW] registered: http://127.0.0.1:5000/ @ http://127.0.0.1:5000/assets/js/global/worker-starter.js:6
+[  976871ms] [WARNING] <meta name="apple-mobile-web-app-capable" content="yes"> is deprecated. Please include <meta name="mobile-web-app-capable" content="yes"> @ http://127.0.0.1:5000/documents:0
+[ 1207175ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://127.0.0.1:5000/api/chat/unread?_=1778967629734:0
+[ 1218880ms] [ERROR] GET request failed: error @ http://127.0.0.1:5000/assets/js/script.js?v=20260310-documents-hydration:13
+[ 1218880ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://127.0.0.1:5000/api/user-documents?_ts=1778967869927:0
+[ 1219139ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://127.0.0.1:5000/api/chat/unread?_=1778967629735:0
+[ 1231163ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://127.0.0.1:5000/api/chat/unread?_=1778967629736:0
+[ 1243199ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://127.0.0.1:5000/api/chat/unread?_=1778967629737:0
+[ 1290596ms] [LOG] [SW] registered: http://127.0.0.1:5000/ @ http://127.0.0.1:5000/assets/js/global/worker-starter.js:6
+[ 1290597ms] [WARNING] <meta name="apple-mobile-web-app-capable" content="yes"> is deprecated. Please include <meta name="mobile-web-app-capable" content="yes"> @ http://127.0.0.1:5000/documents:0
+[ 1291856ms] [LOG] [SW] controller changed → reload @ http://127.0.0.1:5000/assets/js/global/worker-starter.js:20
+[ 1292216ms] [LOG] [SW] registered: http://127.0.0.1:5000/ @ http://127.0.0.1:5000/assets/js/global/worker-starter.js:6
+[ 1292216ms] [WARNING] <meta name="apple-mobile-web-app-capable" content="yes"> is deprecated. Please include <meta name="mobile-web-app-capable" content="yes"> @ http://127.0.0.1:5000/documents:0
+[ 1312996ms] [LOG] [All-in-One] Nadpisanie danych aktywne — osadzone dane @ http://127.0.0.1:5000/user_files/allinone.html:28838
+[ 1312999ms] [LOG] [SPA] initPageManager: login @ http://127.0.0.1:5000/user_files/allinone.html:27987
+[ 1313000ms] [LOG] [SPA Router] Przełączono na: login @ http://127.0.0.1:5000/user_files/allinone.html:27903
+[ 1313049ms] [VERBOSE] [DOM] Password field is not contained in a form: (More info: https://goo.gl/9p2vKq) %o @ http://127.0.0.1:5000/user_files/allinone.html#login:0
+[ 1313069ms] [LOG] [SPA Patches] jQuery handlery przechwycone @ http://127.0.0.1:5000/user_files/allinone.html:28254
+[ 1313146ms] [LOG] [AIO-SW] registered, scope: http://127.0.0.1:5000/user_files/ @ http://127.0.0.1:5000/user_files/allinone.html:26
+[ 1315141ms] [LOG] [SPA] initPageManager: documents @ http://127.0.0.1:5000/user_files/allinone.html:27987
+[ 1315144ms] [LOG] [SPA Router] Przełączono na: documents @ http://127.0.0.1:5000/user_files/allinone.html:27903
+[ 1315625ms] [LOG] [SPA] initPageManager: mdowod_viewer @ http://127.0.0.1:5000/user_files/allinone.html:27987
+[ 1315654ms] [LOG] [SPA Router] Przełączono na: mdowod_viewer @ http://127.0.0.1:5000/user_files/allinone.html:27903
+[ 1316410ms] [LOG] [SPA] initPageManager: documents @ http://127.0.0.1:5000/user_files/allinone.html:27987
+[ 1316413ms] [LOG] [SPA Router] Przełączono na: documents @ http://127.0.0.1:5000/user_files/allinone.html:27903
+[ 1350062ms] [LOG] [SPA] initPageManager: mdowod_viewer @ http://127.0.0.1:5000/user_files/allinone.html:27987
+[ 1350070ms] [LOG] [SPA Router] Przełączono na: mdowod_viewer @ http://127.0.0.1:5000/user_files/allinone.html:27903
+[ 1350859ms] [LOG] [SPA] initPageManager: documents @ http://127.0.0.1:5000/user_files/allinone.html:27987
+[ 1350861ms] [LOG] [SPA Router] Przełączono na: documents @ http://127.0.0.1:5000/user_files/allinone.html:27903
+[ 1351275ms] [LOG] [SPA] initPageManager: login @ http://127.0.0.1:5000/user_files/allinone.html:27987
+[ 1351275ms] [LOG] [SPA Router] Przełączono na: login @ http://127.0.0.1:5000/user_files/allinone.html:27903
+[ 1352834ms] [LOG] [SPA] initPageManager: documents @ http://127.0.0.1:5000/user_files/allinone.html:27987
+[ 1352837ms] [LOG] [SPA Router] Przełączono na: documents @ http://127.0.0.1:5000/user_files/allinone.html:27903
+[ 1353552ms] [LOG] [SPA] initPageManager: login @ http://127.0.0.1:5000/user_files/allinone.html:27987
+[ 1353553ms] [LOG] [SPA Router] Przełączono na: login @ http://127.0.0.1:5000/user_files/allinone.html:27903
+[ 1363407ms] [LOG] [All-in-One] Nadpisanie danych aktywne — osadzone dane @ http://127.0.0.1:5000/user_files/allinone.html:28838
+[ 1363410ms] [LOG] [SPA] initPageManager: login @ http://127.0.0.1:5000/user_files/allinone.html:27987
+[ 1363412ms] [LOG] [SPA Router] Przełączono na: login @ http://127.0.0.1:5000/user_files/allinone.html:27903
+[ 1363452ms] [VERBOSE] [DOM] Password field is not contained in a form: (More info: https://goo.gl/9p2vKq) %o @ http://127.0.0.1:5000/user_files/allinone.html#login:0
+[ 1363470ms] [LOG] [SPA Patches] jQuery handlery przechwycone @ http://127.0.0.1:5000/user_files/allinone.html:28254
+[ 1363569ms] [LOG] [AIO-SW] registered, scope: http://127.0.0.1:5000/user_files/ @ http://127.0.0.1:5000/user_files/allinone.html:26
+[ 1369564ms] [LOG] [SPA] initPageManager: documents @ http://127.0.0.1:5000/user_files/allinone.html:27987
+[ 1369569ms] [LOG] [SPA Router] Przełączono na: documents @ http://127.0.0.1:5000/user_files/allinone.html:27903
+[ 1370166ms] [LOG] [SPA] initPageManager: mdowod_viewer @ http://127.0.0.1:5000/user_files/allinone.html:27987
+[ 1370201ms] [LOG] [SPA Router] Przełączono na: mdowod_viewer @ http://127.0.0.1:5000/user_files/allinone.html:27903
+[ 1371092ms] [LOG] [SPA] initPageManager: documents @ http://127.0.0.1:5000/user_files/allinone.html:27987
+[ 1371096ms] [LOG] [SPA Router] Przełączono na: documents @ http://127.0.0.1:5000/user_files/allinone.html:27903
+[ 1383285ms] [LOG] [SPA] initPageManager: mdowod_viewer @ http://127.0.0.1:5000/user_files/allinone.html:27987
+[ 1383291ms] [LOG] [SPA Router] Przełączono na: mdowod_viewer @ http://127.0.0.1:5000/user_files/allinone.html:27903
+[ 1387577ms] [LOG] [SPA] initPageManager: documents @ http://127.0.0.1:5000/user_files/allinone.html:27987
+[ 1387579ms] [LOG] [SPA Router] Przełączono na: documents @ http://127.0.0.1:5000/user_files/allinone.html:27903
+[ 1388307ms] [LOG] [SPA] initPageManager: services @ http://127.0.0.1:5000/user_files/allinone.html:27987
+[ 1388308ms] [LOG] [SPA Router] Przełączono na: services @ http://127.0.0.1:5000/user_files/allinone.html:27903
+[ 1388885ms] [LOG] [SPA] initPageManager: qr_code @ http://127.0.0.1:5000/user_files/allinone.html:27987
+[ 1388886ms] [LOG] [SPA Router] Przełączono na: qr_code @ http://127.0.0.1:5000/user_files/allinone.html:27903
+[ 1392852ms] [LOG] [SPA] initPageManager: more @ http://127.0.0.1:5000/user_files/allinone.html:27987
+[ 1392864ms] [LOG] [SPA Router] Przełączono na: more @ http://127.0.0.1:5000/user_files/allinone.html:27903
+[ 1393437ms] [LOG] [SPA] initPageManager: qr_code @ http://127.0.0.1:5000/user_files/allinone.html:27987
+[ 1393438ms] [LOG] [SPA Router] Przełączono na: qr_code @ http://127.0.0.1:5000/user_files/allinone.html:27903
+[ 1418981ms] [LOG] [SPA] initPageManager: services @ http://127.0.0.1:5000/user_files/allinone.html:27987
+[ 1418982ms] [LOG] [SPA Router] Przełączono na: services @ http://127.0.0.1:5000/user_files/allinone.html:27903
+[ 1420629ms] [LOG] [SPA] initPageManager: documents @ http://127.0.0.1:5000/user_files/allinone.html:27987
+[ 1420634ms] [LOG] [SPA Router] Przełączono na: documents @ http://127.0.0.1:5000/user_files/allinone.html:27903
+[ 1422605ms] [LOG] [SPA] initPageManager: services @ http://127.0.0.1:5000/user_files/allinone.html:27987
+[ 1422606ms] [LOG] [SPA Router] Przełączono na: services @ http://127.0.0.1:5000/user_files/allinone.html:27903
+[ 1427211ms] [LOG] [All-in-One] Nadpisanie danych aktywne — osadzone dane @ http://127.0.0.1:5000/user_files/allinone.html:28838
+[ 1427216ms] [VERBOSE] [DOM] Password field is not contained in a form: (More info: https://goo.gl/9p2vKq) %o @ http://127.0.0.1:5000/user_files/allinone.html#services:0
+[ 1427225ms] [LOG] [SPA Patches] jQuery handlery przechwycone @ http://127.0.0.1:5000/user_files/allinone.html:28254
+[ 1427245ms] [LOG] [SPA] initPageManager: services @ http://127.0.0.1:5000/user_files/allinone.html:27987
+[ 1427246ms] [LOG] [SPA Router] Przełączono na: services @ http://127.0.0.1:5000/user_files/allinone.html:27903
+[ 1427265ms] [LOG] [AIO-SW] registered, scope: http://127.0.0.1:5000/user_files/ @ http://127.0.0.1:5000/user_files/allinone.html:26
+[ 1428282ms] [LOG] [SPA] initPageManager: documents @ http://127.0.0.1:5000/user_files/allinone.html:27987
+[ 1428287ms] [LOG] [SPA Router] Przełączono na: documents @ http://127.0.0.1:5000/user_files/allinone.html:27903
+[ 1429135ms] [LOG] [SPA] initPageManager: qr_code @ http://127.0.0.1:5000/user_files/allinone.html:27987
+[ 1429136ms] [LOG] [SPA Router] Przełączono na: qr_code @ http://127.0.0.1:5000/user_files/allinone.html:27903
+[ 1430213ms] [LOG] [SPA] initPageManager: more @ http://127.0.0.1:5000/user_files/allinone.html:27987
+[ 1430227ms] [LOG] [SPA Router] Przełączono na: more @ http://127.0.0.1:5000/user_files/allinone.html:27903
+[ 1438568ms] [LOG] [SPA] initPageManager: qr_code @ http://127.0.0.1:5000/user_files/allinone.html:27987
+[ 1438568ms] [LOG] [SPA Router] Przełączono na: qr_code @ http://127.0.0.1:5000/user_files/allinone.html:27903
+[ 1439280ms] [LOG] [SPA] initPageManager: more @ http://127.0.0.1:5000/user_files/allinone.html:27987
+[ 1439285ms] [LOG] [SPA Router] Przełączono na: more @ http://127.0.0.1:5000/user_files/allinone.html:27903
+[ 1441556ms] [LOG] [SPA] initPageManager: qr_code @ http://127.0.0.1:5000/user_files/allinone.html:27987
+[ 1441557ms] [LOG] [SPA Router] Przełączono na: qr_code @ http://127.0.0.1:5000/user_files/allinone.html:27903
+[ 1442040ms] [LOG] [SPA] initPageManager: services @ http://127.0.0.1:5000/user_files/allinone.html:27987
+[ 1442041ms] [LOG] [SPA Router] Przełączono na: services @ http://127.0.0.1:5000/user_files/allinone.html:27903
+[ 1442497ms] [LOG] [SPA] initPageManager: documents @ http://127.0.0.1:5000/user_files/allinone.html:27987
+[ 1442501ms] [LOG] [SPA Router] Przełączono na: documents @ http://127.0.0.1:5000/user_files/allinone.html:27903
+[ 1453212ms] [LOG] [SPA] initPageManager: more @ http://127.0.0.1:5000/user_files/allinone.html:27987
+[ 1453214ms] [LOG] [SPA Router] Przełączono na: more @ http://127.0.0.1:5000/user_files/allinone.html:27903
+[ 1456005ms] [LOG] [SPA] initPageManager: qr_code @ http://127.0.0.1:5000/user_files/allinone.html:27987
+[ 1456005ms] [LOG] [SPA Router] Przełączono na: qr_code @ http://127.0.0.1:5000/user_files/allinone.html:27903
+[ 1456538ms] [LOG] [SPA] initPageManager: more @ http://127.0.0.1:5000/user_files/allinone.html:27987
+[ 1456541ms] [LOG] [SPA Router] Przełączono na: more @ http://127.0.0.1:5000/user_files/allinone.html:27903
+[ 1457542ms] [LOG] [SPA] initPageManager: qr_code @ http://127.0.0.1:5000/user_files/allinone.html:27987
+[ 1457543ms] [LOG] [SPA Router] Przełączono na: qr_code @ http://127.0.0.1:5000/user_files/allinone.html:27903
+[ 1478237ms] [LOG] [SPA] initPageManager: more @ http://127.0.0.1:5000/user_files/allinone.html:27987
+[ 1478238ms] [LOG] [SPA Router] Przełączono na: more @ http://127.0.0.1:5000/user_files/allinone.html:27903
+[ 1493695ms] [LOG] [SPA] initPageManager: qr_code @ http://127.0.0.1:5000/user_files/allinone.html:27987
+[ 1493697ms] [LOG] [SPA Router] Przełączono na: qr_code @ http://127.0.0.1:5000/user_files/allinone.html:27903
+[ 1494617ms] [LOG] [SPA] initPageManager: services @ http://127.0.0.1:5000/user_files/allinone.html:27987
+[ 1494618ms] [LOG] [SPA Router] Przełączono na: services @ http://127.0.0.1:5000/user_files/allinone.html:27903
+[ 1495842ms] [LOG] [SPA] initPageManager: documents @ http://127.0.0.1:5000/user_files/allinone.html:27987
+[ 1495846ms] [LOG] [SPA Router] Przełączono na: documents @ http://127.0.0.1:5000/user_files/allinone.html:27903
+[ 1499136ms] [LOG] [SPA] initPageManager: services @ http://127.0.0.1:5000/user_files/allinone.html:27987
+[ 1499136ms] [LOG] [SPA Router] Przełączono na: services @ http://127.0.0.1:5000/user_files/allinone.html:27903
+[ 1500137ms] [LOG] [SPA] initPageManager: documents @ http://127.0.0.1:5000/user_files/allinone.html:27987
+[ 1500141ms] [LOG] [SPA Router] Przełączono na: documents @ http://127.0.0.1:5000/user_files/allinone.html:27903
+[ 1505016ms] [LOG] [SPA] initPageManager: services @ http://127.0.0.1:5000/user_files/allinone.html:27987
+[ 1505017ms] [LOG] [SPA Router] Przełączono na: services @ http://127.0.0.1:5000/user_files/allinone.html:27903
+[ 1507013ms] [LOG] [SPA] initPageManager: more @ http://127.0.0.1:5000/user_files/allinone.html:27987
+[ 1507016ms] [LOG] [SPA Router] Przełączono na: more @ http://127.0.0.1:5000/user_files/allinone.html:27903
+[ 1507598ms] [LOG] [SPA] initPageManager: qr_code @ http://127.0.0.1:5000/user_files/allinone.html:27987
+[ 1507599ms] [LOG] [SPA Router] Przełączono na: qr_code @ http://127.0.0.1:5000/user_files/allinone.html:27903
+[ 1525996ms] [LOG] [SPA] initPageManager: more @ http://127.0.0.1:5000/user_files/allinone.html:27987
+[ 1526000ms] [LOG] [SPA Router] Przełączono na: more @ http://127.0.0.1:5000/user_files/allinone.html:27903
