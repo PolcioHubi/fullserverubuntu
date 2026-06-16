@@ -600,11 +600,17 @@ def _inject_doc_guard_js(html_str: str, username: str, doc_key: str, files_folde
     """Wstrzykuje __DOC_GUARD + heartbeat check do pojedynczego dokumentu HTML.
 
     Analogiczne do AIO Guard (see compile_allinone.generate_spa_router) ale
-    okrojone do pojedynczego dokumentu — bez SPA navigation hooks, bez TTL
-    cache w sessionStorage (per-page-open jeden check wystarczy). Sprawdza
+    okrojone do pojedynczego dokumentu — bez SPA navigation hooks. Sprawdza
     fingerprint przez ``/api/aio/heartbeat`` (ten sam endpoint co AIO).
 
-    Tylko 'wrong user' i 'stale data' są wykrywane. Offline → silent.
+    Reakcje:
+      - 'wrong user'  → twarda, pełnoekranowa blokada (anty-współdzielenie).
+      - 'stale data'  → najpierw JEDNORAZOWY cichy ``location.reload()``
+        (samo-naprawa np. starego cache na stronach serwowanych z serwera);
+        jeśli po przeładowaniu nadal nieaktualne — albo jesteśmy w pobranym
+        All-in-One, gdzie dane są wbudowane i reload nic nie zmieni — pokazuje
+        delikatny, znikający toast z przyciskiem zamiast wielkiego banera.
+      - offline / błąd sieci → cicho (bez żadnego komunikatu).
     """
     if not username:
         return html_str
@@ -637,11 +643,20 @@ def _inject_doc_guard_js(html_str: str, username: str, doc_key: str, files_folde
         "if(ctaUrl){var a=document.createElement('a');a.href=ctaUrl;a.style.cssText='background:#285ff4;color:#fff;padding:12px 24px;border-radius:999px;text-decoration:none;font-weight:600;font-size:15px;';a.textContent=ctaLabel;o.appendChild(a);}"
         "document.body.appendChild(o);"
         "}"
-        "function showWarn(msg){"
-        "if(document.querySelector('.doc-guard-banner'))return;"
-        "var b=document.createElement('div');b.className='doc-guard-banner';"
-        "b.style.cssText='position:fixed;top:0;left:0;right:0;z-index:9998;background:#e67e22;color:#fff;padding:10px 16px;text-align:center;font:14px Inter,Arial,sans-serif;box-shadow:0 2px 8px rgba(0,0,0,.25);';"
-        "b.textContent=msg;document.body.appendChild(b);"
+        # Gentle, dismissible toast (bottom-center) — NOT a full-width orange
+        # bar. Action button adapts: inside the All-in-One it points to the app
+        # to download a fresh file; on a standalone document it points to the
+        # form to regenerate. Auto-hides after 12s and has a manual close.
+        "function showToast(){"
+        "if(document.querySelector('.doc-guard-toast'))return;"
+        "var isAio=!!window.__AIO_GUARD;"
+        "var t=document.createElement('div');t.className='doc-guard-toast';"
+        "t.style.cssText='position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:9998;display:flex;align-items:center;gap:12px;max-width:calc(100vw - 24px);background:#1f2430;color:#eef1f4;padding:12px 14px;border-radius:14px;font:14px Inter,Arial,sans-serif;box-shadow:0 8px 28px rgba(0,0,0,.35);';"
+        "var s=document.createElement('span');s.style.cssText='line-height:1.35;';s.textContent='Twoje dane są nowsze niż w tej wersji.';"
+        "var a=document.createElement('a');a.href=isAio?'/documents':'/';a.textContent=isAio?'Pobierz aktualny plik':'Wygeneruj ponownie';a.style.cssText='flex:none;background:#285ff4;color:#fff;padding:8px 14px;border-radius:999px;text-decoration:none;font-weight:600;font-size:13px;white-space:nowrap;';"
+        "var x=document.createElement('button');x.setAttribute('aria-label','Zamknij');x.textContent='×';x.style.cssText='flex:none;background:transparent;border:0;color:#aeb6c2;font-size:20px;line-height:1;cursor:pointer;padding:0 2px;';x.onclick=function(){t.remove();};"
+        "t.appendChild(s);t.appendChild(a);t.appendChild(x);document.body.appendChild(t);"
+        "setTimeout(function(){if(t.parentNode)t.remove();},12000);"
         "}"
         "function check(){"
         "fetch('/api/aio/heartbeat',{credentials:'same-origin',cache:'no-store'})"
@@ -653,8 +668,14 @@ def _inject_doc_guard_js(html_str: str, username: str, doc_key: str, files_folde
         "showBlock('Ten dokument należy do innego konta','Ten plik został wygenerowany dla użytkownika \"'+GUARD.username+'\", ale aktualnie zalogowany jest \"'+d.username+'\". Wróć do aplikacji i pobierz własną kopię.','/documents','Przejdź do aplikacji');return;}"
         "var serverHash=(d.data_hashes&&GUARD.doc_key)?d.data_hashes[GUARD.doc_key]:'';"
         "if(serverHash&&GUARD.data_hash&&serverHash!==GUARD.data_hash){"
-        "showWarn('Twoje dane zostały zaktualizowane od ostatniej generacji tego dokumentu — wygeneruj go ponownie, aby zobaczyć aktualne dane.');"
-        "}"
+        # Self-heal: a page served from the server might just be a stale cache,
+        # so reload ONCE per session. If it's still stale after that — or we're
+        # inside the All-in-One (data is embedded, reload can't change it) —
+        # fall through to the gentle toast instead of looping.
+        "var reloaded=false;try{reloaded=!!sessionStorage.getItem('__doc_guard_reloaded');}catch(e){}"
+        "if(!window.__AIO_GUARD&&!reloaded){try{sessionStorage.setItem('__doc_guard_reloaded','1');}catch(e){}location.reload();return;}"
+        "showToast();"
+        "}else{try{sessionStorage.removeItem('__doc_guard_reloaded');}catch(e){}}"
         "}).catch(function(){});"
         "}"
         "if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',check);else check();"

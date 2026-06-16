@@ -191,6 +191,30 @@ def test_injected_doc_guard_matches_heartbeat(logged_in_client, user_form_data_o
     assert "data_hashes" in injected
 
 
+def test_doc_guard_self_heals_then_shows_gentle_toast(logged_in_client, user_form_data_on_disk):
+    """Stale data → one silent reload (server pages), else a gentle dismissible
+    toast — never the old full-width orange banner."""
+    files_folder, _ = user_form_data_on_disk
+    injected = _inject_doc_guard_js(
+        "<html><body>x</body></html>", username="testuser",
+        doc_key="new_mdowod", files_folder=files_folder,
+    )
+    # Self-heal: reload once, guarded by a session flag (no infinite loop).
+    assert "location.reload()" in injected
+    assert "__doc_guard_reloaded" in injected
+    # Reload is skipped inside the All-in-One (embedded data → reload can't help).
+    assert "window.__AIO_GUARD" in injected
+    # Gentle, dismissible toast instead of the old full-width orange banner.
+    assert "doc-guard-toast" in injected
+    assert "showToast" in injected
+    assert "showWarn" not in injected
+    assert "doc-guard-banner" not in injected
+    assert "#e67e22" not in injected  # the alarming orange is gone
+    # Anti-sharing hard block (different account) must remain.
+    assert "showBlock" in injected
+    assert "GUARD.username" in injected
+
+
 def test_aio_guard_has_no_global_soft_warning():
     """compile_allinone's AIO guard must keep the username hard-block but no
     longer carry the global data_hash soft-warning (per-document guards handle
