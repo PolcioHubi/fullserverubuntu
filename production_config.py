@@ -3,6 +3,7 @@ Konfiguracja produkcyjna dla aplikacji Dowodnowy HTML App
 """
 
 import os
+import secrets
 
 
 def _env_int(name: str, default: int) -> int:
@@ -100,7 +101,11 @@ class DevelopmentConfig:
     """Konfiguracja deweloperska"""
 
     DEBUG = True
-    SECRET_KEY = "dev-secret-key-change-in-production"
+    # Never ship a hardcoded, publicly-known signing key: if FLASK_ENV is left
+    # unset the app falls back to DevelopmentConfig, and a fixed key would let
+    # anyone forge session cookies. Prefer the env value; otherwise generate a
+    # fresh random key per process (dev sessions simply reset on restart).
+    SECRET_KEY = os.environ.get("SECRET_KEY") or secrets.token_hex(32)
     SESSION_COOKIE_SECURE = False
     SESSION_COOKIE_HTTPONLY = True
     MAX_CONTENT_LENGTH = _env_int("MAX_CONTENT_LENGTH", 512 * 1024 * 1024)  # 512MB max upload for development (dla backupów)

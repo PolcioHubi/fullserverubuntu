@@ -34,10 +34,38 @@ except ImportError:
 # SEKCJA A — Konfiguracja i narzędzia
 # ============================================================================
 
+def _js_embed(value) -> str:
+    """Serialize a value for safe embedding inside an inline <script> block.
+
+    ``json.dumps`` alone is NOT safe here: it does not escape ``</script>`` (so
+    a field value like ``</script><script>...`` breaks out of the script and
+    executes — stored XSS), nor the line separators U+2028 / U+2029 (which are
+    valid JS string terminators). We escape the HTML-significant characters and
+    those separators as ``\\uXXXX`` so the output is inert as both HTML and JS.
+    """
+    return (
+        json.dumps(value, ensure_ascii=False)
+        .replace("<", "\\u003c")
+        .replace(">", "\\u003e")
+        .replace("&", "\\u0026")
+        .replace(" ", "\\u2028")
+        .replace(" ", "\\u2029")
+    )
+
+
 SCRIPT_DIR = Path(__file__).parent.resolve()
 STATIC_NEW = SCRIPT_DIR / "static" / "new"
 ASSETS_DIR = STATIC_NEW / "assets"
 DEFAULT_OUTPUT = STATIC_NEW / "allinone.html"
+
+# Bezstratna optymalizacja obrazów PNG przed osadzeniem (identyczne piksele,
+# mniejszy rozmiar). Można wyłączyć ustawiając AIO_OPTIMIZE_IMAGES=0.
+OPTIMIZE_IMAGES = os.environ.get("AIO_OPTIMIZE_IMAGES", "1") != "0"
+
+# Cache enkodowania assetów: ten sam plik (po ścieżce + mtime + rozmiar) jest
+# czytany, opcjonalnie optymalizowany i kodowany do Base64 tylko RAZ na kompilację.
+# Klucz zawiera mtime/rozmiar, więc zmiana pliku (np. nowe zdjęcie usera) unieważnia wpis.
+_ASSET_B64_CACHE = {}
 
 # Strony do zmergowania: (nazwa_sekcji, plik_html)
 PAGES = OrderedDict([
@@ -205,16 +233,100 @@ def get_mime(filepath):
     return MIME_MAP.get(ext, mimetypes.guess_type(str(filepath))[0] or "application/octet-stream")
 
 
+def _optimize_image_bytes(raw, mime):
+    """Bezstratnie zmniejsza rozmiar obrazu PNG (te same piksele, lepsza kompresja
+    zlib + dobór filtrów, bez metadanych). Zwraca ``(bytes, mime)``; przy każdym
+    błędzie / braku Pillow zwraca oryginał, więc kompilacja nigdy się nie wywala."""
+    if not OPTIMIZE_IMAGES or mime != "image/png":
+        return raw, mime
+    try:
+        from io import BytesIO
+
+        from PIL import Image
+
+        with Image.open(BytesIO(raw)) as im:
+            im.load()
+            buf = BytesIO()
+            # optimize=True => zlib lvl 9 + optymalne filtry; tryb/piksele bez zmian.
+            im.save(buf, format="PNG", optimize=True)
+        opt = buf.getvalue()
+        return (opt, mime) if 0 < len(opt) < len(raw) else (raw, mime)
+    except Exception:
+        return raw, mime
+
+
 def file_to_base64(filepath):
-    """Konwertuje plik binarny na data URI."""
+    """Konwertuje plik binarny na data URI (z cache i bezstratną optymalizacją)."""
     filepath = Path(filepath)
     if not filepath.exists():
         log(f"Nie znaleziono pliku: {filepath}", "WARN")
         return ""
+    try:
+        st = filepath.stat()
+        key = (str(filepath.resolve()), st.st_mtime_ns, st.st_size)
+    except OSError:
+        key = (str(filepath), None, None)
+    cached = _ASSET_B64_CACHE.get(key)
+    if cached is not None:
+        return cached
     mime = get_mime(filepath)
     with open(filepath, "rb") as f:
-        data = base64.b64encode(f.read()).decode("ascii")
-    return f"data:{mime};base64,{data}"
+        raw = f.read()
+    raw, mime = _optimize_image_bytes(raw, mime)
+    data = base64.b64encode(raw).decode("ascii")
+    uri = f"data:{mime};base64,{data}"
+    _ASSET_B64_CACHE[key] = uri
+    return uri
+
+
+# ---------------------------------------------------------------------------
+# Dedup powtarzających się obrazów (data: URI) w sekcjach stron
+# ---------------------------------------------------------------------------
+_IMG_DATA_URI_RE = re.compile(
+    r'<img\b([^>]*?)\ssrc="(data:[^"]+)"([^>]*?)>',
+    re.IGNORECASE | re.DOTALL,
+)
+
+
+def dedupe_img_data_uris(pages_html, min_bytes=40000):
+    """Usuwa zduplikowane data: URI z atrybutów ``src`` obrazów.
+
+    Każdy powtarzający się (i odpowiednio duży) obraz trafia RAZ do rejestru JS
+    ``window.__AIO_IMG``; wszystkie ``<img>`` dostają krótką referencję
+    ``data-aio-img``. Hydratacja jest synchroniczna (skrypt zaraz po sekcjach
+    stron), więc obrazy mają ``src`` jeszcze przed ``DOMContentLoaded`` — licznik
+    splashu i SPA router działają bez zmian.
+
+    Zwraca ``(nowy_html, skrypt_rejestru_i_hydracji, zaoszczedzone_bajty)``.
+    """
+    counts = {}
+    for m in _IMG_DATA_URI_RE.finditer(pages_html):
+        uri = m.group(2)
+        if len(uri) >= min_bytes:
+            counts[uri] = counts.get(uri, 0) + 1
+    dups = [uri for uri, c in counts.items() if c >= 2]
+    if not dups:
+        return pages_html, "", 0
+    index = {uri: i for i, uri in enumerate(dups)}
+    saved = sum(len(uri) * (counts[uri] - 1) for uri in dups)
+
+    def _repl(m):
+        idx = index.get(m.group(2))
+        if idx is None:
+            return m.group(0)
+        return f'<img{m.group(1)} data-aio-img="{idx}"{m.group(3)}>'
+
+    new_html = _IMG_DATA_URI_RE.sub(_repl, pages_html)
+    registry = {str(i): uri for uri, i in index.items()}
+    script = (
+        "<script>\n"
+        "window.__AIO_IMG=" + _js_embed(registry) + ";\n"
+        "(function(){var m=window.__AIO_IMG,n=document.querySelectorAll('img[data-aio-img]');"
+        "for(var i=0;i<n.length;i++){var k=n[i].getAttribute('data-aio-img');"
+        "if(m[k]){n[i].src=m[k];}}})();\n"
+        "</script>"
+    )
+    return new_html, script, saved
 
 
 def read_text(filepath, encoding="utf-8"):
@@ -1997,14 +2109,11 @@ class Compiler:
         js_lines = []
         js_lines.append("// === EMBEDDED USER DATA ===")
         js_lines.append(self._generate_aio_guard_js(form_data_path))
-        js_lines.append(f"window.__EMBEDDED_USER_DATA = {json.dumps(api_data, ensure_ascii=False)};")
-        js_lines.append(f"window.__AVAILABLE_DOCS = {json.dumps(available_docs)};")
-        js_lines.append(f"window.__SELECTED_DOCS = {json.dumps(self.selected_docs)};")
-        if photo_b64:
-            js_lines.append(f'window.__USER_PHOTO_BASE64 = "{photo_b64}";')
-        else:
-            js_lines.append('window.__USER_PHOTO_BASE64 = "";')
-        js_lines.append(f"window.__IS_PER_USER = true;")
+        js_lines.append(f"window.__EMBEDDED_USER_DATA = {_js_embed(api_data)};")
+        js_lines.append(f"window.__AVAILABLE_DOCS = {_js_embed(available_docs)};")
+        js_lines.append(f"window.__SELECTED_DOCS = {_js_embed(self.selected_docs)};")
+        js_lines.append(f"window.__USER_PHOTO_BASE64 = {_js_embed(photo_b64 or '')};")
+        js_lines.append("window.__IS_PER_USER = true;")
 
         return "\n".join(js_lines)
 
@@ -2209,6 +2318,83 @@ class Compiler:
                 all_refs.append(extra)
         return self.js_resolver.resolve_scripts(all_refs)
 
+    def _build_splash(self):
+        """Buduje ekran ładowania (splash) z determinowanym paskiem postępu.
+
+        Zwraca ``(style, html, script)``. Wszystko jest samowystarczalne i inline
+        (bez żądań sieciowych), a krytyczny CSS ląduje w <head> PRZED wielkim
+        blokiem <style>, więc splash maluje się od razu — zanim przeglądarka
+        zdąży zdekodować setki obrazów Base64. Pasek rośnie czasowo do ~90%
+        (faza parsowania), potem wg liczby zdekodowanych obrazów, a po
+        ``window.load`` skacze do 100% i znika. Bezpiecznik 12 s nigdy nie
+        zostawia użytkownika na splashu."""
+        style = (
+            "    <style id=\"aio-splash-style\">\n"
+            "#aio-splash{position:fixed;inset:0;z-index:2147483646;display:flex;"
+            "align-items:center;justify-content:center;background:#f5f6fb;"
+            "transition:opacity .4s ease;"
+            "font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;}\n"
+            "#aio-splash.aio-hide{opacity:0;pointer-events:none;}\n"
+            "#aio-splash .aio-box{width:min(78%,300px);text-align:center;}\n"
+            "#aio-splash .aio-logo{width:72px;height:72px;margin:0 auto 22px;display:block;}\n"
+            "#aio-splash .aio-title{font-size:20px;font-weight:700;color:#1b1f24;margin:0 0 4px;}\n"
+            "#aio-splash .aio-sub{font-size:13px;color:#67707d;margin:0 0 22px;}\n"
+            "#aio-splash .aio-track{height:6px;border-radius:999px;background:rgba(40,95,244,.14);overflow:hidden;}\n"
+            "#aio-splash .aio-fill{height:100%;width:0;border-radius:999px;background:#285ff4;transition:width .25s ease;}\n"
+            "#aio-splash .aio-pct{margin-top:10px;font-size:13px;font-weight:600;color:#285ff4;font-variant-numeric:tabular-nums;}\n"
+            "@media (prefers-reduced-motion:reduce){#aio-splash,#aio-splash .aio-fill{transition:none;}}\n"
+            "    </style>"
+        )
+
+        logo_b64 = file_to_base64(STATIC_NEW / "assets" / "svg" / "logo.svg")
+        logo_img = (
+            f'<img class="aio-logo" src="{logo_b64}" alt="mObywatel">' if logo_b64 else ""
+        )
+        html = (
+            '<div id="aio-splash" role="status" aria-live="polite">'
+            '<div class="aio-box">'
+            f"{logo_img}"
+            '<div class="aio-title">mObywatel</div>'
+            '<div class="aio-sub">Wczytywanie aplikacji…</div>'
+            '<div class="aio-track"><div class="aio-fill" id="aio-fill"></div></div>'
+            '<div class="aio-pct" id="aio-pct">0%</div>'
+            "</div></div>"
+        )
+
+        script = (
+            "<script>\n"
+            "(function(){\n"
+            "var fill=document.getElementById('aio-fill'),pct=document.getElementById('aio-pct'),"
+            "splash=document.getElementById('aio-splash');\n"
+            "if(!splash){return;}\n"
+            "var p=0,done=false,stage2=false;\n"
+            "function set(v){v=Math.max(p,Math.min(100,v));p=v;"
+            "if(fill){fill.style.width=v+'%';}if(pct){pct.textContent=Math.round(v)+'%';}}\n"
+            "var now=function(){return (window.performance&&performance.now)?performance.now():Date.now();};\n"
+            "var t0=now();\n"
+            "var raf=window.requestAnimationFrame||function(f){return setTimeout(function(){f(now());},16);};\n"
+            "function tick(){if(done){return;}if(!stage2){var el=(now()-t0)/6000;if(el>1){el=1;}"
+            "set(90*(1-Math.pow(1-el,3)));}raf(tick);}\n"
+            "raf(tick);\n"
+            "document.addEventListener('DOMContentLoaded',function(){\n"
+            "stage2=true;\n"
+            "var imgs=Array.prototype.slice.call(document.images||[]);\n"
+            "var total=imgs.length||1,cnt=0;\n"
+            "function bump(){cnt++;set(25+70*(cnt/total));}\n"
+            "imgs.forEach(function(im){if(im.complete){bump();}"
+            "else{im.addEventListener('load',bump,{once:true});im.addEventListener('error',bump,{once:true});}});\n"
+            "if(!imgs.length){set(95);}\n"
+            "});\n"
+            "function finish(){if(done){return;}done=true;set(100);"
+            "setTimeout(function(){splash.classList.add('aio-hide');"
+            "setTimeout(function(){if(splash&&splash.parentNode){splash.parentNode.removeChild(splash);}},500);},180);}\n"
+            "window.addEventListener('load',finish);\n"
+            "setTimeout(finish,12000);\n"
+            "})();\n"
+            "</script>"
+        )
+        return style, html, script
+
     def _assemble(self, page_sections, css_content, js_blocks, spa_router, js_patches,
                    user_doc_sections=None, embedded_data_js="", data_override_js="",
                    user_photo_b64=""):
@@ -2218,6 +2404,15 @@ class Compiler:
         # Dodaj sekcje dokumentów użytkownika
         if user_doc_sections:
             pages_html += "\n" + "\n".join(user_doc_sections)
+
+        # Dedup powtarzających się obrazów (te same karty są osadzane w karuzeli
+        # i ponownie w sekcji podglądu dokumentu) — jeden rejestr zamiast kopii.
+        pages_html, img_registry_js, img_saved = dedupe_img_data_uris(pages_html)
+        if img_saved:
+            log(f"Dedup obrazów: zaoszczędzono ~{img_saved // 1024} KB Base64", "OK")
+
+        # Ekran ładowania (splash) z paskiem postępu — osadzony, działa offline.
+        splash_style, splash_html, splash_script = self._build_splash()
 
         js_all = "\n\n".join(
             [f"// === {name} ===\n{code}" for name, code in js_blocks]
@@ -2280,6 +2475,7 @@ class Compiler:
         }});
     }})();
     </script>
+{splash_style}
 {external_links}    <style>
 {css_content}
 
@@ -2315,7 +2511,10 @@ a[data-spa-nav].nav-active span.active {{
     </style>
 </head>
 <body>
+{splash_html}
+{splash_script}
 {pages_html}
+{img_registry_js}
 <script>
 // === Embedded user data (musi być PRZED skryptami stron) ===
 {embedded_data_js}

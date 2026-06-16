@@ -943,36 +943,51 @@ select {
 .loading-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(17, 19, 21, 0.86);
+    background: rgba(17, 19, 21, 0.55);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 9999;
     visibility: hidden;
     opacity: 0;
-    transition: visibility 0s, opacity 0.2s linear;
+    /* Ukrywanie: opacity płynnie gaśnie, a visibility "snapuje" dopiero NA KOŃCU
+       (po 0.25s), więc nakładka nie blokuje klików po zaniknięciu. */
+    transition: opacity 0.25s ease, visibility 0s linear 0.25s;
 }
 
 .loading-overlay.visible {
     visibility: visible;
     opacity: 1;
+    transition: opacity 0.25s ease, visibility 0s linear 0s;
 }
 
 .spinner {
-    border: 6px solid #2d343d;
-    border-top: 6px solid #667789;
+    width: 56px;
+    height: 56px;
     border-radius: 50%;
-    width: 52px;
-    height: 52px;
-    animation: spin 0.9s linear infinite;
+    /* Gładki pierścień w kolorze marki (conic-gradient) z wyciętym środkiem (mask)
+       — zamiast „ząbkowanego" dwukolorowego bordera. */
+    background: conic-gradient(from 0deg, rgba(40, 95, 244, 0) 0%, #285ff4 100%);
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 6px), #000 calc(100% - 6px));
+            mask: radial-gradient(farthest-side, transparent calc(100% - 6px), #000 calc(100% - 6px));
+    animation: spinner-rotate 0.85s linear infinite;
 }
 
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
+@keyframes spinner-rotate {
+    to {
         transform: rotate(360deg);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .loading-overlay,
+    .loading-overlay.visible {
+        transition: none;
+    }
+    .spinner {
+        animation-duration: 1.5s;
     }
 }
 
@@ -2106,20 +2121,34 @@ body::before {
 }
 
 .app-slide-panel {
-    /* Center horizontally via margin auto so the JS-driven slide animation
-       (translateX(100%) ↔ translateX(0)) works relative to the centered
-       position. The previous "left: 50%" without translateX(-50%) put the
-       panel's left edge at viewport center, leaving it half-hidden. */
+    /* Centered ~430px column matching the app frame. The panel slides a SHORT
+       distance (translateX(100%) ↔ translateX(0), driven by the JS toggling the
+       .is-open class + inline transform) like the document SPA panels. */
     left: 0;
     right: 0;
     width: min(100%, 430px);
     margin: 0 auto;
     background: rgb(244, 245, 250);
-    /* Default state: off-screen to the right, matching the JS close handler
-       (translateX(100%)). The csp-s-95508af6 utility class on these panels
-       used translateX(50vw) which broke layout on wide viewports — the
-       panel ended up partially off-screen even when "closed". */
+    /* Closed: parked just off the frame's right edge AND visibility:hidden.
+       translateX(100%) alone would leave the panel peeking on the right of any
+       viewport wider than 430px (desktop / DevTools device widths) because the
+       panel is centered — a 100% shift only equals its own width. visibility
+       hides that peek without the ugly full-viewport (100vw) fly-in. visibility
+       is NOT transitioned (it snaps) so the panel can never get stuck visible —
+       a delayed-visibility approach broke under prefers-reduced-motion, which
+       zeroes transition-duration. Only transform animates: it slides IN on open;
+       on close it snaps hidden. */
     transform: translateX(100%);
+    visibility: hidden;
+    pointer-events: none;
+    transition: transform 0.3s ease;
+}
+
+.app-slide-panel.is-open {
+    transform: translateX(0);
+    visibility: visible;
+    pointer-events: auto;
+    transition: transform 0.3s ease;
 }
 
 body.form-panel-open .document-form-panel {
@@ -2709,5 +2738,83 @@ body.tutorial-active .document-form-panel {
     .tutorial-content,
     .emulator-choice-card {
         width: 100%;
+    }
+}
+
+/* ============================================================
+   Płynne przejścia między stronami + dopieszczenie interakcji
+   (dodane). page-transitions.js dokłada .page-transitioning na
+   <body> i nawiguje po ~200 ms — bez tej reguły był martwy
+   przestój bez animacji.
+   ============================================================ */
+body {
+    transition: opacity 0.18s ease;
+}
+body.page-transitioning {
+    opacity: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+    body {
+        transition: none;
+    }
+    body.page-transitioning {
+        opacity: 1; /* bez animacji = bez migotania/znikania */
+    }
+}
+
+/* Wspólne, bezkolizyjne stany interakcji (transition + wciśnięcie). */
+.app-main-action,
+.document-choice-item,
+.document-choice-close,
+.emulator-choice-actions button,
+#allinone-doc-list .allinone-doc-check {
+    transition: background-color 0.15s ease, box-shadow 0.15s ease,
+        border-color 0.15s ease, transform 0.08s ease;
+}
+.app-main-action:active:not(:disabled),
+.document-choice-item:active,
+.document-choice-close:active,
+.emulator-choice-actions button:active {
+    transform: translateY(1px);
+}
+
+/* Główne CTA (kompiluj / przejdź do dokumentu) — wyraźniejszy hover. */
+.document-choice-item:hover {
+    background: rgb(31, 78, 210);
+}
+.document-choice-close:hover {
+    background: rgb(218, 227, 250);
+}
+
+/* Dolny dock: główne CTA uniesione nad półprzezroczystym paskiem. */
+.app-bottom-dock .app-main-action,
+.app-main-action#openGeneratedDocumentBtn {
+    box-shadow: 0 6px 16px rgba(40, 95, 244, 0.28);
+}
+.app-bottom-dock .app-main-action:hover:not(:disabled),
+.app-main-action#openGeneratedDocumentBtn:hover:not(:disabled) {
+    background: rgb(31, 78, 210);
+}
+
+/* Wybór dokumentów All-in-One: czytelny stan zaznaczenia i braku. */
+#allinone-doc-list .allinone-doc-check:has(input:checked) {
+    background: rgb(238, 243, 255) !important;
+    box-shadow: inset 3px 0 0 rgb(40, 95, 244);
+}
+#allinone-doc-list .allinone-doc-check:has(input:disabled) {
+    cursor: not-allowed;
+}
+.allinone-doc-status.is-ready {
+    color: rgb(17, 101, 49);
+}
+.allinone-doc-status.is-missing {
+    color: rgb(198, 40, 40);
+}
+@media (prefers-reduced-motion: reduce) {
+    .app-main-action:active,
+    .document-choice-item:active,
+    .document-choice-close:active,
+    .emulator-choice-actions button:active {
+        transform: none;
     }
 }

@@ -1,14 +1,29 @@
+import hashlib
 import logging
 import secrets
 import datetime
 from typing import Dict, List, Optional, Tuple, Any
 from models import db, AccessKey, Announcement, ChatMessage, File, Notification, User
+from sqlalchemy import func, desc
+from sqlalchemy.exc import IntegrityError
 
 
 def _utc_naive_now() -> datetime.datetime:
     """UTC-naive "now" — see user_auth._utc_naive_now docstring."""
     return datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
-from sqlalchemy import func, desc
+
+
+def _key_ref(key_val: str) -> str:
+    """Non-reversible reference for logging access keys.
+
+    Access keys are single-use bearer credentials; logging them verbatim let
+    anyone with log/backup read access replay an unused key to register an
+    account. We log only a short SHA-256 prefix so log lines stay correlatable
+    without exposing the secret.
+    """
+    if not key_val:
+        return "<none>"
+    return "sha256:" + hashlib.sha256(key_val.encode("utf-8")).hexdigest()[:12]
 
 
 class AccessKeyService:
@@ -29,7 +44,7 @@ class AccessKeyService:
             db.session.add(new_key)
             db.session.commit()
             logging.info(
-                f"Generated access key: {key_val} with description '{description}' and expires_at {expires_at}"
+                f"Generated access key: {_key_ref(key_val)} with description '{description}' and expires_at {expires_at}"
             )
             return key_val
         except Exception as e:
@@ -38,20 +53,20 @@ class AccessKeyService:
             raise
 
     def validate_access_key(self, key_val: str) -> Tuple[bool, str]:
-        logging.info(f"Validating access key: {key_val}")
+        logging.info(f"Validating access key: {_key_ref(key_val)}")
         key_data = AccessKey.query.filter_by(key=key_val).first()
         logging.info(f"Access key data found: {key_data is not None}")
         if key_data:
             logging.info(
-                f"Access key {key_val} active: {key_data.is_active}, expires: {key_data.expires_at}"
+                f"Access key {_key_ref(key_val)} active: {key_data.is_active}, expires: {key_data.expires_at}"
             )
 
         if not key_data:
-            logging.warning(f"Access key {key_val} not found.")
+            logging.warning(f"Access key {_key_ref(key_val)} not found.")
             return False, "Nieprawidłowy klucz dostępu"
 
         if not key_data.is_active:
-            logging.warning(f"Access key {key_val} is inactive.")
+            logging.warning(f"Access key {_key_ref(key_val)} is inactive.")
             return False, "Klucz dostępu został dezaktywowany"
 
         if key_data.expires_at:
@@ -62,12 +77,12 @@ class AccessKeyService:
                 except Exception as e:
                     db.session.rollback()
                     logging.error(
-                        f"Error deactivating expired key {key_val}: {e}", exc_info=True
+                        f"Error deactivating expired key {_key_ref(key_val)}: {e}", exc_info=True
                     )
-                logging.warning(f"Access key {key_val} has expired.")
+                logging.warning(f"Access key {_key_ref(key_val)} has expired.")
                 return False, "Klucz dostępu wygasł"
 
-        logging.info(f"Access key {key_val} is valid.")
+        logging.info(f"Access key {_key_ref(key_val)} is valid.")
         return True, ""
 
     def use_access_key(self, key_val: str, commit: bool = True) -> bool:
@@ -96,20 +111,20 @@ class AccessKeyService:
                 key_data.is_active = False  # Deactivate after use
                 if commit:
                     db.session.commit()
-                logging.info(f"Access key {key_val} marked as used and deactivated.")
+                logging.info(f"Access key {_key_ref(key_val)} marked as used and deactivated.")
                 return True
             elif key_data and not key_data.is_active:
                 if commit:
                     db.session.rollback()  # Release the lock
-                logging.info(f"Access key {key_val} is already inactive. Not incrementing usage.")
+                logging.info(f"Access key {_key_ref(key_val)} is already inactive. Not incrementing usage.")
                 return False
             else:
-                logging.warning(f"Access key {key_val} not found for usage attempt.")
+                logging.warning(f"Access key {_key_ref(key_val)} not found for usage attempt.")
                 return False
         except Exception as e:
             if commit:
                 db.session.rollback()
-            logging.error(f"Error using access key {key_val}: {e}", exc_info=True)
+            logging.error(f"Error using access key {_key_ref(key_val)}: {e}", exc_info=True)
             raise
 
     def deactivate_access_key(self, key_val: str) -> bool:
@@ -117,18 +132,18 @@ class AccessKeyService:
             key_data = AccessKey.query.filter_by(key=key_val).first()
             if key_data:
                 if not key_data.is_active:
-                    logging.info(f"Access key {key_val} is already inactive. No action needed.")
+                    logging.info(f"Access key {_key_ref(key_val)} is already inactive. No action needed.")
                     return False
                 key_data.is_active = False
                 db.session.commit()
-                logging.info(f"Access key {key_val} deactivated.")
+                logging.info(f"Access key {_key_ref(key_val)} deactivated.")
                 return True
-            logging.warning(f"Access key {key_val} not found for deactivation attempt.")
+            logging.warning(f"Access key {_key_ref(key_val)} not found for deactivation attempt.")
             return False
         except Exception as e:
             db.session.rollback()
             logging.error(
-                f"Error deactivating access key {key_val}: {e}", exc_info=True
+                f"Error deactivating access key {_key_ref(key_val)}: {e}", exc_info=True
             )
             return False
 
@@ -142,7 +157,7 @@ class AccessKeyService:
             return False
         except Exception as e:
             db.session.rollback()
-            logging.error(f"Error deleting access key {key_val}: {e}", exc_info=True)
+            logging.error(f"Error deleting access key {_key_ref(key_val)}: {e}", exc_info=True)
             return False
 
     def get_all_access_keys(self) -> List[AccessKey]:
@@ -223,6 +238,17 @@ class StatisticsService:
         )
 
     def get_all_users_with_stats(self, page=1, per_page=10, excluded_usernames=None) -> Dict[str, Any]:
+        # Clamp pagination inputs: a per_page of 0 would raise ZeroDivisionError
+        # below, and negative values would produce a negative OFFSET. Inputs may
+        # come straight from untrusted query-string parameters.
+        try:
+            page = max(1, int(page))
+        except (TypeError, ValueError):
+            page = 1
+        try:
+            per_page = min(max(1, int(per_page)), 200)
+        except (TypeError, ValueError):
+            per_page = 10
         # Using a subquery to count files and sum sizes for performance
         # Type ignore: SQLAlchemy column attributes are dynamically generated
         file_stats = (
@@ -279,9 +305,14 @@ class StatisticsService:
         if excluded_usernames:
             users_query = users_query.filter(~User.username.in_(excluded_usernames))
         total_users = users_query.scalar()
-        result = db.session.query(
-            func.count(File.id), func.sum(File.size)
-        ).first()
+        files_query = db.session.query(func.count(File.id), func.sum(File.size))
+        if excluded_usernames:
+            # Mirror the user-count exclusion so file totals don't count
+            # admin/system accounts that are hidden from the stats elsewhere.
+            files_query = files_query.filter(
+                ~File.user_username.in_(excluded_usernames)
+            )
+        result = files_query.first()
         total_files = result[0] if result else 0
         total_size = result[1] if result else 0
         return {
@@ -314,6 +345,27 @@ class StatisticsService:
                 )
                 db.session.add(file_record)
             db.session.commit()
+        except IntegrityError:
+            # Concurrent submission inserted the same UNIQUE(filepath) first.
+            # Recover by rolling back and applying our values as an update.
+            db.session.rollback()
+            try:
+                file_record = File.query.filter_by(filepath=filepath).first()
+                if file_record is not None:
+                    file_record.size = size
+                    file_record.modified_at = _utc_naive_now()
+                    file_record.file_hash = file_hash
+                    db.session.commit()
+                    return
+                # Row vanished again between rollback and refetch — re-raise.
+                raise
+            except Exception as e:
+                db.session.rollback()
+                logging.error(
+                    f"Error reconciling concurrent file insert {filepath}: {e}",
+                    exc_info=True,
+                )
+                raise
         except Exception as e:
             db.session.rollback()
             logging.error(

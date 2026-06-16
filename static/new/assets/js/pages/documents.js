@@ -13,7 +13,7 @@ const documentsManager = {
         $(".add_document_list").css("transform", "translateX(100%)");
         $(".customize_document_list").css("transform", "translateX(100%)");
         $(".customize_document_order_list").css("transform", "translateX(100%)");
-        $("#chat-panel, #notif-panel").css("transform", "translateX(100%)");
+        $("#chat-panel, #notif-panel").removeClass("is-open").css("transform", "translateX(100%)");
         $('[data-group="navigation"]').removeClass("display-none");
 
         if ($(window).height() < 680) {

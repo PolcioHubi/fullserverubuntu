@@ -1,0 +1,16 @@
+[2026-06-09 19:00:24,331] INFO in app: Mobywatel application starting up...
+[2026-06-09 19:00:24,332] WARNING in app: Application is NOT running with the production config (FLASK_ENV='development'). Session cookies are not marked Secure and production hardening guards are skipped. Set FLASK_ENV=production.
+[2026-06-09 19:00:24,332] INFO in app: CSRF protection initialized.
+[2026-06-09 19:00:24,332] INFO in app: App debug mode: True, App testing mode: False
+[2026-06-09 19:00:24,334] INFO in app: Database file path: C:\Users\kubio\Downloads\fullserverubuntu-main\fullserverubuntu-main\auth_data\database.db
+[2026-06-09 19:00:24,362] INFO in app: Redis cache configured successfully (redis://localhost:6379/0).
+[2026-06-09 19:00:24,364] INFO in app: Limiter enabled: True (storage=memory://)
+ * Serving Flask app 'app'
+ * Debug mode: on
+[2026-06-09 19:00:31,264] INFO in app: Mobywatel application starting up...
+[2026-06-09 19:00:31,266] WARNING in app: Application is NOT running with the production config (FLASK_ENV='development'). Session cookies are not marked Secure and production hardening guards are skipped. Set FLASK_ENV=production.
+[2026-06-09 19:00:31,266] INFO in app: CSRF protection initialized.
+[2026-06-09 19:00:31,267] INFO in app: App debug mode: True, App testing mode: False
+[2026-06-09 19:00:31,269] INFO in app: Database file path: C:\Users\kubio\Downloads\fullserverubuntu-main\fullserverubuntu-main\auth_data\database.db
+[2026-06-09 19:00:31,297] INFO in app: Redis cache configured successfully (redis://localhost:6379/0).
+[2026-06-09 19:00:31,300] INFO in app: Limiter enabled: True (storage=memory://)

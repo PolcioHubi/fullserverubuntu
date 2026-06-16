@@ -625,10 +625,31 @@ button {
 }
 
 .profile-slide-panel {
-    left: 50%;
-    right: auto;
-    width: min(100vw, 430px);
-    margin: 0;
+    /* Centered ~430px column matching the app frame. Short slide
+       (translateX(100%) ↔ translateX(0)) driven by the JS .is-open toggle.
+       Closed state parks the panel just off the frame's right edge AND hides it
+       with visibility, so the centered panel never peeks on viewports wider
+       than 430px (the previous `left:50%` put its left edge at viewport centre
+       — the "expands only to half" bug). Matches .app-slide-panel. */
+    left: 0;
+    right: 0;
+    width: min(100%, 430px);
+    margin: 0 auto;
+    /* visibility snaps (not transitioned) so the closed panel can never get
+       stuck visible — a delayed-visibility hide broke under the
+       prefers-reduced-motion block below, which forces transition-duration:0.
+       Only transform animates (slides in on open). */
+    transform: translateX(100%);
+    visibility: hidden;
+    pointer-events: none;
+    transition: transform 0.3s ease;
+}
+
+.profile-slide-panel.is-open {
+    transform: translateX(0);
+    visibility: visible;
+    pointer-events: auto;
+    transition: transform 0.3s ease;
 }
 
 .profile-bottom-dock {
@@ -711,4 +732,48 @@ button {
 
 .profile-mode-actions button.is-active span {
     color: rgb(40, 95, 244);
+}
+
+/* ============================================================
+   Płynne przejścia między stronami + dopieszczenie interakcji
+   (dodane). page-transitions.js dokłada .page-transitioning na
+   <body> i nawiguje po ~200 ms.
+   ============================================================ */
+body {
+    transition: opacity 0.18s ease;
+}
+body.page-transitioning {
+    opacity: 0;
+}
+
+.profile-main-action,
+.profile-mode-actions button,
+.profile-bottom-nav a {
+    transition: background-color 0.15s ease, box-shadow 0.15s ease,
+        border-color 0.15s ease, transform 0.08s ease, color 0.15s ease;
+}
+.profile-main-action {
+    box-shadow: 0 6px 16px rgba(40, 95, 244, 0.28);
+}
+.profile-main-action:hover {
+    background: rgb(31, 78, 210);
+}
+.profile-main-action:active,
+.profile-mode-actions button:active {
+    transform: translateY(1px);
+}
+.profile-bottom-nav a:active {
+    opacity: 0.7;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    /* Istniejący blok zeruje transition-duration; tu pilnujemy, by przejście
+       nie wygaszało strony na ślepo (brak migotania dla tych użytkowników). */
+    body.page-transitioning {
+        opacity: 1;
+    }
+    .profile-main-action:active,
+    .profile-mode-actions button:active {
+        transform: none;
+    }
 }

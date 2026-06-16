@@ -72,10 +72,13 @@ var chatFeed = {
     },
 
     _request: function (options) {
+        var meta = document.querySelector('meta[name="csrf-token"]');
+        var csrf = meta ? meta.getAttribute('content') : '';
         return $.ajax($.extend(true, {
             cache: false,
             headers: {
-                'Cache-Control': 'no-cache'
+                'Cache-Control': 'no-cache',
+                'X-CSRFToken': csrf
             }
         }, options));
     },
@@ -138,7 +141,9 @@ var chatFeed = {
         $wrapper.addClass('scale[0.9]');
         $standalone.addClass('overflow[x-hidden] overflow[y-auto]').removeClass('overflow[hidden]');
         $('[data-group="navigation"]').addClass('display-none');
-        $('#chat-panel').css('transform', 'translateX(0)');
+        // .is-open drives visibility on the index/profile panels (CSS); the
+        // inline transform keeps the document-SPA panels working unchanged.
+        $('#chat-panel').addClass('is-open').css('transform', 'translateX(0)');
         this.loadHistory();
     },
 
@@ -147,7 +152,9 @@ var chatFeed = {
         var $wrapper = $('[data-wrapper]');
 
         this._open = false;
-        $('#chat-panel').css('transform', 'translateX(100%)');
+        // Short slide back off the frame's right edge; the closed-state peek is
+        // hidden by visibility (CSS, removed with .is-open).
+        $('#chat-panel').removeClass('is-open').css('transform', 'translateX(100%)');
         $wrapper.removeClass('scale[0.9]');
         $standalone.removeClass('overflow[x-hidden] overflow[y-auto]').addClass('overflow[hidden]');
         $('[data-group="navigation"]').removeClass('display-none');

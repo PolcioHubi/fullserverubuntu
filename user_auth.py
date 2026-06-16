@@ -208,9 +208,16 @@ class UserAuthManager:
                 and referral_code != username
                 and self.validate_referral_code(referral_code)
             ):
-                referrer = User.query.filter_by(username=referral_code).first()
-                if referrer:
-                    referrer.hubert_coins += 1
+                # Atomic UPDATE instead of read-modify-write: two concurrent
+                # registrations referring the same user would otherwise both
+                # read the old balance and lose one increment.
+                updated = (
+                    User.query.filter_by(username=referral_code).update(
+                        {User.hubert_coins: User.hubert_coins + 1},
+                        synchronize_session=False,
+                    )
+                )
+                if updated:
                     message += ". Otrzymałeś 1 Hubert Coin za polecenie!"
 
             self.notification_service.create_notification(

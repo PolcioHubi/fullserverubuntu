@@ -96,6 +96,14 @@ is_load_test_mode = (APP_ENV_MODE == "load_test")
 
 app = Flask(__name__, static_folder="static", static_url_path="/static")
 
+# Behind exactly one reverse proxy (nginx in both the systemd and docker
+# deployments). Trust a single hop of X-Forwarded-* so request.remote_addr is
+# the real client IP (correct per-IP rate limiting instead of collapsing every
+# client to the proxy address) and request.is_secure reflects the TLS leg.
+from werkzeug.middleware.proxy_fix import ProxyFix
+
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1)
+
 # Configure session to use Redis
 app.config["SESSION_TYPE"] = "redis"
 app.config["SESSION_PERMANENT"] = False
@@ -162,8 +170,25 @@ app.logger.info("Mobywatel application starting up...")
 
 # Load configuration based on FLASK_ENV environment variable
 env = os.environ.get("FLASK_ENV", "development")
-app_config = config[env]
+app_config = config.get(env)
+if app_config is None:
+    # Unknown value (typo) — fall back to the safe default instead of crashing
+    # at import, but make the misconfiguration loud.
+    app.logger.warning(
+        f"Unrecognized FLASK_ENV={env!r}; falling back to default config. "
+        "Set FLASK_ENV=production for deployments."
+    )
+    app_config = config["default"]
 app.config.from_object(app_config)
+# Defense-in-depth: a served (non-debug, non-test) process running the
+# development profile means Secure cookies are OFF — almost always a missing
+# FLASK_ENV=production in the deployment. Flag it prominently in the logs.
+if env != "production" and not app.config.get("TESTING"):
+    app.logger.warning(
+        "Application is NOT running with the production config "
+        f"(FLASK_ENV={env!r}). Session cookies are not marked Secure and "
+        "production hardening guards are skipped. Set FLASK_ENV=production."
+    )
 # Conditionally disable CSRF for load testing — refuse hard if someone tries
 # to combine APP_ENV_MODE=load_test with FLASK_ENV=production. A misconfigured
 # deployment must not be able to silently drop CSRF protection.
@@ -224,11 +249,20 @@ class _CrossProcessLock:
                     return True
                 return False
             except Exception as e:
-                app.logger.warning(
+                # Redis is the ONLY thing that provides mutual exclusion across
+                # the forked Gunicorn workers. If it is unreachable we cannot
+                # coordinate, so fail CLOSED (deny the lock) for these critical
+                # single-flight operations (import/restart) rather than handing
+                # out a per-process threading.Lock that the other workers can't
+                # see — which would let two workers run a destructive swap at
+                # once. A single-worker dev/test setup is expected to have Redis.
+                app.logger.error(
                     f"CrossProcessLock {self._key}: Redis unavailable ({e}); "
-                    "falling back to local threading.Lock for this acquire."
+                    "failing closed (lock denied) — cross-worker exclusion "
+                    "cannot be guaranteed."
                 )
-        # Fallback path
+                return False
+        # No Redis client configured at all (pure single-process fallback).
         return self._local_lock.acquire(blocking=blocking)
 
     def release(self) -> None:
@@ -310,16 +344,34 @@ app.logger.info(f"App debug mode: {app.debug}, App testing mode: {app.testing}")
 
 # CRITICAL: Exit if in production with default credentials or missing secret key
 if env == "production":
+    _admin_user = app.config.get("ADMIN_USERNAME")
+    _admin_pass = app.config.get("ADMIN_PASSWORD")
+    _secret_key = app.config.get("SECRET_KEY")
+
     # Check for missing critical environment variables
-    if not all(
-        [
-            app.config.get("ADMIN_USERNAME"),
-            app.config.get("ADMIN_PASSWORD"),
-            app.config.get("SECRET_KEY"),
-        ]
-    ):
+    if not all([_admin_user, _admin_pass, _secret_key]):
         app.logger.critical(
             "CRITICAL ERROR: Missing one or more required environment variables for production (ADMIN_USERNAME, ADMIN_PASSWORD, SECRET_KEY)."
+        )
+        sys.exit(1)
+
+    # Presence is not enough — reject well-known/weak defaults so a deployment
+    # can't silently boot with admin/admin or the dev signing key.
+    _weak_passwords = {"admin", "password", "changeme", "admin123", "root", "test"}
+    _weak_secret_keys = {"dev-secret-key-change-in-production", "changeme", "secret"}
+    if (
+        (_admin_pass or "").strip().lower() in _weak_passwords
+        or (_admin_pass or "").strip().lower() == (_admin_user or "").strip().lower()
+    ):
+        app.logger.critical(
+            "CRITICAL ERROR: ADMIN_PASSWORD is a default/weak value. "
+            "Set a strong, unique admin password before running in production."
+        )
+        sys.exit(1)
+    if (_secret_key or "").strip() in _weak_secret_keys or len(_secret_key or "") < 32:
+        app.logger.critical(
+            "CRITICAL ERROR: SECRET_KEY is weak or too short (need >=32 chars, "
+            "not a known default). Generate one with `openssl rand -hex 32`."
         )
         sys.exit(1)
 
@@ -578,17 +630,56 @@ def _disable_sensitive_cache_headers(response):
     return response
 
 
+def _private_revalidate_cache_headers(response):
+    """Cache prywatny z obowiązkową rewalidacją (dla dużego pliku All-in-One).
+
+    ``private`` => zapisać może TYLKO przeglądarka właściciela, nigdy współdzielone
+    proxy/CDN. ``no-cache`` => zapis dozwolony, ale przed użyciem trzeba zrewalidować
+    przez ETag/Last-Modified (które ``send_from_directory`` ustawia domyślnie). Dzięki
+    temu ponowne otwarcie tego samego, niezmienionego pliku kończy się odpowiedzią
+    304 (bez ponownego transferu ~40 MB), a po przekompilowaniu — nowym ETagiem i
+    pełnym pobraniem. NIE używamy ``no-store`` (zakazałby cache w ogóle)."""
+    response.headers["Cache-Control"] = "private, no-cache"
+    response.headers.pop("Pragma", None)
+    response.headers.pop("Expires", None)
+    return response
+
+
 def _json_no_store(payload, status_code: int = 200):
     response = jsonify(payload)
     response.status_code = status_code
     return _disable_sensitive_cache_headers(response)
 
 
+def _log_safe(value, max_len: int = 200) -> str:
+    """Neutralize user-controlled values before they reach a log line.
+
+    Strips CR/LF and other control characters (log/CRLF injection — an attacker
+    could otherwise forge fake log entries) and truncates to keep lines bounded.
+    """
+    text = str(value)
+    text = text.replace("\r", "\\r").replace("\n", "\\n").replace("\t", "\\t")
+    text = "".join(ch if ch.isprintable() else "?" for ch in text)
+    if len(text) > max_len:
+        text = text[:max_len] + "...(truncated)"
+    return text
+
+
 def _regenerate_server_session() -> None:
+    # Rotate the server-side session id on privilege change (login) to defeat
+    # session fixation. flask-session's regenerate() is guarded by `if session:`
+    # and short-circuits on an empty/just-cleared session — so clearing first
+    # would make rotation a silent no-op. We clear stale data, then put a
+    # throwaway key in so the session is truthy when regenerate() runs (it
+    # deletes the old store entry and assigns a fresh sid), then drop the key.
     session.clear()
     regenerate = getattr(app.session_interface, "regenerate", None)
     if callable(regenerate):
+        session["_rotate_marker"] = secrets.token_urlsafe(8)
+        session.modified = True
         regenerate(session)
+        session.pop("_rotate_marker", None)
+        session.modified = True
 
 
 def _release_database_handles_for_import(reason: str = "") -> None:
@@ -949,7 +1040,20 @@ def set_security_headers(response):
     # Other security headers
     response.headers['X-Content-Type-Options'] = 'nosniff'
     response.headers['X-Frame-Options'] = 'SAMEORIGIN'
-    response.headers['X-XSS-Protection'] = '1; mode=block'
+    # X-XSS-Protection's legacy auditor was removed from modern browsers and
+    # '1; mode=block' had its own info-leak issues; '0' is the recommended value
+    # now that a strict CSP is in place.
+    response.headers['X-XSS-Protection'] = '0'
+    # Emitted by the app (not only the nginx snippet) so they are present on
+    # every deployment path (docker/standalone/alt-proxy), per the audit.
+    response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+    response.headers['Permissions-Policy'] = 'camera=(self), microphone=(), geolocation=()'
+    # HSTS only over HTTPS (meaningless/harmful on plain HTTP). request.is_secure
+    # is accurate thanks to ProxyFix honoring X-Forwarded-Proto.
+    if request.is_secure:
+        response.headers['Strict-Transport-Security'] = (
+            'max-age=63072000; includeSubDomains; preload'
+        )
     # Allow root scope for service worker served from /static/sw.js.
     if request.path == "/static/sw.js":
         response.headers["Service-Worker-Allowed"] = "/"
@@ -2201,11 +2305,16 @@ def favicon():
 
 @app.route("/csp-report", methods=["POST"])
 @csrf.exempt
-@limiter.exempt
+@limiter.limit("30 per minute")
 def csp_report():
     """Receive CSP violation reports for the strict policy in Report-Only mode."""
     try:
-        raw = request.get_data(cache=False, as_text=True) or ""
+        # Bounded read: this route is unauthenticated, so we must NOT buffer the
+        # entire (attacker-controlled, up to MAX_CONTENT_LENGTH) body into memory
+        # — that was a memory-amplification DoS. We only log a short snippet, so
+        # reading a few KB is plenty.
+        raw_bytes = request.stream.read(8192) or b""
+        raw = raw_bytes.decode("utf-8", "replace")
         # Cap payload to keep log size bounded.
         snippet = raw[:2048]
         report = json.loads(raw).get("csp-report", {}) if raw else {}
@@ -2223,7 +2332,11 @@ def csp_report():
 @limiter.limit("5 per minute")  # Prevent user enumeration attacks
 def forgot_password():
     try:
-        data = request.get_json()
+        data = request.get_json(silent=True)
+        if not isinstance(data, dict):
+            return jsonify(
+                {"success": False, "error": "Nieprawidłowy format danych"}
+            ), 400
         username = data.get("username", "").strip()
 
         if not username:
@@ -2855,10 +2968,15 @@ def index():
                 # If no image file is uploaded, and no existing file, new_data['image_filename'] will be None
                 pass
 
-            # Save last submitted data for pre-filling
+            # Save last submitted data for pre-filling. Write atomically
+            # (temp file + os.replace) so a concurrent reader — the AIO
+            # heartbeat / DocGuard / form-reload — never observes a half-written
+            # or truncated JSON file.
             last_data_filepath = os.path.join(logs_folder, "last_form_data.json")
-            with open(last_data_filepath, "w", encoding="utf-8") as f:
+            _tmp_last_data = f"{last_data_filepath}.{os.getpid()}.tmp"
+            with open(_tmp_last_data, "w", encoding="utf-8") as f:
                 json.dump(new_data, f, ensure_ascii=False, indent=2)
+            os.replace(_tmp_last_data, last_data_filepath)
 
             # Log the submission for audit purposes — but never persist raw
             # form data (PESEL, address, parents' names) to disk. Only meta
@@ -3148,7 +3266,7 @@ def admin():
 def admin_login():
     if request.method == "POST":
         try:
-            data = request.get_json()
+            data = request.get_json(silent=True)
             app.logger.debug(
                 f"Raw admin login POST request data: {data}"
             )  # Added for debugging
@@ -3166,7 +3284,7 @@ def admin_login():
             
             # Check for null bytes or control characters
             if '\x00' in username or '\x00' in password:
-                logging.warning(f"Admin login attempt with null bytes from username: {username}")
+                logging.warning(f"Admin login attempt with null bytes from username: {_log_safe(username)}")
                 return jsonify({"success": False, "error": "Nieprawidłowe znaki w danych logowania"}), 400
 
             # Compare directly with environment variables using timing-safe comparison
@@ -3181,14 +3299,14 @@ def admin_login():
                 _regenerate_server_session()
                 session["admin_logged_in"] = True
                 session["admin_username"] = username
-                logging.info(f"Admin login successful for user: {username}")
+                logging.info(f"Admin login successful for user: {_log_safe(username)}")
                 response_json = {"success": True, "message": "Logowanie pomyślne"}
                 app.logger.debug(
                     f"Admin login POST response: {response_json}"
                 )  # Log response data
                 return jsonify(response_json)
             else:
-                logging.warning(f"Failed admin login attempt for user: {username}")
+                logging.warning(f"Failed admin login attempt for user: {_log_safe(username)}")
                 response_json = {
                     "success": False,
                     "error": "Nieprawidłowe dane logowania",
@@ -3756,24 +3874,35 @@ def api_get_access_keys():
 @app.route("/admin/api/generate-access-key", methods=["POST"])
 @require_admin_login
 def api_generate_access_key():
-    try:
-        data = request.get_json()
-        description = data.get("description")
-        validity_days = data.get("validity_days")
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return jsonify({"success": False, "error": "Nieprawidłowy format danych"}), 400
 
+    description = data.get("description") or ""
+    # Coerce validity_days defensively: a blank string or non-numeric value
+    # previously reached `expires_days > 0` and raised TypeError, which was
+    # swallowed and returned as HTTP 200 (opaque failure).
+    raw_validity = data.get("validity_days", 30)
+    try:
+        validity_days = int(raw_validity) if str(raw_validity).strip() != "" else 30
+    except (TypeError, ValueError):
+        return jsonify(
+            {"success": False, "error": "validity_days musi być liczbą"}
+        ), 400
+
+    try:
         key = access_key_service.generate_access_key(description, validity_days)
         db.session.commit()
-
         return jsonify({"success": True, "access_key": key})
     except Exception as e:
         db.session.rollback()
-        logging.error(f"Error generating access key: {e}")
+        logging.error(f"Error generating access key: {e}", exc_info=True)
         return jsonify(
             {
                 "success": False,
                 "error": "Wystąpił błąd podczas generowania klucza dostępu",
             }
-        )
+        ), 500
 
 
 @app.route("/admin/api/deactivate-access-key", methods=["POST"])
@@ -4212,7 +4341,17 @@ def login():
 
     if request.method == "GET" and current_user.is_authenticated:
         next_target = request.args.get("next", "")
-        if isinstance(next_target, str) and next_target.startswith("/") and not next_target.startswith("//"):
+        # Only allow same-site relative paths. Reject protocol-relative ("//"),
+        # backslash variants ("/\\evil.com" — browsers normalize \ to /), and
+        # CR/LF (header injection). Otherwise this is an open-redirect.
+        if (
+            isinstance(next_target, str)
+            and next_target.startswith("/")
+            and not next_target.startswith("//")
+            and "\\" not in next_target
+            and "\r" not in next_target
+            and "\n" not in next_target
+        ):
             return redirect(next_target)
         return redirect("/")
 
@@ -4428,7 +4567,9 @@ def serve_user_file(username, filename):
     if not os.path.exists(file_path):
         return jsonify({"success": False, "error": "Plik nie znaleziony"}), 404
 
-    response = send_from_directory(safe_path, filename)
+    response = send_from_directory(safe_path, filename, conditional=True)
+    if os.path.basename(filename) == "allinone.html":
+        return _private_revalidate_cache_headers(response)
     return _disable_sensitive_cache_headers(response)
 
 
@@ -4611,7 +4752,11 @@ def user_files(filename):
         return jsonify(success=False, error="Nieprawidlowa sciezka pliku"), 400
 
     if os.path.exists(file_path):
-        response = send_from_directory(files_folder, filename)
+        response = send_from_directory(files_folder, filename, conditional=True)
+        # All-in-One bywa duży (~40 MB). Pozwól go zcache'ować prywatnie z rewalidacją
+        # ETag, żeby kolejne otwarcia szły z dysku (304) zamiast pełnego pobrania.
+        if os.path.basename(filename) == "allinone.html":
+            return _private_revalidate_cache_headers(response)
         return _disable_sensitive_cache_headers(response)
     else:
         return jsonify(success=False, error="Plik nie znaleziony"), 404
@@ -5225,7 +5370,6 @@ def get_chat_messages():
 
 
 @app.route("/api/chat/messages", methods=["POST"])
-@csrf.exempt
 @login_required
 def post_chat_message():
     data = request.get_json(silent=True)
@@ -5253,7 +5397,6 @@ def post_chat_message():
 
 
 @app.route("/api/chat/read", methods=["POST"])
-@csrf.exempt
 @login_required
 def mark_chat_as_read():
     data = request.get_json(silent=True)
@@ -5273,7 +5416,6 @@ def mark_chat_as_read():
 
 
 @app.route("/api/notifications/read", methods=["POST"])
-@csrf.exempt
 @login_required
 def mark_notification_as_read():
     data = request.get_json(silent=True)
@@ -5294,7 +5436,7 @@ def mark_notification_as_read():
             return jsonify({"success": False, "error": "Powiadomienie nie znalezione"}), 404
 
         return jsonify({"success": True})
-    return jsonify({"success": False, "error": "Brak ID powiadomienia"})
+    return jsonify({"success": False, "error": "Brak ID powiadomienia"}), 400
 
 
 @app.route("/api/announcements/delete/<int:announcement_id>", methods=["DELETE"])

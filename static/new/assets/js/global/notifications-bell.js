@@ -148,10 +148,12 @@ var notifBell = {
             this._dismissed.push(n._key);
             localStorage.setItem('dismissed_notifs', JSON.stringify(this._dismissed));
         } else if (n.source === 'notification' && n._notifId) {
+            var meta = document.querySelector('meta[name="csrf-token"]');
             $.ajax({
                 url: '/api/notifications/read',
                 method: 'POST',
                 contentType: 'application/json',
+                headers: { 'X-CSRFToken': meta ? meta.getAttribute('content') : '' },
                 data: JSON.stringify({ id: n._notifId })
             });
         }
@@ -171,7 +173,8 @@ var notifBell = {
         $wrapper.addClass('scale[0.9]');
         $standalone.addClass('overflow[x-hidden] overflow[y-auto]').removeClass('overflow[hidden]');
         $('[data-group="navigation"]').addClass('display-none');
-        $('#notif-panel').css('transform', 'translateX(0)');
+        // .is-open drives visibility on the index/profile panels (CSS).
+        $('#notif-panel').addClass('is-open').css('transform', 'translateX(0)');
         $('#notif-bell .theme-icon').removeClass('bell-shake');
 
         // Ensure empty state is visible when no items
@@ -183,7 +186,9 @@ var notifBell = {
     closePanel: function () {
         var $standalone = $('[data-standalone]');
         var $wrapper = $('[data-wrapper]');
-        $('#notif-panel').css('transform', 'translateX(100%)');
+        // Short slide back off the frame's right edge; closed-state peek is
+        // hidden by visibility (CSS, removed with .is-open).
+        $('#notif-panel').removeClass('is-open').css('transform', 'translateX(100%)');
         $wrapper.removeClass('scale[0.9]');
         $standalone.removeClass('overflow[x-hidden] overflow[y-auto]').addClass('overflow[hidden]');
         $('[data-group="navigation"]').removeClass('display-none');

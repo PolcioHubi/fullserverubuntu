@@ -309,30 +309,20 @@ body {
 
 .password-toggle::before {
     content: "";
-    width: 19px;
-    height: 13px;
-    border: 2px solid rgb(105, 105, 120);
-    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23696978' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z'/%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3C/svg%3E");
 }
 
 .password-toggle::after {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: rgb(105, 105, 120);
-    transform: translate(-50%, -50%);
+    display: none;
 }
 
 .password-toggle.is-visible::before {
-    border-color: rgb(40, 95, 244);
-}
-
-.password-toggle.is-visible::after {
-    background: rgb(40, 95, 244);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23285ff4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M17.94 17.94A10.94 10.94 0 0 1 12 20c-6.5 0-10-8-10-8a21.8 21.8 0 0 1 5.06-5.94'/%3E%3Cpath d='M9.9 4.24A10.94 10.94 0 0 1 12 4c6.5 0 10 8 10 8a21.8 21.8 0 0 1-4.12 5.19'/%3E%3Cpath d='M2 2l20 20'/%3E%3C/svg%3E");
 }
 
 .remember-row {
@@ -591,3 +581,6 @@ body {
         transition-duration: 0ms !important;
     }
 }
+
+
+

@@ -67,23 +67,39 @@ sudo chmod +x "$0"
 echo ">>> KROK 3: Uruchamianie konfiguracji środowiska Python..."
 sudo -u "$PROJECT_USER" bash -c "
 set -e
-echo '--- Tworzenie pliku .env z sekretami...'
+echo '--- Tworzenie pliku .env z sekretami (tylko jeśli nie istnieje)...'
+# IDEMPOTENT: never overwrite an existing .env — regenerating SECRET_KEY would
+# invalidate all live sessions and rotate the admin password on every re-run.
+if [ ! -f '$DEST_DIR/.env' ]; then
 cat > '$DEST_DIR/.env' <<EOF
+FLASK_ENV=production
 SECRET_KEY=\$(openssl rand -hex 32)
 ADMIN_USERNAME=admin
 ADMIN_PASSWORD=\$(openssl rand -hex 16)
+SESSION_REDIS_URL=redis://127.0.0.1:6379
+CACHE_REDIS_URL=redis://127.0.0.1:6379/0
+RATELIMIT_STORAGE_URL=redis://127.0.0.1:6379
 EOF
+echo '--- .env utworzony (FLASK_ENV=production, losowy SECRET_KEY i hasło admina).'
+echo '--- WAŻNE: zmień domyślny ADMIN_USERNAME=admin na własną wartość.'
+else
+echo '--- .env już istnieje — pomijam (zachowuję istniejące sekrety i sesje).'
+fi
 echo '--- Tworzenie środowiska wirtualnego w $DEST_DIR/venv...'
 python3 -m venv '$DEST_DIR/venv'
 chmod -R +x '$DEST_DIR/venv/bin'
 echo '--- Aktualizacja pip i instalacja zależności z requirements.txt...'
 '$DEST_DIR/venv/bin/pip' install --upgrade pip
 '$DEST_DIR/venv/bin/pip' install -r '$DEST_DIR/requirements.txt'
-echo '--- Wykonywanie migracji bazy danych...'
-rm -rf '$DEST_DIR/migrations'
-rm -f '$DEST_DIR/auth_data/database.db'
-'$DEST_DIR/venv/bin/flask' --app '$DEST_DIR/wsgi.py' db init
-'$DEST_DIR/venv/bin/flask' --app '$DEST_DIR/wsgi.py' db migrate -m 'Initial deployment migration'
+echo '--- Wykonywanie migracji bazy danych (bez kasowania istniejących danych)...'
+# IDEMPOTENT: only initialise the migration repo on first install. NEVER delete
+# the database or migrations on re-run — that would wipe all user accounts,
+# coins, documents and history. Subsequent runs only apply pending migrations.
+if [ ! -d '$DEST_DIR/migrations' ]; then
+    echo '--- Pierwsza instalacja: inicjalizacja repozytorium migracji...'
+    '$DEST_DIR/venv/bin/flask' --app '$DEST_DIR/wsgi.py' db init
+    '$DEST_DIR/venv/bin/flask' --app '$DEST_DIR/wsgi.py' db migrate -m 'Initial deployment migration'
+fi
 '$DEST_DIR/venv/bin/flask' --app '$DEST_DIR/wsgi.py' db upgrade
 "
 
@@ -110,18 +126,13 @@ EOF
 echo ">>> KROK 4.5: Tworzenie pliku z nagłówkami bezpieczeństwa..."
 sudo mkdir -p /etc/nginx/snippets
 sudo tee /etc/nginx/snippets/security-headers.conf > /dev/null <<EOF
-# HSTS (max-age = 2 lata), wymusza HTTPS
-add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
-# Ochrona przed MIME sniffing
-add_header X-Content-Type-Options "nosniff" always;
-# Ochrona przed clickjacking
-add_header X-Frame-Options "SAMEORIGIN" always;
-# Ulepszona polityka Referrer
-add_header Referrer-Policy "strict-origin-when-cross-origin" always;
-# Blokowanie niechcianych funkcji przeglądarki (zezwolenie na kamerę dla QR)
-add_header Permissions-Policy "camera=(self), microphone=(), geolocation=()" always;
-# Polityka bezpieczeństwa treści jest ustawiana przez aplikację Flask (app.py),
-# patrz komentarz nad zmienną CSP_HEADER na początku tego skryptu.
+# WSZYSTKIE nagłówki bezpieczeństwa (HSTS, X-Content-Type-Options,
+# X-Frame-Options, Referrer-Policy, Permissions-Policy oraz CSP z per-request
+# nonce) są teraz ustawiane wyłącznie przez aplikację Flask
+# (app.py:set_security_headers). Dublowanie ich tutaj przez add_header
+# powodowałoby zduplikowane nagłówki — w szczególności podwójny
+# Strict-Transport-Security jest ignorowany przez przeglądarki.
+# Ten snippet celowo nie dodaje żadnych nagłówków.
 EOF
 
 # --- KROK 4.6: Zwiększenie limitu rozmiaru przesyłanych plików ---
@@ -129,6 +140,16 @@ echo ">>> KROK 4.6: Konfiguracja limitu rozmiaru plików (client_max_body_size).
 sudo tee /etc/nginx/snippets/upload-limits.conf > /dev/null <<EOF
 # Zwiększenie limitu przesyłanych plików do 512MB (dla importu backupów)
 client_max_body_size 512M;
+
+# Kompresja gzip — istotna dla dużych odpowiedzi HTML (np. pliku All-in-One
+# serwowanego przez Flask spod /user_files/). Odzyskuje resztę powtarzalności
+# tekstu/Base64, której nie usunął dedup w kompilatorze.
+gzip on;
+gzip_vary on;
+gzip_proxied any;
+gzip_comp_level 5;
+gzip_min_length 1024;
+gzip_types text/plain text/css application/javascript application/json image/svg+xml;
 EOF
 
 # --- KROK 5: Konfiguracja Nginx (WSTĘPNA, tylko HTTP) ---

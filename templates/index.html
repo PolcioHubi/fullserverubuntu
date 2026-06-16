@@ -7,13 +7,13 @@
     <title>e-mobywatel</title>
     <link rel="shortcut icon" href="/assets/img/logo.png" type="image/x-icon">
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-180x.png">
-    <link rel="stylesheet" href="/static/css/index.css?v=20260516-guide1">
+    <link rel="stylesheet" href="/static/css/index.css?v=20260609-polish1">
     <link rel="stylesheet" href="/static/css/index-extras.css?v=1">
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="/assets/js/global/jquery.js"></script>
-    <script src="/assets/js/global/notifications-bell.js?v=20260510-panels2" defer></script>
-    <script src="/assets/js/global/chat-feed.js?v=20260510-index-chat3" defer></script>
+    <script src="/assets/js/global/notifications-bell.js?v=20260609-panelhide3" defer></script>
+    <script src="/assets/js/global/chat-feed.js?v=20260609-panelhide3" defer></script>
     <script src="/static/js/page-transitions.js" defer></script>
     <script src="/static/js/emulator-mode.js?v=20260516-mode1" defer></script>
     <link rel="stylesheet" href="/static/css/csp-inline-utilities.css?v=1">
@@ -550,7 +550,7 @@
         </div>
         </div>
 
-        <div id="notif-panel" class="app-slide-panel csp-s-95508af6">
+        <div id="notif-panel" class="app-slide-panel">
             <div class="app-panel-header">
                 <button type="button" id="notif-back" class="app-panel-back">Wróć</button>
                 <h2>Powiadomienia</h2>
@@ -561,7 +561,7 @@
             </div>
         </div>
 
-        <div id="chat-panel" class="app-slide-panel app-chat-panel csp-s-95508af6">
+        <div id="chat-panel" class="app-slide-panel app-chat-panel">
             <div class="app-panel-header">
                 <button type="button" id="chat-back" class="app-panel-back">Wróć</button>
                 <h2>Globalny chat</h2>
@@ -704,7 +704,7 @@
     <script id="index-bootstrap" type="application/json">
         {{ {'lastFormData': last_form_data, 'hasSeenTutorial': has_seen_tutorial, 'username': username} | tojson }}
     </script>
-    <script src="/static/js/index-page.js?v=20260516-guide1" defer></script>
+    <script src="/static/js/index-page.js?v=20260609-polish1" defer></script>
     {% endif %}
 
     <!-- Loading Overlay -->

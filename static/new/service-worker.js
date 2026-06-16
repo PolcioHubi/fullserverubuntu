@@ -167,13 +167,30 @@ self.addEventListener('fetch', (e) => {
         path === '/assets/js/pages/more.js' ||
         path === '/assets/js/pages/services.js'
     ) {
-        e.respondWith(fetch(e.request));
+        // Network-only, but fall back to cache (or a clean 503) on failure so a
+        // dropped connection / aborted navigation can't reject respondWith()
+        // with an uncaught "Failed to fetch".
+        e.respondWith(
+            fetch(e.request).catch(() =>
+                caches.match(e.request).then(
+                    (c) => c || new Response('', { status: 503, statusText: 'Offline' })
+                )
+            )
+        );
         return;
     }
 
     // Chat API must never return stale data from cache
     if (/^\/api\/chat\//.test(path)) {
-        e.respondWith(fetch(e.request));
+        e.respondWith(
+            fetch(e.request).catch(
+                () =>
+                    new Response(JSON.stringify({ success: false, offline: true }), {
+                        status: 503,
+                        headers: { 'Content-Type': 'application/json' },
+                    })
+            )
+        );
         return;
     }
 
@@ -197,7 +214,25 @@ self.addEventListener('fetch', (e) => {
     // Authentication entrypoint and documents shell must always come from network
     // so remembered sessions and redirects are not masked by stale HTML.
     if (path === '/login' || path === '/documents' || path === '/static/new/login.html') {
-        e.respondWith(fetch(e.request));
+        // Network-first; on failure fall back to a cached copy if one exists,
+        // otherwise a minimal offline page — never let respondWith() reject.
+        e.respondWith(
+            fetch(e.request).catch(() =>
+                caches.match(e.request).then(
+                    (c) =>
+                        c ||
+                        new Response(
+                            '<!doctype html><meta charset="utf-8">' +
+                                '<meta name="viewport" content="width=device-width, initial-scale=1">' +
+                                '<title>Offline</title>' +
+                                '<body style="font-family:-apple-system,sans-serif;padding:2rem;text-align:center;color:#1b1f24">' +
+                                '<h1 style="font-size:20px">Brak połączenia</h1>' +
+                                '<p style="color:#67707d">Nie można połączyć się z serwerem. Odśwież stronę.</p>',
+                            { status: 503, headers: { 'Content-Type': 'text/html; charset=utf-8' } }
+                        )
+                )
+            )
+        );
         return;
     }
 

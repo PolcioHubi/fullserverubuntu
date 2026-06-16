@@ -51,15 +51,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 const docs = data.data.documents;
                 document.querySelectorAll('.allinone-doc-status').forEach(function(el) {
                     const key = el.dataset.doc;
+                    // Kolor statusu sterowany klasą w CSS (is-ready/is-missing),
+                    // nie inline — żeby był spójny z paletą i sterowalny motywem.
+                    const cb = el.closest('label').querySelector('input[type="checkbox"]');
                     if (docs[key]) {
                         el.textContent = '✓ Wygenerowany';
-                        el.style.color = '#4ade80';
-                        const cb = el.closest('label').querySelector('input[type="checkbox"]');
+                        el.classList.add('is-ready');
+                        el.classList.remove('is-missing');
                         if (cb) cb.disabled = false;
                     } else {
                         el.textContent = '✗ Brak';
-                        el.style.color = '#f87171';
-                        const cb = el.closest('label').querySelector('input[type="checkbox"]');
+                        el.classList.add('is-missing');
+                        el.classList.remove('is-ready');
                         if (cb) { cb.disabled = true; cb.checked = false; }
                     }
                 });
@@ -314,7 +317,10 @@ document.addEventListener('DOMContentLoaded', function() {
         confirmOpenDocumentBtn.addEventListener('click', function() {
             if (!disclaimerAgree || !disclaimerAgree.checked) return;
             logAction("Accepted educational disclaimer and opened documents page.");
-            window.location.href = '/logowaniedozmodyfikowanieplikuhtml';
+            // Płynne wygaszenie przed nawigacją (fallback: zwykłe przekierowanie).
+            (window.navigateWithTransition || function (u) { window.location.href = u; })(
+                '/logowaniedozmodyfikowanieplikuhtml'
+            );
         });
     }
 
@@ -705,6 +711,16 @@ document.addEventListener('DOMContentLoaded', function() {
         return document.querySelector('[data-tutorial-target="' + stepData.target + '"]');
     }
 
+    // Cel jest "użyteczny" tylko, gdy faktycznie zajmuje miejsce na ekranie.
+    // Element ukryty (np. profile-link ma display:none w widoku pulpitu) zwraca
+    // zerowy prostokąt — wtedy traktujemy krok jak bez celu (karta na środku),
+    // zamiast przyklejać dymek do narożnika i podświetlać niewidzialny element.
+    function isTutorialTargetVisible(el) {
+        if (!el) return false;
+        const rect = el.getBoundingClientRect();
+        return rect.width >= 1 && rect.height >= 1;
+    }
+
     function getTutorialCounter(stepIndex, stepData) {
         if (stepData.id === 'after-save') return 'Zapisano';
         const visibleSteps = tutorialSteps.filter((step) => step.id !== 'after-save');
@@ -730,10 +746,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (target) {
             const targetRect = target.getBoundingClientRect();
-            const spaceAbove = targetRect.top;
-            const preferAbove = spaceAbove > cardRect.height + 24;
-            top = preferAbove ? targetRect.top - cardRect.height - 12 : targetRect.bottom + 12;
-            left = targetRect.left + (targetRect.width / 2) - (cardRect.width / 2);
+            // Cel ukryty (zerowy prostokąt) albo całkiem poza ekranem → zostaw
+            // kartę wyśrodkowaną, nie doklejaj jej do krawędzi (12,12).
+            const targetUsable =
+                targetRect.width >= 1 && targetRect.height >= 1 &&
+                targetRect.bottom > 0 && targetRect.top < viewportHeight;
+            if (targetUsable) {
+                const spaceAbove = targetRect.top;
+                const preferAbove = spaceAbove > cardRect.height + 24;
+                top = preferAbove ? targetRect.top - cardRect.height - 12 : targetRect.bottom + 12;
+                left = targetRect.left + (targetRect.width / 2) - (cardRect.width / 2);
+            }
         }
 
         content.style.setProperty('--tutorial-card-top', `${clampTutorialPosition(Math.round(top), 12, viewportHeight - cardRect.height - 12)}px`);
@@ -743,7 +766,8 @@ document.addEventListener('DOMContentLoaded', function() {
     function repositionCurrentTutorialCard() {
         const modal = document.getElementById('tutorialModal');
         if (!modal || modal.style.display === 'none') return;
-        positionTutorialCard(getTutorialTarget(tutorialSteps[currentStep] || {}));
+        const t = getTutorialTarget(tutorialSteps[currentStep] || {});
+        positionTutorialCard(isTutorialTargetVisible(t) ? t : null);
     }
 
     function hideTutorialModal(clearHighlight = true) {
@@ -784,6 +808,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const counter = document.getElementById('tutorialStepCounter');
         const hint = document.getElementById('tutorialTargetHint');
         const target = getTutorialTarget(stepData);
+        const targetVisible = isTutorialTargetVisible(target);
 
         if (!modal || !title || !message || !nextBtn || !skipBtn) return;
 
@@ -796,17 +821,20 @@ document.addEventListener('DOMContentLoaded', function() {
             counter.textContent = getTutorialCounter(stepIndex, stepData);
         }
         if (hint) {
-            hint.textContent = stepData.targetHint || '';
-            hint.style.display = stepData.targetHint ? 'block' : 'none';
+            // Podpowiedź "podświetlam X" ma sens tylko, gdy faktycznie jest co
+            // podświetlić — przy ukrytym celu (krok 3 na pulpicie) ją chowamy.
+            const showHint = Boolean(stepData.targetHint) && targetVisible;
+            hint.textContent = showHint ? stepData.targetHint : '';
+            hint.style.display = showHint ? 'block' : 'none';
         }
 
-        modal.classList.toggle('is-guided', Boolean(target));
+        modal.classList.toggle('is-guided', targetVisible);
         document.body.classList.add('tutorial-active');
 
         modal.style.display = 'block';
-        positionTutorialCard(target);
+        positionTutorialCard(targetVisible ? target : null);
 
-        if (target) {
+        if (targetVisible) {
             target.classList.add('tutorial-focus-target');
             window.setTimeout(() => {
                 target.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });

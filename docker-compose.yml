@@ -1,14 +1,45 @@
 version: '3.8'
 
 services:
+  redis:
+    image: redis:7-alpine
+    restart: always
+    # No host port published — only reachable on the internal compose network.
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
   app:
     build: .
     restart: always
     env_file:
       - .env
+    environment:
+      # Point every Redis consumer at the compose `redis` service. These
+      # override the production_config defaults so sessions/cache/rate-limiting
+      # actually work inside the compose network.
+      SESSION_REDIS_URL: redis://redis:6379
+      CACHE_REDIS_URL: redis://redis:6379/0
+      RATELIMIT_STORAGE_URL: redis://redis:6379
     volumes:
       - ./auth_data:/app/auth_data
       - ./user_data:/app/user_data
       - ./logs:/app/logs
+    depends_on:
+      redis:
+        condition: service_healthy
+    expose:
+      - "5000"
+
+  nginx:
+    image: nginx:stable-alpine
+    restart: always
     ports:
-      - "5000:5000" # Wystaw port 5000 kontenera na port 5000 hosta
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./static:/usr/share/nginx/html/static:ro
+    depends_on:
+      - app
