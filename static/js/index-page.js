@@ -73,49 +73,67 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     window.refreshAllinoneDocStatus = fetchAllinoneDocStatus;
 
-    // Compile All-in-One button handler
+    // Wspólna kompilacja All-in-One — używana przez okno z checkboxami oraz przez
+    // przycisk "Zaktualizuj" w oknie gotowego All-in-One (static/js/emulator-mode.js).
+    async function compileAllinone(selectedDocs, options) {
+        options = options || {};
+        const messageId = options.messageId || 'allinone-modal-message';
+        const button = options.button || null;
+        const restoreLabel = button ? button.textContent : null;
+        const loadingOverlay = document.getElementById('loadingOverlay');
+
+        if (!Array.isArray(selectedDocs) || selectedDocs.length === 0) {
+            setInlineMessage(messageId, options.emptyMessage || 'Wybierz co najmniej jeden zapisany dokument.', 'error');
+            return;
+        }
+
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        if (loadingOverlay) loadingOverlay.classList.add('visible');
+        if (button) {
+            button.disabled = true;
+            button.textContent = 'Kompilowanie...';
+        }
+        setInlineMessage(messageId, 'Tworzę All-in-One...', 'info');
+
+        try {
+            const resp = await fetch('/api/compile-allinone', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({ selected_docs: selectedDocs })
+            });
+            const result = await resp.json();
+            if (result.success) {
+                logAction('Compiled All-in-One with docs: ' + selectedDocs.join(', '));
+                window.location.href = result.redirect_url || '/user_files/allinone.html#login';
+            } else {
+                setInlineMessage(messageId, result.error || 'Nie udało się skompilować All-in-One.', 'error');
+            }
+        } catch (error) {
+            console.error('Error compiling All-in-One:', error);
+            setInlineMessage(messageId, 'Wystąpił błąd podczas kompilacji All-in-One.', 'error');
+        } finally {
+            if (loadingOverlay) loadingOverlay.classList.remove('visible');
+            if (button) {
+                button.disabled = false;
+                if (restoreLabel !== null) button.textContent = restoreLabel;
+            }
+        }
+    }
+    window.compileAllinone = compileAllinone;
+
+    // Compile All-in-One button handler (okno z checkboxami)
     const allinoneCompileBtn = document.getElementById('allinone-compile-btn');
     if (allinoneCompileBtn) {
-        allinoneCompileBtn.addEventListener('click', async function() {
+        allinoneCompileBtn.addEventListener('click', function() {
             const checkboxes = document.querySelectorAll('input[name="allinone_doc"]:checked:not(:disabled)');
             const selectedDocs = Array.from(checkboxes).map(cb => cb.value);
-            const allinoneMessage = document.getElementById('allinone-modal-message');
-            if (selectedDocs.length === 0) {
-                setInlineMessage('allinone-modal-message', 'Wybierz co najmniej jeden zapisany dokument.', 'error');
-                return;
-            }
-            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-            const loadingOverlay = document.getElementById('loadingOverlay');
-            loadingOverlay.classList.add('visible');
-            allinoneCompileBtn.disabled = true;
-            allinoneCompileBtn.textContent = 'Kompilowanie...';
-            if (allinoneMessage) {
-                setInlineMessage('allinone-modal-message', 'Tworzę All-in-One...', 'info');
-            }
-            try {
-                const resp = await fetch('/api/compile-allinone', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': csrfToken
-                    },
-                    body: JSON.stringify({ selected_docs: selectedDocs })
-                });
-                const result = await resp.json();
-                if (result.success) {
-                    logAction('Compiled All-in-One with docs: ' + selectedDocs.join(', '));
-                    window.location.href = result.redirect_url || '/user_files/allinone.html#login';
-                } else {
-                    setInlineMessage('allinone-modal-message', result.error || 'Nie udało się skompilować All-in-One.', 'error');
-                }
-            } catch (error) {
-                console.error('Error compiling All-in-One:', error);
-                setInlineMessage('allinone-modal-message', 'Wystąpił błąd podczas kompilacji All-in-One.', 'error');
-            } finally {
-                loadingOverlay.classList.remove('visible');
-                allinoneCompileBtn.disabled = false;
-                allinoneCompileBtn.textContent = 'Kompiluj i przejdź do logowania';
-            }
+            compileAllinone(selectedDocs, {
+                button: allinoneCompileBtn,
+                messageId: 'allinone-modal-message'
+            });
         });
     }
 
@@ -556,7 +574,7 @@ document.addEventListener('DOMContentLoaded', function() {
         {
             id: 'open-document-action',
             title: 'Przejdź do dokumentu',
-            message: 'W trybie zwykłym ten przycisk otwiera zapisany dokument od razu na ekranie logowania. W trybie All-in-One najpierw pokaże wybór dokumentów do połączenia.',
+            message: 'W trybie zwykłym ten przycisk przenosi Cię do logowania, a po zalogowaniu do menu z dokumentami, gdzie wybierasz, co otworzyć. W trybie All-in-One złoży dokumenty w jedną aplikację — a jeśli masz już gotową wersję, pozwoli ją otworzyć albo zaktualizować.',
             target: 'open-document-action',
             targetHint: 'Ten przycisk reaguje inaczej zależnie od aktywnego trybu.',
             nextLabel: 'Pokaż mDowód',

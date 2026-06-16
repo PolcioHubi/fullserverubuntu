@@ -6,6 +6,10 @@
     const splitMode = "split";
     const allinoneMode = "allinone";
 
+    // Ostatnio pobrany status dokumentów (/api/user-documents) — wykorzystywany
+    // przez okno "Masz już gotowy All-in-One" przy opcji "Zaktualizuj".
+    let latestUserDocuments = {};
+
     function normalizeMode(mode) {
         return mode === splitMode ? splitMode : allinoneMode;
     }
@@ -237,57 +241,20 @@
         updateDocumentRows();
     }
 
-    function documentItemsFromStatus(documents) {
-        const items = [];
-        const regularDocs = [
-            ["mdowod", "mDowód", "/static/new/login.html?next=/my-document/mdowod"],
-            ["mprawojazdy", "mPrawo jazdy", "/static/new/login.html?next=/my-document/mprawojazdy"],
-            ["wozek", "Wózek widłowy", "/static/new/login.html?next=/my-document/wozek"],
-            ["school_id", "Legitymacja szkolna", "/static/new/login.html?next=/my-document/school_id"],
-            ["student_id", "Legitymacja studencka", "/static/new/login.html?next=/my-document/student_id"]
-        ];
-
-        regularDocs.forEach(function (doc) {
-            if (documents && documents[doc[0]]) {
-                items.push(doc);
-            }
-        });
-
-        return items;
+    function fetchUserDocuments() {
+        return fetch("/api/user-documents", {
+            headers: { "Cache-Control": "no-cache" }
+        })
+            .then(function (response) { return response.json(); })
+            .then(function (data) {
+                return data && data.success && data.data ? (data.data.documents || {}) : {};
+            });
     }
 
-    function openDocumentChoiceModal(message, items) {
-        const modal = document.getElementById("documentChoiceModal");
-        const list = document.getElementById("documentChoiceList");
-        const messageNode = document.getElementById("documentChoiceMessage");
-
-        if (!modal || !list || !messageNode) {
-            return;
-        }
-
-        messageNode.textContent = message;
-        list.innerHTML = "";
-
-        items.forEach(function (item) {
-            const link = document.createElement("a");
-            link.href = item[2];
-            link.className = "document-choice-item";
-            link.textContent = item[1];
-            list.appendChild(link);
+    function generatedDocKeys(documents) {
+        return Object.keys(documents || {}).filter(function (key) {
+            return key !== "allinone" && documents[key];
         });
-
-        modal.classList.add("is-visible");
-        modal.setAttribute("aria-hidden", "false");
-    }
-
-    function closeDocumentChoiceModal() {
-        const modal = document.getElementById("documentChoiceModal");
-        if (!modal) {
-            return;
-        }
-
-        modal.classList.remove("is-visible");
-        modal.setAttribute("aria-hidden", "true");
     }
 
     function openAllinoneModal() {
@@ -319,17 +286,65 @@
         modal.setAttribute("aria-hidden", "true");
     }
 
+    function openAllinoneExistingModal() {
+        const modal = document.getElementById("allinoneExistingModal");
+        if (!modal) {
+            return;
+        }
+
+        const message = document.getElementById("allinone-existing-message");
+        if (message) {
+            message.textContent = "";
+            message.classList.remove("is-error", "is-success", "is-info");
+        }
+        modal.classList.add("is-visible");
+        modal.setAttribute("aria-hidden", "false");
+    }
+
+    function closeAllinoneExistingModal() {
+        const modal = document.getElementById("allinoneExistingModal");
+        if (!modal) {
+            return;
+        }
+
+        modal.classList.remove("is-visible");
+        modal.setAttribute("aria-hidden", "true");
+    }
+
     function initGeneratedDocumentButton() {
         const button = document.getElementById("openGeneratedDocumentBtn");
-        const closeButton = document.getElementById("documentChoiceClose");
         const closeAllinoneButton = document.getElementById("allinoneChoiceClose");
-
-        if (closeButton) {
-            closeButton.addEventListener("click", closeDocumentChoiceModal);
-        }
+        const closeExistingButton = document.getElementById("allinoneExistingClose");
+        const openExistingButton = document.getElementById("allinoneOpenExistingBtn");
+        const updateButton = document.getElementById("allinoneUpdateBtn");
 
         if (closeAllinoneButton) {
             closeAllinoneButton.addEventListener("click", closeAllinoneModal);
+        }
+
+        if (closeExistingButton) {
+            closeExistingButton.addEventListener("click", closeAllinoneExistingModal);
+        }
+
+        // "Otwórz zapisany" — przejdź do gotowego All-in-One (z obecnymi danymi).
+        if (openExistingButton) {
+            openExistingButton.addEventListener("click", function () {
+                window.location.href = "/user_files/allinone.html#login";
+            });
+        }
+
+        // "Zaktualizuj" — skompiluj ponownie ze wszystkich wygenerowanych dokumentów.
+        if (updateButton) {
+            updateButton.addEventListener("click", function () {
+                if (typeof window.compileAllinone !== "function") {
+                    return;
+                }
+                window.compileAllinone(generatedDocKeys(latestUserDocuments), {
+                    button: updateButton,
+                    messageId: "allinone-existing-message",
+                    emptyMessage: "Brak wygenerowanych dokumentów do aktualizacji. Najpierw wygeneruj dokument w formularzu."
+                });
+            });
         }
 
         if (!button) {
@@ -337,35 +352,25 @@
         }
 
         button.addEventListener("click", async function () {
-            if (currentMode() === allinoneMode) {
-                openAllinoneModal();
+            // Tryb zwykły: bez wyboru — od razu ekran logowania, a po zalogowaniu
+            // użytkownik trafia do głównego menu (/documents) i tam wybiera dokument.
+            if (currentMode() !== allinoneMode) {
+                window.location.href = "/static/new/login.html";
                 return;
             }
 
+            // Tryb All-in-One: sprawdź, czy dokument jest już złożony.
             button.disabled = true;
-
             try {
-                const response = await fetch("/api/user-documents", {
-                    headers: { "Cache-Control": "no-cache" }
-                });
-                const data = await response.json();
-                const documents = data && data.success && data.data ? data.data.documents : {};
-                const items = documentItemsFromStatus(documents || {});
-
-                if (items.length === 0) {
-                    openDocumentChoiceModal("Najpierw wygeneruj dokument w formularzu.", []);
-                    return;
+                latestUserDocuments = await fetchUserDocuments();
+                if (latestUserDocuments.allinone) {
+                    openAllinoneExistingModal();
+                } else {
+                    openAllinoneModal();
                 }
-
-                if (items.length === 1) {
-                    window.location.href = items[0][2];
-                    return;
-                }
-
-                openDocumentChoiceModal("Masz kilka wygenerowanych wersji. Wybierz, którą otworzyć.", items);
             } catch (error) {
-                console.error("Nie udało się pobrać listy dokumentów:", error);
-                openDocumentChoiceModal("Nie udało się sprawdzić dokumentów. Spróbuj ponownie.", []);
+                console.error("Nie udało się sprawdzić dokumentu All-in-One:", error);
+                openAllinoneModal();
             } finally {
                 button.disabled = false;
             }
