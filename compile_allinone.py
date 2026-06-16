@@ -1133,12 +1133,15 @@ def generate_spa_router(selected_docs=None, is_per_user=False):
     // ====================================================================
     // AIO GUARD — wykrywa nieautoryzowane współdzielenie pliku All-in-One
     // ====================================================================
-    // Plik AIO ma osadzone window.__AIO_GUARD = {{ username, data_hash, ... }}.
-    // Heartbeat (/api/aio/heartbeat) zwraca username + data_hash bieżącej
-    // sesji. Trzy ścieżki:
+    // Plik AIO ma osadzone window.__AIO_GUARD = {{ username, ... }}.
+    // Heartbeat (/api/aio/heartbeat) zwraca username bieżącej sesji. Ścieżki:
     //   - inny username  → HARD BLOCK (full-screen overlay)
-    //   - inny data_hash → SOFT WARN (banner u góry)
+    //   - 401/403        → blok "sesja wygasła"
     //   - błąd sieci     → cicho (offline tolerance)
+    // Ostrzeżenie o nieaktualnych danych NIE jest tu obsługiwane — robią to
+    // per-dokumentowe skrypty __DOC_GUARD wstrzyknięte do każdego dokumentu
+    // (porównują hash TYLKO swoich pól, więc nie ma fałszywych banerów, gdy
+    // użytkownik ma w pliku więcej niż jeden dokument).
     // Heartbeat ma 5-min TTL w sessionStorage żeby nie spamować przy
     // SPA navigation.
     (function aioGuard() {{
@@ -1173,15 +1176,6 @@ def generate_spa_router(selected_docs=None, is_per_user=False):
             document.body.appendChild(overlay);
         }}
 
-        function showWarn(msg) {{
-            if (document.querySelector('.aio-guard-banner')) return;
-            var banner = document.createElement('div');
-            banner.className = 'aio-guard-banner';
-            banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9998;background:#e67e22;color:#fff;padding:10px 16px;text-align:center;font:14px Inter,Arial,sans-serif;box-shadow:0 2px 8px rgba(0,0,0,.25);';
-            banner.textContent = msg;
-            document.body.appendChild(banner);
-        }}
-
         function aioCheck() {{
             if (blocked) return;
             var lastCheck = parseInt(sessionStorage.getItem(STORAGE_KEY) || '0', 10);
@@ -1211,10 +1205,10 @@ def generate_spa_router(selected_docs=None, is_per_user=False):
                         );
                         return;
                     }}
-                    // Soft: data changed since this AIO was compiled.
-                    if (data.data_hash && GUARD.data_hash && data.data_hash !== GUARD.data_hash) {{
-                        showWarn('Twoje dane zostały zaktualizowane od ostatniej kompilacji All-in-One — pobierz nową wersję w aplikacji, aby zobaczyć zmiany.');
-                    }}
+                    // Per-document staleness is handled by the __DOC_GUARD
+                    // scripts baked into each bundled document (they compare
+                    // only their own fields). The AIO guard only enforces the
+                    // hard username binding above.
                     sessionStorage.setItem(STORAGE_KEY, String(Date.now()));
                 }})
                 .catch(function() {{
@@ -2025,28 +2019,23 @@ class Compiler:
             return file_to_base64(matches[0])
         return ""
 
-    def _generate_aio_guard_js(self, form_data_path):
-        """Build window.__AIO_GUARD fingerprint snippet.
+    def _generate_aio_guard_js(self, form_data_path=None):
+        """Build the window.__AIO_GUARD fingerprint snippet.
 
-        The guard binds this compiled All-in-One file to a specific username
-        and to a snapshot of their form data. Client-side ``aioGuard()`` in
-        the SPA router compares this against /api/aio/heartbeat at runtime
-        (see plan: AIO heartbeat).
+        The All-in-One guard only enforces the *hard* binding to a single
+        username (anti-sharing). Per-document staleness ("your data changed —
+        regenerate") is handled by the __DOC_GUARD scripts baked into each
+        bundled document, which carry per-document hashes — so the AIO guard no
+        longer embeds a global data_hash (hashing the whole submission produced
+        false staleness banners whenever a user owned more than one document).
+        ``form_data_path`` is accepted for call-site compatibility and unused.
         """
-        import hashlib as _hashlib
         import time as _time
 
         # user_data_dir == user_data/<username>/files → parent.name == username.
         username = self.user_data_dir.parent.name if self.user_data_dir else ""
-        data_hash = ""
-        if form_data_path and form_data_path.exists():
-            try:
-                data_hash = _hashlib.sha256(form_data_path.read_bytes()).hexdigest()[:16]
-            except OSError:
-                data_hash = ""
         guard = {
             "username": username,
-            "data_hash": data_hash,
             "compiled_at": int(_time.time()),
         }
         return f"window.__AIO_GUARD = {json.dumps(guard, ensure_ascii=False)};"

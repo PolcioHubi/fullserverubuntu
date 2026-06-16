@@ -1,8 +1,0 @@
-[    3804ms] [LOG] [All-in-One] Nadpisanie danych aktywne — osadzone dane @ http://127.0.0.1:5000/user_files/allinone.html:29044
-[    3807ms] [LOG] [SPA] initPageManager: login @ http://127.0.0.1:5000/user_files/allinone.html:28193
-[    3809ms] [LOG] [SPA Router] Przełączono na: login @ http://127.0.0.1:5000/user_files/allinone.html:28109
-[    3834ms] [VERBOSE] [DOM] Password field is not contained in a form: (More info: https://goo.gl/9p2vKq) %o @ http://127.0.0.1:5000/user_files/allinone.html:0
-[    3851ms] [LOG] [SPA Patches] jQuery handlery przechwycone @ http://127.0.0.1:5000/user_files/allinone.html:28460
-[    3982ms] [LOG] [AIO-SW] registered, scope: http://127.0.0.1:5000/user_files/ @ http://127.0.0.1:5000/user_files/allinone.html:26
-[   32156ms] [LOG] [SPA] initPageManager: documents @ http://127.0.0.1:5000/user_files/allinone.html:28193
-[   32208ms] [LOG] [SPA Router] Przełączono na: documents @ http://127.0.0.1:5000/user_files/allinone.html:28109

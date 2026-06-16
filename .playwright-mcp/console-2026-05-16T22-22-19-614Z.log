@@ -1,8 +1,0 @@
-[    2356ms] [LOG] [All-in-One] Nadpisanie danych aktywne — osadzone dane @ http://127.0.0.1:5000/user_files/allinone.html:29044
-[    2363ms] [VERBOSE] [DOM] Password field is not contained in a form: (More info: https://goo.gl/9p2vKq) %o @ http://127.0.0.1:5000/user_files/allinone.html#more:0
-[    2400ms] [LOG] [SPA Patches] jQuery handlery przechwycone @ http://127.0.0.1:5000/user_files/allinone.html:28460
-[    2407ms] [LOG] [SPA] initPageManager: more @ http://127.0.0.1:5000/user_files/allinone.html:28193
-[    2425ms] [LOG] [SPA Router] Przełączono na: more @ http://127.0.0.1:5000/user_files/allinone.html:28109
-[    2433ms] [LOG] [AIO-SW] registered, scope: http://127.0.0.1:5000/user_files/ @ http://127.0.0.1:5000/user_files/allinone.html:26
-[  142792ms] [LOG] [TEST] Before click, contact transform: matrix(1, 0, 0, 1, 356, 0) @ :4
-[  142795ms] [LOG] [TEST] After click, contact inline:  @ :7

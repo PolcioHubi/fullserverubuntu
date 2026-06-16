@@ -500,6 +500,102 @@ _PII_FORM_FIELDS = frozenset({
 })
 
 
+# ---------------------------------------------------------------------------
+# Per-document staleness fingerprint
+# ---------------------------------------------------------------------------
+# Each generated document (and the All-in-One that bundles them) embeds a hash
+# and compares it against /api/aio/heartbeat to show a soft "your data changed —
+# regenerate" banner. The hash MUST cover only the fields that document actually
+# displays. Hashing the whole last_form_data.json (which also stores
+# ``template_version`` and every *other* document's fields) made every older
+# document look permanently "stale" the moment the user generated a second
+# document type — a false orange banner that survived cache clears. Mapping per
+# document keeps the warning truthful and per-document.
+_DOC_FINGERPRINT_FIELDS = {
+    "mdowod": (
+        "imie", "nazwisko", "obywatelstwo", "data_urodzenia", "pesel", "plec",
+        "seria_numer_dowodu", "termin_waznosci_dowodu", "data_wydania_dowodu",
+        "seria_numer_mdowodu", "termin_waznosci_mdowodu", "data_wydania_mdowodu",
+        "imie_ojca_mdowod", "imie_matki_mdowod",
+        "nazwisko_rodowe", "nazwisko_rodowe_ojca", "nazwisko_rodowe_matki",
+        "miejsce_urodzenia", "adres_zameldowania", "data_zameldowania",
+    ),
+    "mprawojazdy": (
+        "imie", "nazwisko", "data_urodzenia", "pesel",
+        "pj_kategorie", "pj_data_wydania", "pj_numer", "pj_blankiet",
+        "pj_organ", "pj_ograniczenia",
+    ),
+    "wozek": (
+        "imie", "nazwisko", "data_urodzenia", "pesel",
+        "wozek_kategoria", "wozek_numer", "wozek_data_wydania",
+        "wozek_data_waznosci", "wozek_organ", "wozek_zakres", "wozek_zaswiadczenie",
+    ),
+    "school_id": (
+        "imie", "nazwisko", "data_urodzenia", "pesel",
+        "si_numer", "si_data_wydania", "si_data_waznosci",
+        "si_nazwa_szkoly", "si_adres", "si_dyrektor", "si_telefon",
+    ),
+    "student_id": (
+        "imie", "nazwisko", "data_urodzenia", "pesel",
+        "sti_data_wydania", "sti_uczelnia",
+    ),
+}
+
+
+def _canonical_doc_key(doc_key: str) -> str:
+    """Normalise the various doc-key spellings to one canonical key.
+
+    POST ``/`` and the admin refresh pass the ``template_version`` / ``DOC_MAP``
+    spelling (``new_mdowod``, ``new_school_id`` …); the All-in-One compiler and
+    ``NEW_UI_DOC_FILE_MAP`` use the bare key (``mdowod``, ``school_id`` …). Both
+    must collapse to the same key so an embedded hash and the heartbeat agree.
+    Returns ``""`` for an unknown key (treated as "no fingerprint").
+    """
+    key = (doc_key or "").strip()
+    if key.startswith("new_"):
+        key = key[4:]
+    key = {"school": "school_id", "student": "student_id"}.get(key, key)
+    return key if key in _DOC_FINGERPRINT_FIELDS else ""
+
+
+def _document_data_hash(form_data: dict, doc_key: str) -> str:
+    """Stable 16-char fingerprint of just the fields one document displays.
+
+    Editing an unrelated document (or merely switching ``template_version``) no
+    longer changes this value. ``sort_keys`` makes it independent of dict
+    ordering so the embed side and the heartbeat always agree. Returns ``""``
+    for an unknown ``doc_key`` — the client treats an empty hash as "don't warn".
+    """
+    canonical_key = _canonical_doc_key(doc_key)
+    if not canonical_key:
+        return ""
+    fields = _DOC_FINGERPRINT_FIELDS[canonical_key]
+    projected = {field: form_data.get(field) for field in fields}
+    canonical_json = json.dumps(
+        projected, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    )
+    return hashlib.sha256(canonical_json.encode("utf-8")).hexdigest()[:16]
+
+
+def _read_last_form_data(files_folder: str) -> dict:
+    """Load ``last_form_data.json`` from the ``logs/`` sibling of ``files_folder``.
+
+    Returns ``{}`` when the file is missing or unreadable so callers degrade to
+    an empty fingerprint instead of raising.
+    """
+    if not files_folder:
+        return {}
+    fd_path = os.path.join(os.path.dirname(files_folder), "logs", "last_form_data.json")
+    if not os.path.exists(fd_path):
+        return {}
+    try:
+        with open(fd_path, "r", encoding="utf-8") as fh:
+            data = json.load(fh)
+    except (OSError, json.JSONDecodeError):
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
 def _inject_doc_guard_js(html_str: str, username: str, doc_key: str, files_folder: str = None) -> str:
     """Wstrzykuje __DOC_GUARD + heartbeat check do pojedynczego dokumentu HTML.
 
@@ -513,20 +609,13 @@ def _inject_doc_guard_js(html_str: str, username: str, doc_key: str, files_folde
     if not username:
         return html_str
 
-    # Compute current data_hash from last_form_data.json (same way as
-    # /api/aio/heartbeat) so embedded value matches what server will return.
-    data_hash = ""
-    if files_folder:
-        # files_folder is e.g. user_data/<username>/files
-        # last_form_data.json lives in sibling logs/ folder.
-        logs_folder_path = os.path.join(os.path.dirname(files_folder), "logs")
-        fd_path = os.path.join(logs_folder_path, "last_form_data.json")
-        if os.path.exists(fd_path):
-            try:
-                with open(fd_path, "rb") as fh:
-                    data_hash = hashlib.sha256(fh.read()).hexdigest()[:16]
-            except OSError:
-                data_hash = ""
+    # Per-document fingerprint (see _document_data_hash): hash ONLY the fields
+    # this document displays, so the soft "your data changed" banner fires only
+    # when *this* document's data changed — not when the user generated another
+    # document type (which rewrites the shared last_form_data.json). The
+    # heartbeat returns the matching per-document hash under this canonical key.
+    canonical_key = _canonical_doc_key(doc_key)
+    data_hash = _document_data_hash(_read_last_form_data(files_folder), canonical_key)
 
     guard_block = (
         "\n<script>"
@@ -534,7 +623,7 @@ def _inject_doc_guard_js(html_str: str, username: str, doc_key: str, files_folde
         "window.__DOC_GUARD = {"
         f'"username":{json.dumps(username)},'
         f'"data_hash":{json.dumps(data_hash)},'
-        f'"doc_key":{json.dumps(doc_key)},'
+        f'"doc_key":{json.dumps(canonical_key)},'
         f'"compiled_at":{int(time.time())}'
         "};"
         "var GUARD=window.__DOC_GUARD,blocked=false;"
@@ -562,7 +651,8 @@ def _inject_doc_guard_js(html_str: str, username: str, doc_key: str, files_folde
         ".then(function(d){if(!d)return;"
         "if(d.username&&d.username!==GUARD.username){"
         "showBlock('Ten dokument należy do innego konta','Ten plik został wygenerowany dla użytkownika \"'+GUARD.username+'\", ale aktualnie zalogowany jest \"'+d.username+'\". Wróć do aplikacji i pobierz własną kopię.','/documents','Przejdź do aplikacji');return;}"
-        "if(d.data_hash&&GUARD.data_hash&&d.data_hash!==GUARD.data_hash){"
+        "var serverHash=(d.data_hashes&&GUARD.doc_key)?d.data_hashes[GUARD.doc_key]:'';"
+        "if(serverHash&&GUARD.data_hash&&serverHash!==GUARD.data_hash){"
         "showWarn('Twoje dane zostały zaktualizowane od ostatniej generacji tego dokumentu — wygeneruj go ponownie, aby zobaczyć aktualne dane.');"
         "}"
         "}).catch(function(){});"
@@ -4882,23 +4972,24 @@ def api_aio_heartbeat():
     every page-show transition inside the SPA.
 
     Guard logic on the client (see ``compile_allinone.generate_spa_router``):
-      - ``username`` mismatch  → hard block screen
-      - ``data_hash`` mismatch → soft warning banner
-      - 401/403                → session-expired block
-      - network error          → silent, treat as offline
+      - ``username`` mismatch          → hard block screen
+      - ``data_hashes[doc]`` mismatch  → soft warning banner (per document)
+      - 401/403                        → session-expired block
+      - network error                  → silent, treat as offline
     """
     username = current_user.username
     files_folder = os.path.join(USER_DATA_DIR, username, "files")
-    logs_folder = os.path.join(USER_DATA_DIR, username, "logs")
-    form_data_path = os.path.join(logs_folder, "last_form_data.json")
 
-    data_hash = ""
-    if os.path.exists(form_data_path):
-        try:
-            with open(form_data_path, "rb") as f:
-                data_hash = hashlib.sha256(f.read()).hexdigest()[:16]
-        except OSError:
-            data_hash = ""
+    # Per-document fingerprints (see _document_data_hash). Each generated
+    # document / bundled All-in-One viewer carries the hash of just its own
+    # fields and compares against its entry here, so the soft "data changed"
+    # banner is truthful per document instead of firing for every document the
+    # moment any one of them is regenerated.
+    form_data = _read_last_form_data(files_folder)
+    data_hashes = {
+        canonical_key: _document_data_hash(form_data, canonical_key)
+        for canonical_key in _DOC_FINGERPRINT_FIELDS
+    }
 
     aio_path = os.path.join(files_folder, "allinone.html")
     aio_mtime = int(os.path.getmtime(aio_path)) if os.path.exists(aio_path) else 0
@@ -4906,7 +4997,7 @@ def api_aio_heartbeat():
     response = jsonify({
         "success": True,
         "username": username,
-        "data_hash": data_hash,
+        "data_hashes": data_hashes,
         "aio_compiled_at": aio_mtime,
         "server_time": int(time.time()),
     })

@@ -1,9 +1,0 @@
-[    4419ms] [LOG] [All-in-One] Nadpisanie danych aktywne — osadzone dane @ http://127.0.0.1:5000/user_files/allinone.html:29253
-[    4450ms] [LOG] [SPA Patches] jQuery handlery przechwycone @ http://127.0.0.1:5000/user_files/allinone.html:28669
-[    4455ms] [LOG] [AIO-SW] registered, scope: http://127.0.0.1:5000/user_files/ @ http://127.0.0.1:5000/user_files/allinone.html:26
-[    4471ms] [LOG] [SPA] initPageManager: documents @ http://127.0.0.1:5000/user_files/allinone.html:28291
-[    4476ms] [LOG] [SPA Router] Przełączono na: documents @ http://127.0.0.1:5000/user_files/allinone.html:28207
-[   55251ms] [LOG] [SPA] initPageManager: more @ http://127.0.0.1:5000/user_files/allinone.html:28291
-[   55276ms] [LOG] [SPA Router] Przełączono na: more @ http://127.0.0.1:5000/user_files/allinone.html:28207
-[  113025ms] [LOG] [SPA] initPageManager: documents @ http://127.0.0.1:5000/user_files/allinone.html:28291
-[  113028ms] [LOG] [SPA Router] Przełączono na: documents @ http://127.0.0.1:5000/user_files/allinone.html:28207

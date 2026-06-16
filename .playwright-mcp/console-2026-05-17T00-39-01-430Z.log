@@ -1,5 +1,0 @@
-[     143ms] [WARNING] <meta name="apple-mobile-web-app-capable" content="yes"> is deprecated. Please include <meta name="mobile-web-app-capable" content="yes"> @ http://127.0.0.1:5000/more?cb=fresh1:0
-[     158ms] [LOG] [SW] registered: http://127.0.0.1:5000/ @ http://127.0.0.1:5000/assets/js/global/worker-starter.js:6
-[     318ms] [LOG] [SW] controller changed → reload @ http://127.0.0.1:5000/assets/js/global/worker-starter.js:20
-[     695ms] [LOG] [SW] registered: http://127.0.0.1:5000/ @ http://127.0.0.1:5000/assets/js/global/worker-starter.js:6
-[     697ms] [WARNING] <meta name="apple-mobile-web-app-capable" content="yes"> is deprecated. Please include <meta name="mobile-web-app-capable" content="yes"> @ http://127.0.0.1:5000/more?cb=fresh1:0

@@ -1,7 +1,0 @@
-[     141ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://127.0.0.1:5000/api/csrf-token:0
-[     149ms] [LOG] [SW] registered: http://127.0.0.1:5000/ @ http://127.0.0.1:5000/assets/js/global/worker-starter.js:61
-[     166ms] [WARNING] <meta name="apple-mobile-web-app-capable" content="yes"> is deprecated. Please include <meta name="mobile-web-app-capable" content="yes"> @ http://127.0.0.1:5000/login?pwa=1&cb=final:0
-[     677ms] [LOG] [SW] controller changed → reload @ http://127.0.0.1:5000/assets/js/global/worker-starter.js:75
-[     964ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://127.0.0.1:5000/api/csrf-token:0
-[     966ms] [LOG] [SW] registered: http://127.0.0.1:5000/ @ http://127.0.0.1:5000/assets/js/global/worker-starter.js:61
-[     968ms] [WARNING] <meta name="apple-mobile-web-app-capable" content="yes"> is deprecated. Please include <meta name="mobile-web-app-capable" content="yes"> @ http://127.0.0.1:5000/login?pwa=1&cb=final:0
