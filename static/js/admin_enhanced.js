@@ -58,13 +58,12 @@ function showAlert(message, type = 'success') {
 // Funkcje ładowania danych
 async function refreshData() {
     try {
-        // Załaduj statystyki użytkowników plików
-        const response = await fetch('/admin/api/users');
-        const data = await response.json();
-
-        if (data.success) {
-            currentData.stats = data.stats;
-            currentData.fileUsers = data.users_data.users;
+        // Załaduj WSZYSTKICH użytkowników plików (API stronicuje, max 200/stronę —
+        // pętla po stronach). Wcześniej brana była tylko 1. strona => widać było 10.
+        const fileUsers = await fetchAllFileUsers();
+        if (fileUsers) {
+            currentData.stats = fileUsers.stats;
+            currentData.fileUsers = fileUsers.users;
             updateFileUsersTable();
         }
 
@@ -112,13 +111,30 @@ async function loadRegisteredUsers() {
     }
 }
 
+// Pobiera WSZYSTKICH użytkowników plików, przechodząc po wszystkich stronach API
+// (/admin/api/users stronicuje, max 200/stronę). Bez tego widać było tylko 10.
+async function fetchAllFileUsers() {
+    const users = [];
+    let stats = null;
+    let page = 1;
+    for (let guard = 0; guard < 1000; guard++) {
+        const resp = await fetch(`/admin/api/users?page=${page}&per_page=200`);
+        const data = await resp.json();
+        if (!data.success) break;
+        stats = data.stats;
+        const ud = data.users_data || {};
+        if (Array.isArray(ud.users)) users.push(...ud.users);
+        if (!ud.has_next) break;
+        page++;
+    }
+    return { users, stats };
+}
+
 async function loadFileUsers() {
     try {
-        const response = await fetch('/admin/api/users');
-        const data = await response.json();
-
-        if (data.success) {
-            currentData.fileUsers = data.users_data.users;
+        const fileUsers = await fetchAllFileUsers();
+        if (fileUsers) {
+            currentData.fileUsers = fileUsers.users;
             updateFileUsersTable();
         }
     } catch (error) {
@@ -579,7 +595,7 @@ async function deleteRegisteredUser(username, deleteFiles) {
     if (!confirm(confirmationMessage)) return;
 
     try {
-        const response = await fetch(`/admin/api/delete-registered-user/${username}?delete_files=${deleteFiles}`, {
+        const response = await fetch(`/admin/api/delete-registered-user/${encodeURIComponent(username)}?delete_files=${deleteFiles}`, {
             method: 'DELETE',
             headers: {
                 'X-CSRFToken': csrfToken
@@ -677,7 +693,7 @@ function closeLogsModal() {
 
 async function viewUserLogs(username) {
     try {
-        const response = await fetch(`/admin/api/user-logs/${username}`);
+        const response = await fetch(`/admin/api/user-logs/${encodeURIComponent(username)}`);
         const data = await response.json();
 
         if (data.success) {
@@ -730,6 +746,18 @@ async function viewUserLogs(username) {
                 content += '<p>Brak przesłanych formularzy.</p>';
             }
 
+            // Logi aktywności (actions.log) — wcześniej API je zwracało, ale modal
+            // ich nie wyświetlał.
+            const logs = Array.isArray(data.logs) ? data.logs : [];
+            content += '<h3>📜 Logi aktywności</h3>';
+            if (logs.length > 0) {
+                content += logs
+                    .map(l => `<div class="log-entry">${escapeHtml(l)}</div>`)
+                    .join('');
+            } else {
+                content += '<p>Brak logów aktywności.</p>';
+            }
+
             modalBody.innerHTML = content;
             document.getElementById('logsModal').style.display = 'block';
         } else {
@@ -743,7 +771,7 @@ async function viewUserLogs(username) {
 
 async function downloadUserData(username) {
     try {
-        const response = await fetch(`/admin/api/download-user/${username}`);
+        const response = await fetch(`/admin/api/download-user/${encodeURIComponent(username)}`);
 
         if (response.ok) {
             const blob = await response.blob();
@@ -770,7 +798,7 @@ async function deleteRegisteredUser(username) {
     if (!confirm(`Czy na pewno chcesz usunąć użytkownika ${username} i wszystkie jego dane? Tej operacji nie można cofnąć.`)) return;
 
     try {
-        const response = await fetch(`/admin/api/delete-registered-user/${username}`, {
+        const response = await fetch(`/admin/api/delete-registered-user/${encodeURIComponent(username)}`, {
             method: 'DELETE',
             headers: {
                 'X-CSRFToken': csrfToken
@@ -795,7 +823,7 @@ async function deleteUserFiles(username) {
     if (!confirm(`Czy na pewno chcesz usunąć WSZYSTKIE pliki użytkownika ${username}? Konto użytkownika NIE zostanie usunięte.`)) return;
 
     try {
-        const response = await fetch(`/admin/api/delete-user-files/${username}`, {
+        const response = await fetch(`/admin/api/delete-user-files/${encodeURIComponent(username)}`, {
             method: 'DELETE',
             headers: {
                 'X-CSRFToken': csrfToken

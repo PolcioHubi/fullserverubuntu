@@ -18,6 +18,7 @@ import re
 import sys
 import json
 import base64
+import gzip
 import hashlib
 import argparse
 import mimetypes
@@ -339,6 +340,34 @@ def read_text(filepath, encoding="utf-8"):
         return f.read()
 
 
+def _atomic_write_text(path, text, encoding="utf-8"):
+    """Zapisuje plik atomowo: pisze do rodzeństwa ``.tmp`` i podmienia przez
+    ``os.replace`` (atomowy rename w obrębie tego samego systemu plików).
+
+    Dzięki temu czytelnik czytający plik równolegle (heartbeat / ponowne otwarcie
+    All-in-One / service worker) widzi albo starą, albo nową zawartość — nigdy
+    w połowie zapisanego, uciętego ~45 MB pliku. To samo podejście co atomowy
+    zapis ``last_form_data.json``, ale dla dużego pliku All-in-One."""
+    path = Path(path)
+    tmp = path.with_name(path.name + ".tmp")
+    with open(tmp, "w", encoding=encoding) as f:
+        f.write(text)
+        f.flush()
+        os.fsync(f.fileno())
+    os.replace(tmp, path)
+
+
+def _atomic_write_bytes(path, data):
+    """Jak ``_atomic_write_text``, ale dla danych binarnych (np. payload ``.gz``)."""
+    path = Path(path)
+    tmp = path.with_name(path.name + ".tmp")
+    with open(tmp, "wb") as f:
+        f.write(data)
+        f.flush()
+        os.fsync(f.fileno())
+    os.replace(tmp, path)
+
+
 def resolve_path(base_dir, ref_path):
     """Rozwiązuje ścieżkę assetu relatywną lub absolutną do ścieżki na dysku.
 
@@ -575,6 +604,9 @@ class PageParser:
         # Inline'uj obrazy w body
         self._inline_images(body)
         self._inline_style_urls(body)
+        # Inline'uj assety /assets/... trzymane w atrybutach (np. data-layout-*-src),
+        # inaczej JS dociąga je z sieci.
+        self._inline_asset_attributes(body)
 
         # Zamień anchory nawigacji na SPA linki
         self._patch_navigation_links(body, page_name)
@@ -605,6 +637,26 @@ class PageParser:
             style = tag["style"]
             if "url(" in style:
                 tag["style"] = self._replace_style_urls(style)
+
+    def _inline_asset_attributes(self, element):
+        """Inline'uje ścieżki ``/assets/...`` trzymane w ATRYBUTACH (poza ``src``
+        i ``style``, które są już obsłużone osobno) — np. ``data-layout-active-src``
+        / ``data-layout-inactive-src``, z których ``documents.js`` ustawia
+        ``img.src`` przy zmianie układu kart. Bez tego te ikony SVG są dociągane
+        z sieci (psuje samodzielność All-in-One i działanie offline). Inline'ujemy
+        tylko atrybut, którego CAŁA wartość to pojedyncza, istniejąca ścieżka
+        assetu — złożone wartości (np. srcset) zostawiamy nietknięte."""
+        for tag in element.find_all(True):
+            for attr, value in list(tag.attrs.items()):
+                if attr in ("src", "style") or not isinstance(value, str):
+                    continue
+                v = value.strip()
+                if not (v.startswith("/assets/") or v.startswith("assets/")):
+                    continue
+                resolved = resolve_path(STATIC_NEW, v)
+                if resolved and resolved.exists():
+                    tag[attr] = file_to_base64(resolved)
+                    self._stats["images_inlined"] += 1
 
     def _replace_style_urls(self, style_str):
         """Zamienia url('/assets/...') w stringu stylu na data URI."""
@@ -857,6 +909,19 @@ def generate_spa_router(selected_docs=None, is_per_user=False):
                 target.style.opacity = '1';
                 target.style.transform = 'translateY(0)';
             }});
+            // Po animacji wejścia USUŃ transform sekcji. Dopóki sekcja ma
+            // transform (nawet translateY(0)), staje się "containing block" dla
+            // position:fixed dzieci — a kontener przewijania dokumentu
+            // ([data-standalone]) jest fixed. Zalegający transform losowo psuje
+            // przewijanie dotykiem na mobile (zwł. iOS) po nawigacji — to jest
+            // bug "po wejściu w dokument ponownie nie da się scrollować".
+            // translateY(0) == brak przesunięcia, więc usunięcie nie zmienia widoku.
+            setTimeout(function() {{
+                if (_currentPage === resolved && target) {{
+                    target.style.transition = '';
+                    target.style.transform = '';
+                }}
+            }}, 220);
         }}
 
         _currentPage = resolved;
@@ -872,6 +937,21 @@ def generate_spa_router(selected_docs=None, is_per_user=False):
         updateActiveTab(resolved);
         _trackingEnabled.value = true;
         initPageManager(resolved);
+        // Systemowy "heal" przewijania (All-in-One): managery używają GLOBALNYCH
+        // selektorów ($("[data-standalone]"), tytuły), a tu wszystkie strony są w
+        // DOM naraz — więc np. otwarcie pod-panelu w "Więcej" globalnie zdejmuje
+        // overflow[y-auto] z KAŻDEJ strony (po wyjściu zakładką wszystko zamrożone),
+        // a handlery scrolla krzyżowo ruszają cudze tytuły (glitch tytułu "Więcej").
+        // Przy KAŻDYM wejściu przywracamy AKTYWNEJ stronie czysty, przewijalny
+        // stan + reset belki tytułu. Zawężone do tej sekcji (nie globalnie).
+        if (window.jQuery && target) {{
+            var $sa = $(target).find('[data-standalone]');
+            $sa.removeClass('overflow[hidden]').addClass('overflow[y-auto] overflow[x-hidden]');
+            try {{ $sa.scrollTop(0); }} catch(e) {{}}
+            $(target).find('.dashboard-navigation-large-title').css({{ opacity: '', transform: '' }});
+            $(target).find('.dashboard-navigation-small-title').removeClass('is-visible');
+            $(target).find('.dashboard-navigation').removeClass('scrolled background[backdrop]');
+        }}
         if (window.__allInOneEmblemBridge && typeof window.__allInOneEmblemBridge.onPageShown === 'function') {{
             requestAnimationFrame(function() {{
                 window.__allInOneEmblemBridge.onPageShown(resolved, target);
@@ -963,6 +1043,12 @@ def generate_spa_router(selected_docs=None, is_per_user=False):
 
     function initPageManager(pageName) {{
         console.log('[SPA] initPageManager:', pageName);
+        // Systemowy fix przewijania: managery bindują handlery scrolla GLOBALNIE
+        // do $("[data-standalone]") i część NIE odpina starych — w All-in-One
+        // (wszystkie strony w DOM naraz) kumulują się i krzyżowo ruszają tytuły/
+        // nawigację innych stron. Zdejmujemy wszystkie przed re-initem; aktywny
+        // manager zaraz podepnie swój na nowo, więc żywy jest tylko jeden.
+        if (window.jQuery) {{ try {{ $('[data-standalone]').off('scroll'); }} catch(e) {{}} }}
         try {{
             switch(pageName) {{
                 case 'documents':
@@ -1867,7 +1953,7 @@ class Compiler:
 
         # Krok 5: Złóż wynikowy HTML
         log("Składanie wynikowego HTML...")
-        final_html = self._assemble(
+        payload_html = self._assemble(
             page_sections, css_content, js_blocks,
             spa_router, js_patches,
             user_doc_sections=user_doc_sections,
@@ -1876,16 +1962,43 @@ class Compiler:
             user_photo_b64=user_photo_b64,
         )
 
-        # Krok 6: Zapisz
+        # Krok 6: Zapisz — DWA pliki, żeby pokazać REALNY pasek pobierania:
+        #   allinone.payload.html  → ciężka zawartość (~40 MB), pobierana strumieniowo
+        #   allinone.html (shell)  → malutki loader, ładuje się od razu i dociąga payload
         self.output_path.parent.mkdir(parents=True, exist_ok=True)
-        with open(self.output_path, "w", encoding="utf-8") as f:
-            f.write(final_html)
+        payload_path = self.output_path.with_name("allinone.payload.html")
+        shell_html = self._build_shell(payload_path.name)
+        # Zapis ATOMOWY (temp + os.replace), payload PRZED shellem. Współbieżny
+        # czytelnik (heartbeat / ponowne otwarcie / SW) nigdy nie zobaczy
+        # w połowie zapisanego ~45 MB pliku — dostaje albo całą starą, albo całą
+        # nową wersję. Shell (wskazujący na payload) ląduje na dysku dopiero, gdy
+        # payload jest już w całości podmieniony.
+        # Zapisz TYLKO spakowaną wersję payloadu (.gz). Przeglądarki zawsze proszą
+        # o gzip, więc nieskompresowany ~45 MB plik tylko zajmowałby dysk; serwer
+        # rozpakowuje go w locie dla rzadkiego klienta bez gzip. Gzip robiony RAZ
+        # tutaj (nie na każde żądanie). Loader liczy % po NIESKOMPRESOWANYM
+        # X-Payload-Size (czytanym z trailera gzip), więc gzip jest przezroczysty.
+        _atomic_write_bytes(
+            payload_path.with_name(payload_path.name + ".gz"),
+            gzip.compress(payload_html.encode("utf-8"), compresslevel=6),
+        )
+        # Posprzątaj ewentualny stary, nieskompresowany payload z poprzednich kompilacji.
+        try:
+            if payload_path.exists():
+                payload_path.unlink()
+        except OSError:
+            pass
+        # Shell zapisujemy NA KOŃCU — wskazuje na payload, więc trafia na dysk
+        # dopiero, gdy spakowany payload jest już w całości na miejscu.
+        _atomic_write_text(self.output_path, shell_html)
 
-        # Podsumowanie
-        size_mb = os.path.getsize(self.output_path) / (1024 * 1024)
+        # Podsumowanie (na dysku trzymamy tylko spakowany payload .gz)
+        payload_gz_path = payload_path.with_name(payload_path.name + ".gz")
+        size_mb = os.path.getsize(payload_gz_path) / (1024 * 1024)
+        shell_kb = os.path.getsize(self.output_path) / 1024
         log("=" * 60)
-        log(f"GOTOWE! Plik: {self.output_path}", "OK")
-        log(f"Rozmiar: {size_mb:.2f} MB", "OK")
+        log(f"GOTOWE! Shell: {self.output_path} ({shell_kb:.1f} KB)", "OK")
+        log(f"Payload (gzip): {payload_gz_path} ({size_mb:.2f} MB)", "OK")
         log(f"Strony zmergowane: {self.page_parser.stats['pages']}", "OK")
         if self.is_per_user:
             log(f"Dokumenty użytkownika: {len(user_doc_sections)}", "OK")
@@ -1953,6 +2066,10 @@ class Compiler:
                 style = tag["style"]
                 if "url(" in style:
                     tag["style"] = self._replace_doc_style_urls(style)
+
+            # Inline'uj assety /assets/... w atrybutach (np. data-*-src), żeby nie
+            # były dociągane z sieci w pobranym All-in-One.
+            self.page_parser._inline_asset_attributes(body)
 
             # Patchuj nawigację: data-redirect="documents" → data-spa-nav
             nav_targets = {
@@ -2307,16 +2424,13 @@ class Compiler:
                 all_refs.append(extra)
         return self.js_resolver.resolve_scripts(all_refs)
 
-    def _build_splash(self):
-        """Buduje ekran ładowania (splash) z determinowanym paskiem postępu.
+    def _build_splash_ui(self):
+        """Splash UI (style + html) z DETERMINOWANYM paskiem postępu.
 
-        Zwraca ``(style, html, script)``. Wszystko jest samowystarczalne i inline
-        (bez żądań sieciowych), a krytyczny CSS ląduje w <head> PRZED wielkim
-        blokiem <style>, więc splash maluje się od razu — zanim przeglądarka
-        zdąży zdekodować setki obrazów Base64. Pasek rośnie czasowo do ~90%
-        (faza parsowania), potem wg liczby zdekodowanych obrazów, a po
-        ``window.load`` skacze do 100% i znika. Bezpiecznik 12 s nigdy nie
-        zostawia użytkownika na splashu."""
+        Używany w *shellu* (allinone.html). Pasek napędza ``_build_loader_script``
+        realnymi bajtami pobranego payloadu (allinone.payload.html) — nie ma już
+        zmyślonego timera. ``#aio-sub`` ma id, bo loader podmienia jego tekst przy
+        błędzie sieci."""
         style = (
             "    <style id=\"aio-splash-style\">\n"
             "#aio-splash{position:fixed;inset:0;z-index:2147483646;display:flex;"
@@ -2344,41 +2458,146 @@ class Compiler:
             '<div class="aio-box">'
             f"{logo_img}"
             '<div class="aio-title">mObywatel</div>'
-            '<div class="aio-sub">Wczytywanie aplikacji…</div>'
+            '<div class="aio-sub" id="aio-sub">Wczytywanie aplikacji…</div>'
             '<div class="aio-track"><div class="aio-fill" id="aio-fill"></div></div>'
             '<div class="aio-pct" id="aio-pct">0%</div>'
             "</div></div>"
         )
+        return style, html
 
-        script = (
+    def _build_loader_script(self, payload_name):
+        """Loader shellu: STRUMIENIOWO pobiera payload (pokazując REALNY pasek %),
+        a potem NAWIGUJE do prawdziwego URL payloadu — nie robi blokującego
+        ``document.write`` 40+ MB (zamrażał wątek) ani nawigacji do jednorazowego
+        ``blob:`` (psuł ręczne przeładowanie / pull-to-refresh — sprawdzone: reload
+        dokumentu blob ląduje na stronie błędu). Przeglądarka parsuje payload
+        PRZYROSTOWO (bez zamrożenia), a że to realny adres — reload działa normalnie.
+
+        Strumieniowanie napędza pasek (``odebrane / X-Payload-Size`` — nagłówek
+        z nieskompresowanym rozmiarem, odporny na gzip) i „rozgrzewa" cache, więc
+        następująca nawigacja zwykle kończy się 304 (bez drugiego pełnego pobrania).
+        Bajtów nie trzymamy w pamięci. ``AbortController`` z watchdogiem resetowanym
+        przy każdym chunku (idle 25 s) przerywa zacięty pobór i pokazuje CTA zamiast
+        wisieć ~15 min; ``received>=total`` to koniec. Brak strumieni (stary browser)
+        → od razu zwykła nawigacja do payloadu."""
+        pn = json.dumps(payload_name)
+        return (
             "<script>\n"
             "(function(){\n"
             "var fill=document.getElementById('aio-fill'),pct=document.getElementById('aio-pct'),"
-            "splash=document.getElementById('aio-splash');\n"
-            "if(!splash){return;}\n"
-            "var p=0,done=false,stage2=false;\n"
+            "sub=document.getElementById('aio-sub'),splash=document.getElementById('aio-splash');\n"
+            "var p=0,finished=false;\n"
             "function set(v){v=Math.max(p,Math.min(100,v));p=v;"
             "if(fill){fill.style.width=v+'%';}if(pct){pct.textContent=Math.round(v)+'%';}}\n"
-            "var now=function(){return (window.performance&&performance.now)?performance.now():Date.now();};\n"
-            "var t0=now();\n"
-            "var raf=window.requestAnimationFrame||function(f){return setTimeout(function(){f(now());},16);};\n"
-            "function tick(){if(done){return;}if(!stage2){var el=(now()-t0)/6000;if(el>1){el=1;}"
-            "set(90*(1-Math.pow(1-el,3)));}raf(tick);}\n"
-            "raf(tick);\n"
-            "document.addEventListener('DOMContentLoaded',function(){\n"
-            "stage2=true;\n"
-            "var imgs=Array.prototype.slice.call(document.images||[]);\n"
-            "var total=imgs.length||1,cnt=0;\n"
-            "function bump(){cnt++;set(25+70*(cnt/total));}\n"
-            "imgs.forEach(function(im){if(im.complete){bump();}"
-            "else{im.addEventListener('load',bump,{once:true});im.addEventListener('error',bump,{once:true});}});\n"
-            "if(!imgs.length){set(95);}\n"
-            "});\n"
-            "function finish(){if(done){return;}done=true;set(100);"
-            "setTimeout(function(){splash.classList.add('aio-hide');"
-            "setTimeout(function(){if(splash&&splash.parentNode){splash.parentNode.removeChild(splash);}},500);},180);}\n"
-            "window.addEventListener('load',finish);\n"
-            "setTimeout(finish,12000);\n"
+            "function fail(){if(finished){return;}finished=true;"
+            "if(sub){sub.textContent='Nie udało się wczytać pliku. Otwórz aplikację i spróbuj ponownie.';}"
+            "if(pct){pct.textContent='';}if(fill){fill.style.width='0%';}"
+            "var box=splash?splash.querySelector('.aio-box'):null;"
+            "if(box&&!box.querySelector('.aio-cta')){var a=document.createElement('a');a.className='aio-cta';"
+            "a.href='/documents';a.textContent='Przejdź do aplikacji';"
+            "a.style.cssText='display:inline-block;margin-top:16px;background:#285ff4;color:#fff;padding:10px 20px;border-radius:999px;text-decoration:none;font-weight:600;font-size:14px;';"
+            "box.appendChild(a);}}\n"
+            # Po napełnieniu paska nawiguj do PRAWDZIWEGO URL payloadu (zachowując
+            # #hash, np. #login). Realny adres => ręczne przeładowanie działa.
+            "function go(){if(finished){return;}finished=true;set(100);"
+            "window.location.replace(" + pn + "+(window.location.hash||''));}\n"
+            "if(!window.fetch||!window.ReadableStream){window.location.replace(" + pn + ");return;}\n"
+            "var ctrl=('AbortController' in window)?new AbortController():null,idle=null;\n"
+            "function arm(){if(!ctrl){return;}if(idle){clearTimeout(idle);}"
+            "idle=setTimeout(function(){try{ctrl.abort();}catch(e){}},25000);}\n"
+            "function disarm(){if(idle){clearTimeout(idle);idle=null;}}\n"
+            "var opts={credentials:'same-origin'};if(ctrl){opts.signal=ctrl.signal;}\n"
+            # Po rekompilacji z poziomu AIO shell wraca z ?fresh=1 — omijamy wtedy
+            # cache (max-age), żeby pobrać świeżo przekompilowany payload.
+            "if(location.search.indexOf('fresh')!==-1){opts.cache='reload';}\n"
+            "arm();\n"
+            "fetch(" + pn + ",opts).then(function(resp){\n"
+            "if(!resp.ok||!resp.body){throw new Error('bad response');}\n"
+            "var total=parseInt(resp.headers.get('X-Payload-Size')||resp.headers.get('Content-Length')||'0',10);\n"
+            "var reader=resp.body.getReader(),received=0;\n"
+            "function pump(){return reader.read().then(function(r){\n"
+            "if(finished){return;}\n"
+            "if(r.done){disarm();go();return;}\n"
+            "arm();received+=r.value.length;\n"
+            "if(total>0){set(Math.min(99,received/total*100));"
+            "if(received>=total){try{reader.cancel();}catch(e){}disarm();go();return;}}"
+            "else if(pct){pct.textContent=(received/1048576).toFixed(1)+' MB';}\n"
+            "return pump();});}\n"
+            "return pump();\n"
+            "}).catch(function(){disarm();fail();});\n"
+            "})();\n"
+            "</script>"
+        )
+
+    def _build_shell(self, payload_name):
+        """Buduje malutki shell (allinone.html), który ładuje się natychmiast,
+        pokazuje ekran z realnym paskiem i dociąga ciężki payload."""
+        splash_style, splash_html = self._build_splash_ui()
+        loader = self._build_loader_script(payload_name)
+        return (
+            "<!DOCTYPE html>\n"
+            '<html lang="pl" data-theme="default" data-mode="light" data-custom>\n'
+            "<head>\n"
+            '    <meta charset="UTF-8">\n'
+            '    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">\n'
+            '    <meta name="theme-color" content="#f5f6fb">\n'
+            '    <meta name="apple-mobile-web-app-title" content="mObywatel">\n'
+            '    <meta name="mobile-web-app-capable" content="yes">\n'
+            '    <meta name="apple-mobile-web-app-capable" content="yes">\n'
+            "    <title>mObywatel</title>\n"
+            '    <link rel="shortcut icon" href="/assets/img/logo.png" type="image/x-icon">\n'
+            '    <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-180x.png">\n'
+            '    <link rel="manifest" href="/allinone-manifest.json">\n'
+            "    <script>if('serviceWorker' in navigator){window.addEventListener('load',function(){"
+            "navigator.serviceWorker.register('/allinone-sw.js',{scope:'/user_files/',updateViaCache:'none'})"
+            ".catch(function(){});});}</script>\n"
+            + splash_style + "\n"
+            "</head>\n"
+            "<body>\n"
+            + splash_html + "\n"
+            + loader + "\n"
+            "</body>\n"
+            "</html>"
+        )
+
+    def _build_payload_cover(self):
+        """Lekka zasłona dla payloadu (bez paska — pasek pokazuje shell).
+
+        Po ``document.write`` payload renderuje się z pamięci (pobieranie już za
+        nami); ta zasłona przykrywa krótką chwilę dekodowania obrazów i znika na
+        ``window.load``. Bezpiecznik 8 s."""
+        style = (
+            "    <style id=\"aio-cover-style\">\n"
+            "#aio-cover{position:fixed;inset:0;z-index:2147483646;display:flex;"
+            "align-items:center;justify-content:center;background:#f5f6fb;transition:opacity .35s ease;"
+            "font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;}\n"
+            "#aio-cover.aio-hide{opacity:0;pointer-events:none;}\n"
+            "#aio-cover .aio-box{text-align:center;}\n"
+            "#aio-cover .aio-logo{width:72px;height:72px;margin:0 auto 18px;display:block;}\n"
+            "#aio-cover .aio-title{font-size:20px;font-weight:700;color:#1b1f24;margin:0 0 4px;}\n"
+            "#aio-cover .aio-sub{font-size:13px;color:#67707d;margin:0;}\n"
+            "@media (prefers-reduced-motion:reduce){#aio-cover{transition:none;}}\n"
+            "    </style>"
+        )
+        logo_b64 = file_to_base64(STATIC_NEW / "assets" / "svg" / "logo.svg")
+        logo_img = (
+            f'<img class="aio-logo" src="{logo_b64}" alt="mObywatel">' if logo_b64 else ""
+        )
+        html = (
+            '<div id="aio-cover" role="status" aria-live="polite"><div class="aio-box">'
+            f"{logo_img}"
+            '<div class="aio-title">mObywatel</div>'
+            '<div class="aio-sub">Wczytywanie…</div>'
+            "</div></div>"
+        )
+        script = (
+            "<script>\n"
+            "(function(){var c=document.getElementById('aio-cover');if(!c){return;}\n"
+            "function hide(){c.classList.add('aio-hide');"
+            "setTimeout(function(){if(c&&c.parentNode){c.parentNode.removeChild(c);}},450);}\n"
+            "if(document.readyState==='complete'){setTimeout(hide,120);}"
+            "else{window.addEventListener('load',function(){setTimeout(hide,120);});}\n"
+            "setTimeout(hide,8000);\n"
             "})();\n"
             "</script>"
         )
@@ -2400,8 +2619,8 @@ class Compiler:
         if img_saved:
             log(f"Dedup obrazów: zaoszczędzono ~{img_saved // 1024} KB Base64", "OK")
 
-        # Ekran ładowania (splash) z paskiem postępu — osadzony, działa offline.
-        splash_style, splash_html, splash_script = self._build_splash()
+        # Lekka zasłona ładowania payloadu (pasek postępu jest w shellu).
+        cover_style, cover_html, cover_script = self._build_payload_cover()
 
         js_all = "\n\n".join(
             [f"// === {name} ===\n{code}" for name, code in js_blocks]
@@ -2464,7 +2683,7 @@ class Compiler:
         }});
     }})();
     </script>
-{splash_style}
+{cover_style}
 {external_links}    <style>
 {css_content}
 
@@ -2500,8 +2719,8 @@ a[data-spa-nav].nav-active span.active {{
     </style>
 </head>
 <body>
-{splash_html}
-{splash_script}
+{cover_html}
+{cover_script}
 {pages_html}
 {img_registry_js}
 <script>

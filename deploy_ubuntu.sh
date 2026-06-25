@@ -138,8 +138,9 @@ EOF
 # --- KROK 4.6: Zwiększenie limitu rozmiaru przesyłanych plików ---
 echo ">>> KROK 4.6: Konfiguracja limitu rozmiaru plików (client_max_body_size)..."
 sudo tee /etc/nginx/snippets/upload-limits.conf > /dev/null <<EOF
-# Zwiększenie limitu przesyłanych plików do 512MB (dla importu backupów)
-client_max_body_size 512M;
+# 0 = bez limitu rozmiaru uploadu (duże backupy importu/eksportu). Limit i tak
+# egzekwuje aplikacja per-route: import nielimitowany, reszta = 512MB.
+client_max_body_size 0;
 
 # Kompresja gzip — istotna dla dużych odpowiedzi HTML (np. pliku All-in-One
 # serwowanego przez Flask spod /user_files/). Odzyskuje resztę powtarzalności

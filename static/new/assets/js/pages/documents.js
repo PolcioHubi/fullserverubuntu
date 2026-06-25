@@ -2,12 +2,13 @@ const documentsManager = {
     init() {
         this.setupLayout();
         this.listeners();
+        this.collapsibleHeader();
     },
 
     setupLayout() {
         this.$standalone = $("[data-standalone]");
         this.$wrapper = $("[data-wrapper]");
-        this.$standalone.removeClass("overflow[hidden]").addClass("overflow[hidden] fixed");
+        this.$standalone.removeClass("overflow[hidden]").addClass("overflow[y-auto] overflow[x-hidden] fixed");
         this.$wrapper.removeClass("scale[0.9]");
         $("body").removeClass("add-document-list-open customize-document-open");
         $(".add_document_list").css("transform", "translateX(100%)");
@@ -20,6 +21,51 @@ const documentsManager = {
             this.$standalone.removeClass("overflow[hidden]").addClass("overflow[x-hidden]");
             $(".navigation").removeClass("sticky").addClass("fixed fillWidth");
         }
+    },
+
+    collapsibleHeader() {
+        // Collapse the big "Dokumenty" title into the top bar on scroll, and
+        // collapse the "Dodaj dokument" FAB to just "+". Scoped to the active
+        // page (same pattern as services.js) so the All-in-One — where every
+        // page is in the DOM at once — reads THIS page's scroll/title, not the
+        // first page's. In the normal app $root === document (single page).
+        const $root = $(window._spaActiveSection || document);
+        const $scrollable = $root.find("[data-standalone]");
+        const $nav = $root.find(".dashboard-navigation").first();
+        const $largeTitle = $root.find(".dashboard-navigation-large-title");
+        const $smallTitle = $root.find(".dashboard-navigation-small-title");
+        const $fab = $root.find(".documents-fab");
+        if (!$scrollable.length || !$largeTitle.length) return;
+
+        $scrollable.off("scroll.documentsManager");
+
+        const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+        function progress() {
+            const st = $scrollable.scrollTop();
+            const navH = $nav.outerHeight() || 0;
+            const cRect = $scrollable[0].getBoundingClientRect();
+            const tRect = $largeTitle[0].getBoundingClientRect();
+            const top = (tRect.top - cRect.top) + st;
+            const h = Math.max(1, $largeTitle.outerHeight());
+            return clamp(((st + navH) - top) / h, 0, 1);
+        }
+        // Hysteresis: collapse only past 0.55, expand only below 0.3. A single
+        // threshold makes the FAB flip back and forth ("bounce") when the user
+        // parks the scroll right at the boundary.
+        let fabCollapsed = $fab.hasClass("is-collapsed");
+        function apply(p) {
+            $largeTitle.css({
+                opacity: 1 - p,
+                transform: "translateY(" + (-8 * p) + "px) scale(" + (1 - 0.02 * p) + ")"
+            });
+            $smallTitle.toggleClass("is-visible", p > 0.55);
+            $nav.toggleClass("background[backdrop] scrolled", p > 0.55);
+            if (!fabCollapsed && p > 0.55) fabCollapsed = true;
+            else if (fabCollapsed && p < 0.3) fabCollapsed = false;
+            $fab.toggleClass("is-collapsed", fabCollapsed);
+        }
+        apply(progress());
+        $scrollable.on("scroll.documentsManager", function () { apply(progress()); });
     },
 
     listeners() {

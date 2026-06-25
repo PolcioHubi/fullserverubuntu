@@ -256,11 +256,61 @@ textarea.secondary:focus {
 }
 
 .navigation {
-    background-color: rgba(var(--navigation-background), 0.85);
-    box-shadow:         0px -0.5px 0px 0px rgba(var(--ring), 0.15);
-    -webkit-box-shadow: 0px -0.5px 0px 0px rgba(var(--ring), 0.15);
-    -moz-box-shadow:    0px -0.5px 0px 0px rgba(var(--ring), 0.15);
+    /* Flat bottom bar: same colour as the page background, no shadow/blur so it
+       blends in and doesn't "stick out" (backdrop[8px] removed from markup too). */
+    background-color: rgba(var(--background-custom), 1);
+    box-shadow: none;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
 }
+
+/* Documents top-right icons (chat / notifications) — slightly greyed down. */
+#chat-button .theme-icon,
+#notif-bell .theme-icon {
+    opacity: 0.72;
+    width: 20px;
+    height: 20px;
+}
+
+/* "Dodaj dokument" floating button — rounded square, collapses to just "+"
+   on scroll (toggled by documentsManager.collapsibleHeader). */
+.documents-fab {
+    position: fixed;
+    right: 16px;
+    bottom: 92px;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    height: 52px;
+    padding: 0 22px;
+    border: 0;
+    border-radius: 16px;
+    background-color: rgba(31, 80, 214, 1);
+    color: #fff;
+    font-family: var(--font-custom);
+    font-size: 15px;
+    font-weight: 400;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .18);
+    /* Slow, smooth, no-overshoot easing so collapse/expand glides (no bounce). */
+    transition: width .42s cubic-bezier(.4, 0, .2, 1), padding .42s cubic-bezier(.4, 0, .2, 1), gap .42s cubic-bezier(.4, 0, .2, 1);
+}
+.documents-fab .documents-fab-label { white-space: nowrap; overflow: hidden; max-width: 220px; opacity: 1; transition: max-width .42s cubic-bezier(.4, 0, .2, 1), opacity .34s cubic-bezier(.4, 0, .2, 1); }
+.documents-fab .documents-fab-plus { position: relative; display: inline-block; width: 16px; height: 16px; }
+.documents-fab .documents-fab-plus::before,
+.documents-fab .documents-fab-plus::after { content: ""; position: absolute; background: currentColor; }
+.documents-fab .documents-fab-plus::before { top: 50%; left: 0; right: 0; height: 1.5px; transform: translateY(-50%); }
+.documents-fab .documents-fab-plus::after { left: 50%; top: 0; bottom: 0; width: 1.5px; transform: translateX(-50%); }
+.documents-fab.is-collapsed { width: 52px; padding: 0; gap: 0; }
+.documents-fab.is-collapsed .documents-fab-label { max-width: 0; opacity: 0; }
+
+/* "Dokumenty" page title — compact (~25px), bold, dark (inherits --primary 25,25,25). */
+.documents-title { font-size: 25px; font-weight: 600; }
+
+/* "Dostosuj widok" link — muted dark grey (overrides .redirect's blue). */
+.documents-customize-link { color: rgba(31, 80, 214, 1) !important; }
 
 .add_document_list .navigation {
     background-color: rgba(var(--navigation-background), 1);
@@ -496,6 +546,7 @@ body.customize-document-open [data-group="navigation"] {
 
 .doc_title {
     color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, .25);
 }
 
 .doc_background{

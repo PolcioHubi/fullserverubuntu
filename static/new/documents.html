@@ -28,7 +28,10 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-180x.png">
     <link rel="apple-touch-startup-image" sizes="180x180" href="/assets/img/apple-180x.png">
     <link rel="manifest" href="/manifest.json">
-    <link rel="stylesheet" href="/assets/css/style.css?v=20260309-documents-layout-7">
+    <link rel="stylesheet" href="/assets/css/style.css?v=20260619-nav-3">
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link crossorigin href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <!-- JavaScript -->
     <script src='/assets/js/global/jquery.js'></script>
     <script src='/assets/js/global/qrcode.js'></script>
@@ -49,10 +52,13 @@
     <link rel="stylesheet" href="/static/css/csp-inline-utilities.css?v=1">
 </head>
 <body class="background[unset]">
-    <div class="fillWidth fillHeight overflow[hidden]" data-standalone>
+    <div class="fillWidth fillHeight overflow[y-auto]" data-standalone>
         <div class="dashboard-navigation sticky top[0] background[unset] flex direction[row] justify[between] align[end] g[s] fillWidth height[60px] px[s] z[max] pb[s]">
             <img class="square[35px]" src="/assets/svg/logo.svg" alt="">
-            <div class="flex direction[row] g[4] autoHeight autoWidth">
+            <div class="fillWidth flex justify[start] align[center] dashboard-navigation-small-title">
+                <h1 class="font[Inter] text-align[center] font-weight[600] text-size[18] text[nowrap]">Dokumenty</h1>
+            </div>
+            <div class="flex direction[row] g[12] autoHeight autoWidth">
                 <div class="square[35px] flex justify[center] align[center] cursor[pointer] csp-s-d461c96d" id="chat-button">
                     <img class="theme-icon square[25px] radius[m]" src="/assets/svg/documents/ai.svg" alt="">
                     <span class="csp-s-16953ed4" id="chat-badge"></span>
@@ -65,19 +71,13 @@
         </div>
         <div class="relative fillWidth fillHeight us[none] pb[s]" data-wrapper>
             <div class="flex direction[column] g[4]">
-                <div class="flex fillWidth autoHeight px[s]">
-                    <div class="height[30px] flex justify[center] align[center] cursor[pointer]">
-                        <h1 class="font[Inter] font-weight[700] text-size[36]">Dokumenty</h1>
-                    </div>
-                </div>
-                <div class="flex direction[row] justify[end] align[center] g[s] fillWidth height[30px] px[s] mb[s]">
-                    <div class="height[30px] flex direction[row] g[16] justify[center] align[center] cursor[pointer]">
-                        <a class="redirect font-weight[500] text-size[14] text-align[left]" data-button="documents">Dostosuj</a>
-                        <a class="redirect font-weight[500] text-size[14] text-align[left]" data-button="add_document_list">Dodaj</a>
+                <div class="flex fillWidth autoHeight px[s] mt[16]">
+                    <div class="height[30px] flex justify[start] align[center] cursor[pointer] dashboard-navigation-large-title">
+                        <h1 class="font[Inter] documents-title">Dokumenty</h1>
                     </div>
                 </div>
             </div>
-            <div class="documents-layout-root pagePop" data-documents-layout-root data-documents-ready="0">
+            <div class="documents-layout-root pagePop mt[16]" data-documents-layout-root data-documents-ready="0">
                 <div class="documents-layout-view documents-layout-overlap relative fillWidth max-height[810px]" data-layout-view="overlap">
                     <div class="absolute z[1] flex top[0px] justify[center] align[center] fillWidth autoHeight px[s]" data-document-card="mdowod" data-layout-card="overlap" data-document-key="mdowod" data-redirect="my-document/mdowod">
                         <p class="doc_title absolute font[Inter] font-weight[600] text-size[18] top[20px] left[30px]">mDowód</p>
@@ -200,6 +200,9 @@
                         </div>
                     </div>
                 </div>
+            </div>
+            <div class="flex justify[start] align[center] fillWidth px[s] mt[24]">
+                <a class="redirect font-weight[500] text-size[14] documents-customize-link" data-button="documents">Dostosuj widok</a>
             </div>
         </div>
         <div class="add_document_list add-document-list-panel absolute top[0] z[max] fillWidth overflow[hidden] flex direction[column] background[unset] csp-s-d5f7c1ec">
@@ -622,7 +625,11 @@
         </div>
     </div>
 
-    <div class="navigation backdrop[8px] sticky  top[100] flex justify[end] align[center] bottom[0] height[80px] z[max]" data-group="navigation">
+    <button type="button" class="documents-fab" data-button="add_document_list" aria-label="Dodaj dokument">
+        <span class="documents-fab-plus"></span>
+        <span class="documents-fab-label">Dodaj dokument</span>
+    </button>
+    <div class="navigation sticky  top[100] flex justify[end] align[center] bottom[0] height[80px] z[max]" data-group="navigation">
     <div class="fillWidth fillHeight flex direction[row] justify[around] align[start]">
                 <a
             href="/documents"

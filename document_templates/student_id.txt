@@ -239,29 +239,5 @@
 </div>
 </div>
 </div>
-<div class="navigation backdrop[8px] sticky top[100] flex justify[end] align[center] bottom[0] height[80px] z[max]" data-group="navigation">
-<div class="fillWidth fillHeight flex direction[row] justify[around] align[start]">
-<a aria-label="documents" class="fillHeight fillWidth flex direction[column] g[4] justify[center] align[center] max-height[60px] mb[4] text-decoration[none]" href="/documents">
-<img alt="documents" class="square[20px]" src="/assets/svg/navigation/light/documents_active.svg"/>
-<span class="label active text-size[10] text[nowrap]">
-                Dokumenty            </span>
-</a>
-<a aria-label="services" class="fillHeight fillWidth flex direction[column] g[4] justify[center] align[center] max-height[60px] mb[4] text-decoration[none]" href="/services">
-<img alt="services" class="square[20px]" src="/assets/svg/navigation/light/services.svg"/>
-<span class="label text-size[10] text[nowrap]">
-                Usługi            </span>
-</a>
-<a aria-label="qr_code" class="fillHeight fillWidth flex direction[column] g[4] justify[center] align[center] max-height[60px] mb[4] text-decoration[none]" href="/qr_code">
-<img alt="qr_code" class="square[20px]" src="/assets/svg/navigation/light/qr_code.svg"/>
-<span class="label text-size[10] text[nowrap]">
-                Kod QR            </span>
-</a>
-<a aria-label="more" class="fillHeight fillWidth flex direction[column] g[4] justify[center] align[center] max-height[60px] mb[4] text-decoration[none]" href="/more">
-<img alt="more" class="square[20px]" src="/assets/svg/navigation/light/more.svg"/>
-<span class="label text-size[10] text[nowrap]">
-                Więcej            </span>
-</a>
-</div>
-</div>
 </body>
 </html>

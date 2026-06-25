@@ -202,8 +202,11 @@ def test_doc_guard_self_heals_then_shows_gentle_toast(logged_in_client, user_for
     # Self-heal: reload once, guarded by a session flag (no infinite loop).
     assert "location.reload()" in injected
     assert "__doc_guard_reloaded" in injected
-    # Reload is skipped inside the All-in-One (embedded data → reload can't help).
-    assert "window.__AIO_GUARD" in injected
+    # CRITICAL (heavy 42MB file): the reload is GATED behind !window.__AIO_GUARD,
+    # so the All-in-One NEVER auto-reloads. Lock the gate by ordering: the AIO
+    # check must appear before the reload call.
+    assert "!window.__AIO_GUARD" in injected
+    assert injected.index("!window.__AIO_GUARD") < injected.index("location.reload()")
     # Gentle, dismissible toast instead of the old full-width orange banner.
     assert "doc-guard-toast" in injected
     assert "showToast" in injected
@@ -213,6 +216,23 @@ def test_doc_guard_self_heals_then_shows_gentle_toast(logged_in_client, user_for
     # Anti-sharing hard block (different account) must remain.
     assert "showBlock" in injected
     assert "GUARD.username" in injected
+
+
+def test_aio_staleness_cta_recompiles_and_reloads_fresh(logged_in_client, user_form_data_on_disk):
+    """Inside the All-in-One the 'Pobierz aktualny plik' CTA must REALLY refresh:
+    one-click recompile (POST /api/compile-allinone with the embedded selected
+    docs) + reload the shell with ?fresh=1. The old <a href=/documents> was
+    swallowed by the SPA router (stayed in the stale AIO) — that's the bug."""
+    files_folder, _ = user_form_data_on_disk
+    injected = _inject_doc_guard_js(
+        "<html><body>x</body></html>", username="testuser",
+        doc_key="new_mdowod", files_folder=files_folder,
+    )
+    assert "/api/compile-allinone" in injected
+    assert "__SELECTED_DOCS" in injected
+    assert "fresh=1" in injected
+    # Fallback when recompile fails: a hard nav that escapes the SPA (?ts exempt).
+    assert "/documents?ts=" in injected
 
 
 def test_aio_guard_has_no_global_soft_warning():

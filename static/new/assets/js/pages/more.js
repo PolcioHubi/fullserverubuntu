@@ -198,10 +198,18 @@ const moreManager = {
         // mają własne handlery powyżej.)
 
         // --- Collapsible navigation header ---
-        const $scrollable = $("[data-standalone]");
-        const $nav = $(".dashboard-navigation");
-        const $largeTitle = $(".dashboard-navigation-large-title");
-        const $smallTitle = $(".dashboard-navigation-small-title");
+        // Scope to the ACTIVE page (same pattern as services.js, which works).
+        // In the All-in-One every page is in the DOM at once, so the old global
+        // $("[data-standalone]") / $(".dashboard-navigation-large-title") read
+        // the FIRST element in the document — another page's — making the scroll
+        // math wrong and leaving the large title stuck half-faded ("cień") after
+        // scrolling back to the top. In the normal app $root === document, so
+        // this is identical to the old behaviour (no regression).
+        const $root = $(window._spaActiveSection || document);
+        const $scrollable = $root.find("[data-standalone]");
+        const $nav = $root.find(".dashboard-navigation");
+        const $largeTitle = $root.find(".dashboard-navigation-large-title");
+        const $smallTitle = $root.find(".dashboard-navigation-small-title");
 
         const COLLAPSE_THRESHOLD = 0.7;
         const EXPAND_THRESHOLD = 0.35;

@@ -2,6 +2,7 @@ import atexit
 import bleach
 import click
 import gc
+import gzip
 import hashlib
 import hmac
 import json
@@ -653,7 +654,28 @@ def _inject_doc_guard_js(html_str: str, username: str, doc_key: str, files_folde
         "var t=document.createElement('div');t.className='doc-guard-toast';"
         "t.style.cssText='position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:9998;display:flex;align-items:center;gap:12px;max-width:calc(100vw - 24px);background:#1f2430;color:#eef1f4;padding:12px 14px;border-radius:14px;font:14px Inter,Arial,sans-serif;box-shadow:0 8px 28px rgba(0,0,0,.35);';"
         "var s=document.createElement('span');s.style.cssText='line-height:1.35;';s.textContent='Twoje dane są nowsze niż w tej wersji.';"
-        "var a=document.createElement('a');a.href=isAio?'/documents':'/';a.textContent=isAio?'Pobierz aktualny plik':'Wygeneruj ponownie';a.style.cssText='flex:none;background:#285ff4;color:#fff;padding:8px 14px;border-radius:999px;text-decoration:none;font-weight:600;font-size:13px;white-space:nowrap;';"
+        # CTA. W All-in-One musi REALNIE odświeżyć dane: <a href=/documents> był
+        # przechwytywany przez router SPA (zostawał w nieaktualnym AIO). Zamiast
+        # tego <button> (nie łapie go handler kliknięć SPA) jednym kliknięciem
+        # rekompiluje AIO (POST /api/compile-allinone z osadzonymi __SELECTED_DOCS
+        # + CSRF) i przeładowuje shell z ?fresh=1 (loader omija wtedy cache).
+        # Awaryjnie (błąd/CSRF) — twarda nawigacja do /documents (?ts omija router).
+        "var a;"
+        "if(isAio){"
+        "a=document.createElement('button');a.type='button';a.textContent='Pobierz aktualny plik';"
+        "a.addEventListener('click',function(){"
+        "if(a.disabled)return;a.disabled=true;a.textContent='Aktualizuję…';"
+        "var m=document.querySelector('meta[name=\"csrf-token\"]');"
+        "fetch('/api/compile-allinone',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','X-CSRFToken':m?m.getAttribute('content'):''},body:JSON.stringify({selected_docs:window.__SELECTED_DOCS||[]})})"
+        ".then(function(r){return r.json();}).then(function(d){"
+        "if(d&&d.success){window.location.replace('/user_files/allinone.html?fresh=1'+(window.location.hash||''));}"
+        "else{window.location.assign('/documents?ts='+Date.now());}})"
+        ".catch(function(){window.location.assign('/documents?ts='+Date.now());});"
+        "});"
+        "}else{"
+        "a=document.createElement('a');a.href='/';a.textContent='Wygeneruj ponownie';"
+        "}"
+        "a.style.cssText='flex:none;background:#285ff4;color:#fff;padding:8px 14px;border-radius:999px;text-decoration:none;font-weight:600;font-size:13px;white-space:nowrap;border:0;cursor:pointer;';"
         "var x=document.createElement('button');x.setAttribute('aria-label','Zamknij');x.textContent='×';x.style.cssText='flex:none;background:transparent;border:0;color:#aeb6c2;font-size:20px;line-height:1;cursor:pointer;padding:0 2px;';x.onclick=function(){t.remove();};"
         "t.appendChild(s);t.appendChild(a);t.appendChild(x);document.body.appendChild(t);"
         "setTimeout(function(){if(t.parentNode)t.remove();},12000);"
@@ -713,17 +735,35 @@ def _redact_form_data(form_data: dict) -> dict:
 
 
 def _get_import_zip_limits() -> tuple[int, int, int, int]:
+    # minimum=0 => wartość 0 oznacza "bez limitu" (nie jest podbijana do 1).
     max_uncompressed = _config_int(
-        "IMPORT_MAX_UNCOMPRESSED_BYTES", DEFAULT_IMPORT_MAX_UNCOMPRESSED_BYTES
+        "IMPORT_MAX_UNCOMPRESSED_BYTES", DEFAULT_IMPORT_MAX_UNCOMPRESSED_BYTES, minimum=0
     )
-    max_files = _config_int("IMPORT_MAX_FILES", DEFAULT_IMPORT_MAX_FILES)
+    max_files = _config_int("IMPORT_MAX_FILES", DEFAULT_IMPORT_MAX_FILES, minimum=0)
     max_single_file = _config_int(
-        "IMPORT_MAX_SINGLE_FILE_BYTES", DEFAULT_IMPORT_MAX_SINGLE_FILE_BYTES
+        "IMPORT_MAX_SINGLE_FILE_BYTES", DEFAULT_IMPORT_MAX_SINGLE_FILE_BYTES, minimum=0
     )
     max_ratio = _config_int(
-        "IMPORT_MAX_COMPRESSION_RATIO", DEFAULT_IMPORT_MAX_COMPRESSION_RATIO
+        "IMPORT_MAX_COMPRESSION_RATIO", DEFAULT_IMPORT_MAX_COMPRESSION_RATIO, minimum=0
     )
     return max_uncompressed, max_files, max_single_file, max_ratio
+
+
+def _lift_upload_limit_for_import():
+    """Zdejmij globalny limit uploadu (MAX_CONTENT_LENGTH) TYLKO dla tras importu
+    backupu (funkcja admina; archiwum jest strumieniowane na dysk przez
+    ``file.save``, nie buforowane w pamięci) — backupy bywają duże.
+
+    Ustawiamy bardzo wysoki limit per-request (efektywnie bez limitu, ograniczone
+    tylko miejscem na dysku). Globalny ``MAX_CONTENT_LENGTH`` zostaje nietknięty dla
+    pozostałych endpointów (ochrona przed memory-DoS z dużych ciał, np. JSON).
+    Konfigurowalne przez ``IMPORT_MAX_UPLOAD_BYTES`` (bajty); 0/brak → ~1 TiB."""
+    try:
+        request.max_content_length = (
+            _config_int("IMPORT_MAX_UPLOAD_BYTES", 0, minimum=0) or (1 << 40)
+        )
+    except Exception:
+        pass
 
 
 def _sanitize_log_action(action: str, max_length: int = 200) -> str:
@@ -741,6 +781,20 @@ def _disable_sensitive_cache_headers(response):
     return response
 
 
+def _gzip_uncompressed_size(gz_path):
+    """Rozmiar NIESKOMPRESOWANY z trailera gzip (ostatnie 4 bajty = ISIZE mod 2^32).
+
+    Dokładny dla plików < 4 GiB (payload All-in-One to ~45 MB). Pozwala podać
+    loaderowi prawdziwy ``X-Payload-Size`` bez trzymania nieskompresowanego pliku
+    na dysku. Zwraca ``None`` przy błędzie odczytu."""
+    try:
+        with open(gz_path, "rb") as fh:
+            fh.seek(-4, os.SEEK_END)
+            return int.from_bytes(fh.read(4), "little")
+    except OSError:
+        return None
+
+
 def _private_revalidate_cache_headers(response):
     """Cache prywatny z obowiązkową rewalidacją (dla dużego pliku All-in-One).
 
@@ -751,6 +805,21 @@ def _private_revalidate_cache_headers(response):
     304 (bez ponownego transferu ~40 MB), a po przekompilowaniu — nowym ETagiem i
     pełnym pobraniem. NIE używamy ``no-store`` (zakazałby cache w ogóle)."""
     response.headers["Cache-Control"] = "private, no-cache"
+    response.headers.pop("Pragma", None)
+    response.headers.pop("Expires", None)
+    return response
+
+
+def _payload_reuse_cache_headers(response):
+    """Krótki ``max-age`` dla payloadu All-in-One — eliminuje DRUGIE żądanie.
+
+    Shell pobiera payload strumieniowo (pasek %), a zaraz potem (ułamek sekundy)
+    nawiguje pod jego adres. Z ``no-cache`` ta nawigacja musiałaby rewalidować
+    (drugie żądanie/304). Z krótkim ``max-age`` świeżo pobrana kopia jest jeszcze
+    „świeża", więc nawigacja bierze ją z cache BEZ sieci — payload leci po sieci
+    tylko RAZ. Okno (10 s) jest na tyle krótkie, że kolejne otwarcia i tak
+    rewalidują ETag (świeżo po rekompilacji) i nie obejmie ono rekompilacji."""
+    response.headers["Cache-Control"] = "private, max-age=10"
     response.headers.pop("Pragma", None)
     response.headers.pop("Expires", None)
     return response
@@ -1421,11 +1490,22 @@ def get_admin_excluded_usernames():
     return list(excluded)
 
 
+def _secure_str_eq(a, b) -> bool:
+    """Constant-time string comparison that TOLERATES non-ASCII input.
+
+    ``hmac.compare_digest`` raises ``TypeError`` ("comparing strings with
+    non-ASCII characters is not supported") when given a ``str`` with non-ASCII
+    characters. Polish letters (ą, ę, ł…) are allowed in usernames, so the raw
+    call crashed login and admin operations (HTTP 500) for such accounts.
+    Comparing UTF-8 bytes is just as timing-safe and accepts any input."""
+    return hmac.compare_digest(str(a).encode("utf-8"), str(b).encode("utf-8"))
+
+
 def is_configured_admin_username(username: str) -> bool:
     return bool(
         username
         and any(
-            hmac.compare_digest(str(username), admin_username)
+            _secure_str_eq(username, admin_username)
             for admin_username in get_admin_excluded_usernames()
         )
     )
@@ -1451,7 +1531,14 @@ def handle_error(e):
     if code == 404:
         message = "Resource not found."
 
-    logging.error(f"HTTP Error {code}: {message}", exc_info=True)
+    if code >= 500:
+        # Genuine server error — log at ERROR with a full traceback.
+        logging.error(f"HTTP Error {code}: {message}", exc_info=True)
+    else:
+        # Client errors (404/400/401: bots, mistyped URLs, expired CSRF tokens)
+        # are routine — log a single WARNING line WITHOUT a stack trace, so real
+        # 5xx errors aren't buried under hundreds of benign 404 tracebacks.
+        logging.warning(f"HTTP Error {code}: {message}")
     response = jsonify({"success": False, "error": message})
     response.status_code = code
     return response
@@ -1520,6 +1607,24 @@ def require_admin_login(f):
             # Otherwise, redirect to the login page
             return redirect(url_for("admin_login"))
         return f(*args, **kwargs)
+
+    return decorated_function
+
+
+def login_or_admin_required(f):
+    """Allow flask-login authenticated users OR a logged-in admin (session
+    ``admin_logged_in``).
+
+    The admin panel authenticates via a session flag, NOT flask-login, so a plain
+    ``@login_required`` 302-redirected the admin's requests for user files — e.g.
+    the photo-preview ``<img>`` in the user-logs modal silently failed. The view
+    body still does the fine-grained authorization (owner vs admin)."""
+
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if current_user.is_authenticated or session.get("admin_logged_in"):
+            return f(*args, **kwargs)
+        return login_manager.unauthorized()
 
     return decorated_function
 
@@ -1810,10 +1915,16 @@ def calculate_file_hash(filepath: str) -> str | None:
 ALLOWED_IMPORT_ROOTS = {"user_data", "auth_data"}
 REQUIRED_IMPORT_DB_TABLES = {"users"}
 REQUIRED_USERS_COLUMNS = {"username", "password"}
-DEFAULT_IMPORT_MAX_UNCOMPRESSED_BYTES = 2 * 1024 * 1024 * 1024
-DEFAULT_IMPORT_MAX_FILES = 10_000
-DEFAULT_IMPORT_MAX_SINGLE_FILE_BYTES = 512 * 1024 * 1024
-DEFAULT_IMPORT_MAX_COMPRESSION_RATIO = 100
+# Limity rozmiaru importu: 0 = BEZ LIMITU (na życzenie — duże backupy). Import to
+# funkcja admina, a archiwum jest strumieniowane na dysk, więc rozmiar to polityka,
+# nie pamięć. ZACHOWUJEMY guard współczynnika kompresji (ochrona przed "zip-bombą":
+# malutkim plikiem rozpakowującym się do gigabajtów i zapychającym dysk). Nie
+# blokuje realnych backupów (te kompresują się dużo poniżej 100×); wyłączysz go
+# ustawiając IMPORT_MAX_COMPRESSION_RATIO=0.
+DEFAULT_IMPORT_MAX_UNCOMPRESSED_BYTES = 0  # bez limitu
+DEFAULT_IMPORT_MAX_FILES = 0  # bez limitu
+DEFAULT_IMPORT_MAX_SINGLE_FILE_BYTES = 0  # bez limitu
+DEFAULT_IMPORT_MAX_COMPRESSION_RATIO = 100  # guard zip-bomby (0 = wyłączony)
 
 
 def _schema_update_spec() -> tuple[dict[str, list[tuple[str, str]]], list[str]]:
@@ -2072,16 +2183,17 @@ def validate_backup_zip_structure(zip_path: str) -> tuple[bool, list[str]]:
                 file_count += 1
                 total_uncompressed_size += member_info.file_size
 
-                if file_count > max_files:
+                # Limit <= 0 oznacza "bez limitu" — pomijamy sprawdzenie.
+                if max_files > 0 and file_count > max_files:
                     issues.append(
                         f"Archiwum zawiera zbyt wiele plików ({file_count} > {max_files})."
                     )
-                if member_info.file_size > max_single_file_bytes:
+                if max_single_file_bytes > 0 and member_info.file_size > max_single_file_bytes:
                     issues.append(
                         f"Plik {member} przekracza dopuszczalny rozmiar po rozpakowaniu "
                         f"({member_info.file_size} > {max_single_file_bytes} bajtów)."
                     )
-                if total_uncompressed_size > max_uncompressed_bytes:
+                if max_uncompressed_bytes > 0 and total_uncompressed_size > max_uncompressed_bytes:
                     issues.append(
                         "Suma rozmiarów plików po rozpakowaniu przekracza dopuszczalny limit "
                         f"({total_uncompressed_size} > {max_uncompressed_bytes} bajtów)."
@@ -2093,7 +2205,8 @@ def validate_backup_zip_structure(zip_path: str) -> tuple[bool, list[str]]:
                         issues.append(
                             f"Plik {member} ma nieprawidłowy rozmiar skompresowany (0 bajtów)."
                         )
-                else:
+                elif max_compression_ratio > 0:
+                    # Guard "zip-bomby" — domyślnie aktywny (0 = wyłączony).
                     compression_ratio = member_info.file_size / compressed_size
                     if compression_ratio > max_compression_ratio:
                         issues.append(
@@ -3402,9 +3515,9 @@ def admin_login():
             admin_user_env = os.environ.get("ADMIN_USERNAME")
             admin_pass_env = os.environ.get("ADMIN_PASSWORD")
 
-            # Use hmac.compare_digest to prevent timing attacks
-            username_match = hmac.compare_digest(username, admin_user_env or "")
-            password_match = hmac.compare_digest(password, admin_pass_env or "")
+            # Timing-safe compare; _secure_str_eq tolerates non-ASCII (no TypeError).
+            username_match = _secure_str_eq(username, admin_user_env or "")
+            password_match = _secure_str_eq(password, admin_pass_env or "")
 
             if username_match and password_match:
                 _regenerate_server_session()
@@ -3655,7 +3768,7 @@ def api_get_user_logs(username):
         return admin_user_management_forbidden_response()
 
     try:
-        user_folder, _, logs_folder = create_user_folder(username)
+        user_folder, files_folder, logs_folder = create_user_folder(username)
 
         logs = []
         submissions = []
@@ -3684,17 +3797,25 @@ def api_get_user_logs(username):
                     f"Error reading or parsing form_submissions.log for {username}: {e}"
                 )
 
-        # Pobierz listę plików z bazy danych
-        files_obj = statistics_service.get_user_files(username)
-        files = [
-            {
-                "name": f.filename,
-                "path": f.filepath,
-                "size": f.size,
-                "modified": f.modified_at,
-            }
-            for f in files_obj
-        ]
+        # Lista plików z DYSKU (źródło prawdy). Wcześniej brana z bazy
+        # (get_user_files), ale gdy plik nie był zapisany w DB (np. zdjęcie, albo
+        # po resecie bazy) admin nie widział go ani podglądu zdjęcia. Skan katalogu
+        # zawsze odzwierciedla rzeczywiste pliki użytkownika.
+        files = []
+        try:
+            if os.path.isdir(files_folder):
+                for fname in sorted(os.listdir(files_folder)):
+                    fpath = os.path.join(files_folder, fname)
+                    if os.path.isfile(fpath):
+                        st = os.stat(fpath)
+                        files.append({
+                            "name": fname,
+                            "path": fpath,
+                            "size": st.st_size,
+                            "modified": datetime.fromtimestamp(st.st_mtime).isoformat(),
+                        })
+        except OSError as e:
+            logging.error(f"Error listing files on disk for {username}: {e}")
 
         return jsonify(
             {"success": True, "logs": logs, "submissions": submissions, "files": files}
@@ -4506,8 +4627,8 @@ def login():
 
             admin_user_env = os.environ.get("ADMIN_USERNAME")
             admin_pass_env = os.environ.get("ADMIN_PASSWORD")
-            if admin_user_env and hmac.compare_digest(username, admin_user_env):
-                if admin_pass_env and hmac.compare_digest(password, admin_pass_env):
+            if admin_user_env and _secure_str_eq(username, admin_user_env):
+                if admin_pass_env and _secure_str_eq(password, admin_pass_env):
                     _regenerate_server_session()
                     session["admin_logged_in"] = True
                     session["admin_username"] = username
@@ -4603,7 +4724,7 @@ def profile():
 
 
 @app.route("/user_files/<username>/<path:filename>")
-@login_required
+@login_or_admin_required
 def serve_user_file(username, filename):
     # Defence in depth: re-validate the username and filename here instead of
     # trusting that registration always rejected forbidden chars. A regression
@@ -4862,11 +4983,57 @@ def user_files(filename):
         )
         return jsonify(success=False, error="Nieprawidlowa sciezka pliku"), 400
 
+    base = os.path.basename(filename)
+
+    # Payload All-in-One trzymamy na dysku TYLKO spakowany (.gz) — przeglądarki
+    # zawsze proszą o gzip, więc nieskompresowany 45 MB plik tylko zajmowałby
+    # miejsce. Obsługujemy go ZANIM zadziała ogólny warunek istnienia pliku,
+    # bo nieskompresowany plain zwykle nie istnieje.
+    if base == "allinone.payload.html":
+        gz_path = file_path + ".gz"
+        accepts_gzip = "gzip" in request.headers.get("Accept-Encoding", "").lower()
+        if os.path.exists(gz_path):
+            uncompressed = _gzip_uncompressed_size(gz_path)
+            if accepts_gzip:
+                # Serwuj gotowy .gz (Content-Encoding: gzip) — bezstratnie, ~30%
+                # mniej transferu, zero kompresji CPU per-request. X-Payload-Size =
+                # rozmiar NIESKOMPRESOWANY (z trailera gzip), żeby loader liczył %.
+                resp = send_from_directory(files_folder, base + ".gz", conditional=True)
+                resp.headers["Content-Encoding"] = "gzip"
+                resp.headers["Content-Type"] = "text/html; charset=utf-8"
+                resp.headers["Vary"] = "Accept-Encoding"
+                resp = _payload_reuse_cache_headers(resp)
+                if uncompressed is not None:
+                    resp.headers["X-Payload-Size"] = str(uncompressed)
+                return resp
+            # Rzadko: klient bez gzip — rozpakuj w locie (nie trzymamy plain).
+            try:
+                with open(gz_path, "rb") as fh:
+                    data = gzip.decompress(fh.read())
+            except OSError:
+                return jsonify(success=False, error="Plik nie znaleziony"), 404
+            resp = make_response(data)
+            resp.headers["Content-Type"] = "text/html; charset=utf-8"
+            resp.headers["Vary"] = "Accept-Encoding"
+            resp = _payload_reuse_cache_headers(resp)
+            resp.headers["X-Payload-Size"] = str(len(data))
+            return resp
+        # Zaszłość: starsze kompilacje mogły zostawić nieskompresowany payload.
+        if os.path.exists(file_path):
+            response = send_from_directory(files_folder, filename, conditional=True)
+            response = _payload_reuse_cache_headers(response)
+            try:
+                response.headers["X-Payload-Size"] = str(os.path.getsize(file_path))
+            except OSError:
+                pass
+            return response
+        return jsonify(success=False, error="Plik nie znaleziony"), 404
+
     if os.path.exists(file_path):
-        response = send_from_directory(files_folder, filename, conditional=True)
         # All-in-One bywa duży (~40 MB). Pozwól go zcache'ować prywatnie z rewalidacją
         # ETag, żeby kolejne otwarcia szły z dysku (304) zamiast pełnego pobrania.
-        if os.path.basename(filename) == "allinone.html":
+        response = send_from_directory(files_folder, filename, conditional=True)
+        if base == "allinone.html":
             return _private_revalidate_cache_headers(response)
         return _disable_sensitive_cache_headers(response)
     else:
@@ -4935,7 +5102,7 @@ def api_compile_allinone():
         result_path = compiler.compile()
         log_user_action(f"Compiled All-in-One with documents: {selected_docs}")
 
-        # Zapisz metadane pliku w bazie
+        # Zapisz metadane pliku w bazie (shell + ciężki payload osobno).
         allinone_hash = calculate_file_hash(output_path) or ""
         allinone_size = os.path.getsize(output_path) if os.path.exists(output_path) else 0
         statistics_service.add_or_update_file(
@@ -4945,6 +5112,16 @@ def api_compile_allinone():
             size=allinone_size,
             file_hash=allinone_hash,
         )
+        # Payload trzymamy tylko spakowany (.gz) — jego metadane rejestrujemy.
+        payload_gz_path = os.path.join(files_folder, "allinone.payload.html.gz")
+        if os.path.exists(payload_gz_path):
+            statistics_service.add_or_update_file(
+                username=user_name,
+                filename="allinone.payload.html.gz",
+                filepath=payload_gz_path,
+                size=os.path.getsize(payload_gz_path),
+                file_hash=calculate_file_hash(payload_gz_path) or "",
+            )
         db.session.commit()
 
         return jsonify({
@@ -5030,6 +5207,7 @@ def api_aio_heartbeat():
 @require_admin_login
 def api_validate_import_data():
     """Validate backup ZIP compatibility without mutating current data."""
+    _lift_upload_limit_for_import()
     if "backupFile" not in request.files:
         return _admin_error("Brak pliku w żądaniu.", 400, "IMPORT_FILE_MISSING")
 
@@ -5116,6 +5294,7 @@ def api_validate_import_data():
 @require_admin_login
 def api_import_all_data():
     """Import data from backup ZIP with pre-validation and rollback-safe swap."""
+    _lift_upload_limit_for_import()
     if not import_operation_lock.acquire(blocking=False):
         return _admin_error(
             "Import jest już w trakcie wykonywania.",

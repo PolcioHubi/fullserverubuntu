@@ -1,5 +1,5 @@
 // All-in-One dedicated Service Worker
-const CACHE_NAME = 'allinone-v7';
+const CACHE_NAME = 'allinone-v8';
 
 self.addEventListener('install', (e) => {
     self.skipWaiting();
@@ -18,6 +18,18 @@ self.addEventListener('fetch', (e) => {
     if (e.request.method !== 'GET' || url.origin !== self.location.origin) return;
 
     const path = url.pathname;
+
+    // The All-in-One shell (allinone.html) and its heavy ~45 MB payload
+    // (allinone.payload.html) must BYPASS the SW entirely: let the browser
+    // fetch/stream/revalidate them natively. Routing them through the SW added a
+    // redundant ~40 MB Cache Storage write (quota pressure on phones) and — worse —
+    // a network-failure fallback (caches.match() -> undefined on a miss ->
+    // respondWith(undefined)) that blanked the navigation with no visible request.
+    // The shell is also loaded as a blob: navigation after this, which is out of
+    // SW scope anyway. Excluding both kills the white-screen-no-request path.
+    if (path.endsWith('/allinone.html') || path.endsWith('/allinone.payload.html')) {
+        return;
+    }
 
     // /user_files/*.html — recompiled per click, must never come from cache.
     // Otherwise users see stale JS handlers after recompile (regression observed

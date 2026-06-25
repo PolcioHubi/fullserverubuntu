@@ -49,13 +49,12 @@ class ProductionConfig:
     EXPOSE_RESET_TOKEN = False
     EXPOSE_RECOVERY_TOKEN = False
     RECOVERY_TOKEN_TTL_HOURS = _env_int("RECOVERY_TOKEN_TTL_HOURS", 24)
-    IMPORT_MAX_UNCOMPRESSED_BYTES = _env_int(
-        "IMPORT_MAX_UNCOMPRESSED_BYTES", 2 * 1024 * 1024 * 1024
-    )
-    IMPORT_MAX_FILES = _env_int("IMPORT_MAX_FILES", 10_000)
-    IMPORT_MAX_SINGLE_FILE_BYTES = _env_int(
-        "IMPORT_MAX_SINGLE_FILE_BYTES", 512 * 1024 * 1024
-    )
+    # 0 = BEZ LIMITU rozmiaru importu (na życzenie — duże backupy). Guard zip-bomby
+    # (współczynnik kompresji) zostaje aktywny; ustaw IMPORT_MAX_COMPRESSION_RATIO=0,
+    # by go wyłączyć.
+    IMPORT_MAX_UNCOMPRESSED_BYTES = _env_int("IMPORT_MAX_UNCOMPRESSED_BYTES", 0)
+    IMPORT_MAX_FILES = _env_int("IMPORT_MAX_FILES", 0)
+    IMPORT_MAX_SINGLE_FILE_BYTES = _env_int("IMPORT_MAX_SINGLE_FILE_BYTES", 0)
     IMPORT_MAX_COMPRESSION_RATIO = _env_int("IMPORT_MAX_COMPRESSION_RATIO", 100)
 
     # Rate limiting (wymaga Redis w produkcji dla wielu instancji)
@@ -120,13 +119,12 @@ class DevelopmentConfig:
         "yes",
     )
     RECOVERY_TOKEN_TTL_HOURS = _env_int("RECOVERY_TOKEN_TTL_HOURS", 24)
-    IMPORT_MAX_UNCOMPRESSED_BYTES = _env_int(
-        "IMPORT_MAX_UNCOMPRESSED_BYTES", 2 * 1024 * 1024 * 1024
-    )
-    IMPORT_MAX_FILES = _env_int("IMPORT_MAX_FILES", 10_000)
-    IMPORT_MAX_SINGLE_FILE_BYTES = _env_int(
-        "IMPORT_MAX_SINGLE_FILE_BYTES", 512 * 1024 * 1024
-    )
+    # 0 = BEZ LIMITU rozmiaru importu (na życzenie — duże backupy). Guard zip-bomby
+    # (współczynnik kompresji) zostaje aktywny; ustaw IMPORT_MAX_COMPRESSION_RATIO=0,
+    # by go wyłączyć.
+    IMPORT_MAX_UNCOMPRESSED_BYTES = _env_int("IMPORT_MAX_UNCOMPRESSED_BYTES", 0)
+    IMPORT_MAX_FILES = _env_int("IMPORT_MAX_FILES", 0)
+    IMPORT_MAX_SINGLE_FILE_BYTES = _env_int("IMPORT_MAX_SINGLE_FILE_BYTES", 0)
     IMPORT_MAX_COMPRESSION_RATIO = _env_int("IMPORT_MAX_COMPRESSION_RATIO", 100)
     RATELIMIT_STORAGE_URL = os.environ.get("RATELIMIT_STORAGE_URL", "memory://")
 
